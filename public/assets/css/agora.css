@@ -1,0 +1,281 @@
+.fi-page-header-widgets {
+    --cols-lg: repeat(1, minmax(0, 1fr))!important;
+}
+body{
+}
+.fi-timeline-item-heading{
+    justify-content: space-between!important;
+}
+.fi-timeline-section-content .flex-col{
+
+    margin-bottom: 10px!important;
+}
+
+
+._messenger-body {
+    background-color: #fff;
+    box-shadow: 0px 4px 15px rgba(55, 165, 155, 0.1019607843);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.messages-content {
+    padding: 10px;
+}
+@media (max-width: 767px) {
+    .messages-content {
+        padding: 5px;
+    }
+}
+.messages-content .messages-list {
+    max-height: 446px;
+    overflow-y: auto;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #37a59b #f1f1f1;
+}
+@media (max-width: 767px) {
+    .messages-content .messages-list {
+        padding: 10px;
+    }
+}
+.messages-content .messages-list::-webkit-scrollbar {
+    background-color: #f1f1f1;
+    width: 4px;
+    border-radius: 3px;
+}
+.messages-content .messages-list::-webkit-scrollbar-thumb {
+    background-color: #37a59b;
+    border-radius: 3px;
+}
+
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.message-item:last-of-type {
+    margin-bottom: 0;
+}
+.message-item .user-img {
+    width: 44px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background-color: #e2f2f1;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0c8c5;
+    margin-inline-end: 6px;
+}
+.message-item .user-img img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+@media (max-width: 767px) {
+    .message-item .user-img {
+        width: 30px;
+        font-size: 14px;
+    }
+}
+.message-item .message-content {
+    max-width: 463px;
+    background-color: #f5fbfb;
+    border-radius: 7px;
+    border-start-start-radius: 0;
+    position: relative;
+    padding: 12px 17px;
+}
+@media (max-width: 767px) {
+    .message-item .message-content {
+        padding: 10px;
+        max-width: calc(100% - 66px);
+    }
+}
+.message-item .message-content p {
+    font-size: 14px;
+    color: #343434;
+    line-height: 1.57142857;
+    text-align: start;
+    margin: 0;
+    padding-inline-end: 10px;
+}
+@media (max-width: 767px) {
+    .message-item .message-content p {
+        font-size: 12px;
+        padding: 0;
+    }
+}
+.message-item .message-content img {
+    border-radius: 7px;
+    max-width: 100%;
+}
+.message-item .message-content .date {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 11px;
+    color: #a8a8a8;
+    font-weight: 400;
+    margin-top: 8px;
+    line-height: 1.6363636;
+}
+@media (max-width: 767px) {
+    .message-item .message-content .date {
+        font-size: 10px;
+    }
+}
+.message-item .message-content::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-end: 100%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 6px 0 0;
+    border-color: #f5fbfb transparent transparent transparent;
+}
+.message-item.received {
+    flex-direction: row-reverse;
+}
+.message-item.received .user-img {
+    margin: 0;
+    margin-inline-start: 6px;
+}
+.message-item.received .message-content {
+    border-radius: 7px;
+    border-start-end-radius: 0;
+}
+.message-item.received .message-content p {
+    text-align: end;
+    padding: 0;
+    padding-inline-start: 10px;
+}
+@media (max-width: 767px) {
+    .message-item.received .message-content p {
+        padding: 0;
+    }
+}
+.message-item.received .message-content .date {
+    justify-content: flex-end;
+}
+.message-item.received .message-content::after {
+    inset-inline-end: unset;
+    inset-inline-start: 100%;
+    border-width: 0 6px 10px 0;
+    border-color: transparent #f5fbfb transparent transparent;
+}
+
+.message-form {
+    background-color: #d5ebe9;
+    border-radius: 0px 0px 10px 10px;
+    padding: 14px 30px 13px;
+    display: flex;
+    align-items: flex-end;
+    gap: 11px;
+}
+@media (max-width: 767px) {
+    .message-form {
+        gap: 5px;
+        padding: 12px 10px;
+    }
+}
+.message-form .input-content {
+    width: calc(100% - 59px);
+    position: relative;
+}
+@media (max-width: 767px) {
+    .message-form .input-content {
+        width: calc(100% - 53px);
+    }
+}
+.message-form .message-media {
+    position: absolute;
+    bottom: 0;
+    height: 48px;
+    width: 48px;
+    inset-inline-end: 0;
+    padding-inline-end: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    fill: #37a59b;
+    border-end-end-radius: 24px;
+    border-start-end-radius: 24px;
+    cursor: pointer;
+}
+.message-form .message-media input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+.message-form .message-media svg {
+    max-width: 24px;
+}
+.message-form .message-input {
+    width: 100%;
+    min-height: 48px;
+    max-height: 158px;
+    overflow-y: auto;
+    border-radius: 24px;
+    padding: 13px 25px;
+    padding-inline-end: 60px;
+    background-color: #fff;
+    font-size: 14px;
+    line-height: 1.57142857;
+    color: #343434;
+    cursor: text;
+    word-break: break-word;
+    scrollbar-width: thin;
+    scrollbar-color: #37a59b #f1f1f1;
+}
+.message-form .message-input::before {
+    content: attr(data-placeholder);
+    color: #9b9b9b;
+    display: none;
+}
+.message-form .message-input:empty::before {
+    display: block;
+}
+.message-form .message-input::-webkit-scrollbar {
+    background-color: #f1f1f1;
+    width: 4px;
+    border-radius: 3px;
+}
+.message-form .message-input::-webkit-scrollbar-thumb {
+    background-color: #37a59b;
+    border-radius: 3px;
+}
+.message-form .message-send {
+    width: 48px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #37a59b;
+    border: 2px solid #37a59b;
+    fill: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease-in-out;
+}
+.message-form .message-send svg {
+    max-width: 24px;
+}
+html[dir=rtl] .message-form .message-send svg {
+    transform: scaleX(-1);
+}
+.message-form .message-send:hover {
+    background-color: #fff;
+    fill: #37a59b;
+}

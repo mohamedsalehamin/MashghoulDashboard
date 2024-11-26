@@ -1,0 +1,168 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\ContentModule\Models\BanksAccount;
+use App\ContentModule\Models\City;
+use App\DefaultPanel\Enum\UserStatus;
+use App\Notifications\YourAccountActivatedNotification;
+use App\Notifications\YourAccountInActivatedNotification;
+use App\UsersModule\Models\DeviceToken;
+use App\UsersModule\Models\User\Doctor;
+use App\UsersModule\Models\User\Lab;
+use App\UsersModule\Models\User\Patient;
+use App\UsersModule\Models\VerificationCode;
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use ChristianKuri\LaravelFavorite\Traits\Favoriteability;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable implements HasMedia, FilamentUser, HasLocalePreference {
+    use HasApiTokens, HasFactory, Notifiable;
+    use HasRoles, InteractsWithMedia;
+    use HasPanelShield, Favoriteability;
+
+    protected $table = 'users';
+    public $guard_name = 'web';
+
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'active',
+        'api_token',
+        'password',
+        'phone_verified_at',
+        'settings',
+        'city_id',
+        'dob',
+        'gender',
+        'data',
+        'id_number'
+
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'settings' => 'array',
+        'data' => 'array',
+        'active' => UserStatus::class
+    ];
+
+    public function setPasswordAttribute($value): void {
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
+    }
+
+
+    public function getMorphClass(): string {
+        return User::class;
+    }
+    public function provider(): HasOne {
+        return $this->hasOne(\App\UsersModule\Models\Provider::class, "user_id");
+    }
+
+    public function setPhoneAttribute($value): void {
+        $this->attributes['phone'] = \Str::replace(' ', '', $value);
+    }
+
+    public function getStatusAttribute($value) {
+        return $this->active->value;
+    }
+
+    public function toggleActive(): bool {
+        if ($this->active->value) {
+
+            $this->notify(new YourAccountInActivatedNotification());
+            return $this->update(['active' => 0]);
+        }
+        $this->notify(new YourAccountActivatedNotification());
+        return $this->update(['active' => 1]);
+    }
+
+    public function deviceTokens(): HasMany {
+        return $this->hasMany(DeviceToken::class, "user_id");
+    }
+
+    public function notifications() {
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
+
+    }
+
+    public function isFirstTimeToLogin(): bool {
+        return !$this->remember_token;
+    }
+
+    public function verified(): int {
+        return !is_null($this->phone_verified_at);
+    }
+    public function bankAccount(): HasOne {
+        return $this->hasOne(BanksAccount::class, "user_id");
+    }
+    public function verificationCodes(): HasMany {
+        return $this->hasMany(VerificationCode::class, "user_id");
+    }
+
+    public function preferredLocale() {
+        return 'ar';
+    }
+
+    public function addresses() {
+        return $this->hasMany(AddressBook::class);
+    }
+
+    public function toCustomer(): HasOne {
+        return $this->hasOne(Customer::class, 'id');
+    }
+
+    public function actAs($model) {
+        return $this->hasOne($model, 'id')->first();
+    }
+
+    public function city() {
+        return $this->belongsTo(City::class);
+    }
+
+    public function patient() {
+        return $this->hasOne(Patient::class, 'id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool {
+        return !$this->hasRole(['customer']) && $this->active->value == 1;
+    }
+
+
+}

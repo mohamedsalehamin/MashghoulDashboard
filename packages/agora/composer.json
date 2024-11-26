@@ -1,0 +1,68 @@
+{
+    "name": "tasawk/agora",
+    "description": "This is my package agora",
+    "keywords": [
+        "tasawk",
+        "laravel",
+        "agora"
+    ],
+    "homepage": "https://github.com/tasawk/agora",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ahmed Mostafa",
+            "email": "ahmed.mostafa.dev.eg@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "spatie/laravel-package-tools": "^1.14.0",
+        "illuminate/contracts": "^10.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^6.1",
+        "orchestra/testbench": "^8.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tasawk\\Agora\\": "src",
+            "Tasawk\\Agora\\Database\\Factories\\": "database/factories"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tasawk\\Agora\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tasawk\\Agora\\AgoraServiceProvider"
+            ],
+            "aliases": {
+                "Agora": "Tasawk\\Agora\\Facades\\Agora"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

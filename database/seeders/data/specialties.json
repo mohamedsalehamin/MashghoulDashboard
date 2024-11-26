@@ -1,0 +1,72 @@
+[
+  {
+    "name": {
+      "ar": "جلدية",
+      "en": "Leather"
+    },
+    "image": "images/specialties/1.svg"
+  },
+  {
+    "name": {
+      "ar": "أسنان",
+      "en": "Teeth"
+    },
+    "image": "images/specialties/2.svg"
+  },
+  {
+    "name": {
+      "ar": "نفسي",
+      "en": "Psychological"
+    },
+    "image": "images/specialties/3.svg"
+  },
+  {
+    "name": {
+      "ar": "أطفال وحديثي الولادة",
+      "en": "Children and newborns"
+    },
+    "image": "images/specialties/4.svg"
+  },
+  {
+    "name": {
+      "ar": "مخ وأعصاب",
+      "en": "Neurologists"
+    },
+    "image": "images/specialties/5.svg"
+  },
+  {
+    "name": {
+      "ar": "عظام",
+      "en": "Bones"
+    },
+    "image": "images/specialties/6.svg"
+  },
+  {
+    "name": {
+      "ar": "نساء وتوليد",
+      "en": "Gynecology and obstetrics"
+    },
+    "image": "images/specialties/7.svg"
+  },
+  {
+    "name": {
+      "ar": "أنف وأذن وحنجرة",
+      "en": "Ear, Nose and Throat"
+    },
+    "image": "images/specialties/8.svg"
+  },
+  {
+    "name": {
+      "ar": "قلب وأوعية دموية",
+      "en": "Heart and blood vessels"
+    },
+    "image": "images/specialties/9.svg"
+  },
+  {
+    "name": {
+      "ar": "باطنة",
+      "en": "Internal"
+    },
+    "image": "images/specialties/10.svg"
+  }
+]
