@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->foreignId('reservation_id');
             $table->integer('rate')->default(0);
             $table->longText('comment')->nullable();
+            $table->longText('type')->nullable();
             $table->timestamps();
         });
     }

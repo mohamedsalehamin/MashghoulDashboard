@@ -13,10 +13,7 @@ class CreateVerificationCodesTable extends Migration {
     public function up() {
         Schema::create('verification_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")
-                ->constrained("users")
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+            $table->foreignId("user_id")->nullable();
             $table->string("phone");
             $table->string("code");
             $table->timestamp("expired_at")->nullable();

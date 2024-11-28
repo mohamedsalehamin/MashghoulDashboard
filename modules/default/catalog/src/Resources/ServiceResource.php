@@ -74,7 +74,12 @@ class ServiceResource extends Resource {
                         ->addActionLabel(__('panel.actions.add'))
                         ->label('')
                         ->schema([
-                            TextInput::make('title')->required(),
+                            TextInput::make('title.ar')
+                                ->formatStateUsing(fn($record)=>$record->getTranslation("title","ar"))
+                                ->label(__("forms.fields.title_ar"))->required(),
+                            TextInput::make('title.en')->label(__("forms.fields.title_en"))
+                                ->formatStateUsing(fn($record)=>$record->getTranslation("title","en"))
+                                ->required(),
                             TextInput::make('price')->required()->formatStateUsing(fn($record) =>  $record?->price?->formatByDecimal()),
                         ])->relationship('products'),
                 ])->columnSpan(1),
@@ -169,8 +174,6 @@ class ServiceResource extends Resource {
         return $record->name;
     }
 
-    public static function getNavigationGroup(): ?string {
-        return __('menu.payments');
-    }
+
 
 }

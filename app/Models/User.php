@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\BanksAccount;
 use App\ContentModule\Models\City;
 use App\DefaultPanel\Enum\UserStatus;
@@ -27,11 +28,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
+use Theamostafa\Wallet\Traits\HasWallet;
 
 class User extends Authenticatable implements HasMedia, FilamentUser, HasLocalePreference {
     use HasApiTokens, HasFactory, Notifiable;
     use HasRoles, InteractsWithMedia;
-    use HasPanelShield, Favoriteability;
+    use HasPanelShield, Favoriteability, HasWallet;
 
     protected $table = 'users';
     public $guard_name = 'web';
@@ -91,6 +93,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     public function getMorphClass(): string {
         return User::class;
     }
+
     public function provider(): HasOne {
         return $this->hasOne(\App\UsersModule\Models\Provider::class, "user_id");
     }
@@ -129,9 +132,11 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     public function verified(): int {
         return !is_null($this->phone_verified_at);
     }
+
     public function bankAccount(): HasOne {
         return $this->hasOne(BanksAccount::class, "user_id");
     }
+
     public function verificationCodes(): HasMany {
         return $this->hasMany(VerificationCode::class, "user_id");
     }
@@ -164,5 +169,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
         return !$this->hasRole(['customer']) && $this->active->value == 1;
     }
 
-
+    public function reservations(): HasMany {
+        return $this->hasMany(Reservation::class, 'user_id');
+    }
 }

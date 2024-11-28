@@ -3,35 +3,25 @@
 namespace App\ProviderPanel\Filament\Resources;
 
 use App\CatalogModule\Models\Reservation;
-use App\CatalogModule\Resources\ConsultingReservationResource\Actions\CancelReservationAction;
-use App\CatalogModule\Resources\ConsultingReservationResource\Actions\CompleteReservationAction;
-use App\CatalogModule\Resources\ConsultingReservationResource\Actions\PatientNotAttendReservationAction;
-use App\CatalogModule\Resources\ConsultingReservationResource\Actions\ScheduleReservationAction;
-use App\CatalogModule\Resources\ConsultingReservationResource\Actions\WritePrescriptionAction;
+use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
 use App\DefaultPanel\Actions\GetRefundTransactionStatusAction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
-use App\DefaultPanel\Enum\ServicesTypeEnum;
-use App\DefaultPanel\Enum\TimesTypeEnum;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\ReservationResource\Pages\ListReservations;
 use App\ProviderPanel\Filament\Resources\ReservationResource\Pages\ViewReservation;
 use App\ProviderPanel\Filament\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
-use App\ProviderPanel\Filament\Resources\ReservationResource\Widgets\CalendarWidget;
-use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Lab;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -60,17 +50,20 @@ class ReservationResource extends Resource {
 
         return $table
             ->modifyQueryUsing(fn($query) => $query
-                ->where('reservable_type', Lab::class)
                 ->where('reservable_id', provider()->id)
-                ->whereNull('parent_id')
             )
             ->columns([
                 TextColumn::make('id')->searchable(),
-                TextColumn::make('patient.name')->label(__('forms.fields.patient_name'))->searchable(),
+                TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),
+                TextColumn::make('customer.name')->label(__('forms.fields.customer_name'))->searchable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->searchable(),
                 TextColumn::make('date')
                     ->date()
                     ->searchable(),
-                TextColumn::make('period')->searchable(),
+                TextColumn::make('from')->searchable(),
+                TextColumn::make('to')->searchable(),
                 TextColumn::make('price')
                     ->searchable(),
                 TextColumn::make('status')
@@ -112,7 +105,7 @@ class ReservationResource extends Resource {
 
             ])
             ->actions([
-
+                ChangeReservationStatusAction::make()->visible(true),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -139,12 +132,12 @@ class ReservationResource extends Resource {
                         Section::make("basic_information")
                             ->schema([
                                 TextEntry::make('id'),
-                                TextEntry::make('patient.name'),
+                                TextEntry::make('customer.name'),
+                                TextEntry::make('seat.title')->label(__("forms.fields.seat_name")),
                                 TextEntry::make('date')->date(),
-                                TextEntry::make('period'),
-                                TextEntry::make('price'),
-                                TextEntry::make('reserve_type'),
-                                TextEntry::make('service_type'),
+                                TextEntry::make('from'),
+                                TextEntry::make('to'),
+
                                 TextEntry::make('status')
                                     ->label(__('forms.fields.status'))
                                     ->color(fn($record) => $record?->status?->getColor())
@@ -154,58 +147,27 @@ class ReservationResource extends Resource {
                                     ->helperText(fn($record) => isset($record->transaction->meta_data['refund_data']['RefundId']) ? "Refund status: " . GetRefundTransactionStatusAction::run($record->transaction->meta_data['refund_data']['RefundId']) : '')
                                     ->color(fn($record) => $record?->transaction?->status?->getColor())
                                     ->badge(),
+                                TextEntry::make('duration')
+                                    ->label(__('forms.fields.duration')),
+                                Group::make()->schema(function ($record){
+                                    $totals= $record->as_cart->formattedTotals();
+                                    return [
+                                        TextEntry::make('services_total')->state(fn()=>$totals['services_total']),
+                                        TextEntry::make('products_total')->state(fn()=>$totals['products_total']),
+                                        TextEntry::make('discount')->state(fn()=>$totals['discount']),
+                                        TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
+                                        TextEntry::make('total')->state(fn()=>$totals['total']),
+                                    ];
+                                })
+                                    ->columnSpan(4)
+                                    ->columns(4)
 
                             ])
                             ->columns(4),
                     ])
-                        ->columnSpan(3),
-                    Group::make([
-                        ActivitySection::make('timeline')
-                            ->label(__('sections.timeline'))
-                            ->schema(components: [
-                                ActivityTitle::make('title.' . app()->getLocale()),
-                                ActivityDate::make('created_at')
-                                    ->date('F j, Y h:i a'),
-                                ActivityIcon::make('status')
-                                    ->icon(fn(string $state) => ReservationStatus::tryFrom($state)->getIcon())
-                                    ->color(fn(string|null $state): string|null => ReservationStatus::tryFrom($state)->getColor()),
-                            ]),
 
-                        Section::make("schedule_data")
-                            ->visible(fn(Model $record) => $record->schedule()->exists())
-                            ->relationship('schedule')
-                            ->schema([
-                                TextEntry::make('date'),
-                                TextEntry::make('period'),
-                            ])->columns(3),
 
-                        Section::make("cancellation_data")
-                            ->visible(fn(Model $record) => $record->cancellation()->exists())
-                            ->relationship('cancellation')
-                            ->schema([
-                                TextEntry::make('reason.name'),
-                                TextEntry::make('comment'),
-                            ])->columns(3),
-
-                        Section::make("report_data")
-                            ->visible(fn(Model $record) => $record->report()->exists())
-                            ->relationship('report')
-                            ->schema([
-                                TextEntry::make('reason.name'),
-                                TextEntry::make('comment'),
-                            ])->columns(3),
-
-                        Section::make("rate_data")
-                            ->visible(fn(Model $record) => $record->report()->exists())
-                            ->relationship('rate')
-                            ->schema([
-                                TextEntry::make('rate'),
-                                TextEntry::make('comment'),
-                            ])->columns(3),
-
-                    ])
-                        ->columnSpan(2)
-                ])->columns(5)
+                ])->columns(1)
             ]);
     }
 
@@ -225,12 +187,14 @@ class ReservationResource extends Resource {
 
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::belongsToAuthUser()->count();
+        return static::getModel()::where('reservable_id', provider()->id)
+            ->where('status',ReservationStatus::PENDING)
+            ->count();
 
     }
     public static function getWidgets(): array {
         return [
-            CalendarWidget::make(),
+//            CalendarWidget::make(),
         ];
     }
 

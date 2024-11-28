@@ -13,8 +13,11 @@ class Product extends Model {
 
     use HasFactory, Publishable, HasTranslations;
 
-    public array $translatable = ['name'];
+    public array $translatable = ['title'];
     protected $guarded = ['id'];
+    protected $casts = [
+        'title' => 'array'
+    ];
 
     public function price(): Attribute {
 

@@ -34,19 +34,22 @@ class CustomerPaymentResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->where('status', 'paid'))
+            ->modifyQueryUsing(fn($query) => $query->paid())
             ->columns([
 
 
                 TextColumn::make('transactionable_id')
                     ->label(__('forms.fields.reservation_id'))
-//                    ->url(fn($record) => route('filament.admin.resources.reservations.view', $record->id))
+                    ->url(fn($record) => route('filament.admin.resources.reservations.view', $record->id),true)
                     ->searchable(['id']),
 
-                TextColumn::make('created_at')
-                    ->formatStateUsing(fn($record) => $record->created_at->format('Y-m-d'))
+                TextColumn::make('user.name')
+                    ->label(__('forms.fields.customer_name'))
                     ->searchable(),
-                TextColumn::make('user.name')->searchable(),
+
+                TextColumn::make('transactionable.reservable.name')
+                    ->label(__("forms.fields.provider_name"))
+                    ->searchable(),
 
                 TextColumn::make('user.phone')
                     ->label(__('forms.fields.phone'))
@@ -54,13 +57,13 @@ class CustomerPaymentResource extends Resource {
 
 
 
-                TextColumn::make('meta_data.method')
+                TextColumn::make('meta_data.gateway')
                     ->label(__('forms.fields.payment_data_method'))
                     ->searchable(false)
                     ->badge()
                     ->formatStateUsing(function ($record) {
 
-                        return PaymentMethods::from($record->meta_data['method'])->getLabel();
+                        return $record->meta_data['gateway'];
                     }),
                 TextColumn::make('meta_data.paid_at')
                     ->label(__('forms.fields.payment_data_paid_at'))
@@ -79,6 +82,9 @@ class CustomerPaymentResource extends Resource {
                 TextColumn::make('price')
                     ->formatStateUsing(fn($record) => $record->price->format())
                     ->summarize(Tables\Columns\Summarizers\Sum::make()->money('SAR')),
+                TextColumn::make('created_at')
+                    ->formatStateUsing(fn($record) => $record->created_at->format('Y-m-d'))
+                    ->searchable(),
             ])
             ->filters([
 

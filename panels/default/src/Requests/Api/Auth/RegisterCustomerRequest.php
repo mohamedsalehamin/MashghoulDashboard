@@ -28,35 +28,21 @@ class RegisterCustomerRequest extends FormRequest {
      * @return array
      */
     public function rules() {
-        if ($this->has('pre-step')) {
-            return [
-                'phone' => [
-                    'required',
-                    'unique:users',
-                    new FormatPhoneRule
-                ],
-            ];
-        }
         return [
             'first_name' => ['required', 'string', 'min:3', 'max:40'],
             'last_name' => ['required', 'string', 'min:3', 'max:40'],
             'email' => ['required', 'email', 'unique:users'],
+            'dob' => ['nullable', 'date',],
 
             'phone' => [
                 'required',
                 'unique:users',
                 new FormatPhoneRule
             ],
-            'password' => [
-                'required',
-                Password::min(8),
-            ],
-            'password_confirmation' => ['required', 'same:password'],
             'gender' => ['required', new Enum(GenderEnum::class)],
-            'dob' => ['required', 'date'],
             'state_id' => ['required', Rule::exists('states', 'id')],
             'city_id' => ['required', Rule::exists('cities', 'id')],
-            'code'=> ['required', 'string', new IsValidVerificationCodeRule()],
+            'code'=> ['required',"digits:4", new IsValidVerificationCodeRule()],
             'avatar'=>['nullable','image']
         ];
     }

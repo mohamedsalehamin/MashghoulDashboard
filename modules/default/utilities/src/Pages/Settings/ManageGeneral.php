@@ -10,6 +10,7 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -53,7 +54,6 @@ class ManageGeneral extends SettingsPage {
 //                    Textarea::make('app_address')
 //                        ->minLength(3)
 //                        ->required(),
-
                     TextInput::make('taxes')
                         ->label(__("forms.fields.taxes"))
                         ->type('number')
@@ -61,10 +61,22 @@ class ManageGeneral extends SettingsPage {
                         ->rules(['numeric','min:1','max:100'])
                         ->required(),
 
+                    TextInput::make('reservations_fess')
+                        ->type('number')
+                        ->required(),
+                    TextInput::make('app_percentage')
+                        ->type('number')
+                        ->required(),
 
-
+                    Select::make('reservation_flow')
+                    ->options([
+                        'total'=>__("panel.messages.pay_reservation_totals"),
+                        'fees'=>__("panel.messages.pay_reservation_fees")
+                    ]),
+                    Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
 
                 ]),
+
                 Forms\Components\Section::make("applications_links")->schema([
 
                     TextInput::make('applications_links.google_play_link')

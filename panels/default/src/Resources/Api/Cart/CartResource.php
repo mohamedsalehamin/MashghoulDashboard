@@ -16,9 +16,9 @@ class CartResource extends JsonResource {
      */
     public function toArray($request) {
         return [
-            'duration'=>$this->getContent()->max(fn($product)=>$product->associatedModel->duration),
+            'duration'=>$this->getContent()->sum(fn($product)=>$product->associatedModel->duration),
             'duration_unit'=>'minutes',
-            "products" => CartProductResource::collection($this->getContent()->values()),
+            "services" => CartServiceResource::collection($this->getContent()->values()),
             'totals' => $this->formattedTotals()
         ];
     }

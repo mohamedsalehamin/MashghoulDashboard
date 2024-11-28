@@ -12,6 +12,7 @@ use App\UsersModule\Models\Users\Customer;
 use App\UsersModule\Resources\CustomerResource\Pages\CreateCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\EditCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\ListCustomers;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
@@ -98,7 +99,7 @@ class CustomerResource extends Resource {
                             'male' => __("panel.enums.male"),
                             'female' => __("panel.enums.female"),
                         )),
-
+                    DatePicker::make('dob'),
                     Select::make('country_id')
                         ->live()
                         ->required()
@@ -192,22 +193,7 @@ class CustomerResource extends Resource {
                     ->options(ModelStatus::class)
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->fillForm(fn($record) => [
-                        'user' => $record->user,
-                        'patient' => $record,
-                        'health_data' => $record->healthData,
-                        'chronic_diseases' => $record->chronicDiseases->pluck('id')->toArray()
-                    ])
-                    ->action(function ($data, $record) {
-                        $record->user()->update([
-                            ...array_filter($data['user']),
-                            'name' => $data['patient']['first_name'] . ' ' . $data['patient']['last_name'],
-                        ]);
-                        $record->update($data['patient']);
-                        $record->healthData()->update($data['health_data']);
-                        $record->chronicDiseases()->sync($data['chronic_diseases']);
-                    }),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

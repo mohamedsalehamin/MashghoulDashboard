@@ -12,6 +12,7 @@ return new class extends Migration {
         Schema::create('banners', function (Blueprint $table) {
             $table->id();
             $table->json('name');
+            $table->string('link')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

@@ -48,6 +48,9 @@ class BannerResource extends Resource {
                 ->label(__('forms.fields.image_ar'))
                 ->collection('ar')
                 ->required(),
+            TextInput::make('link')
+                ->url()
+                ->translateLabel(),
             Toggle::make('status')->default(1)
 
                 ->onColor('success')

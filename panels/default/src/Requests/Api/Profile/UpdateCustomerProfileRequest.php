@@ -32,7 +32,6 @@ class UpdateCustomerProfileRequest extends FormRequest {
         return [
             'first_name' => ['required', 'string', 'max:150'],
             'last_name' => ['required', 'string', 'max:150'],
-            'id_number' => ['nullable', 'string', 'max:150'],
             'phone' => [
                 'required',
                 Rule::unique('users')->ignore(auth()->id()),

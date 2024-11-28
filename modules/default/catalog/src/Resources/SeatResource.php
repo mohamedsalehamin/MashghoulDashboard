@@ -26,6 +26,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Tasawk\Models\Catalog\Category;
 
 
 class SeatResource extends Resource {
@@ -50,7 +51,8 @@ class SeatResource extends Resource {
                 Select::make('services')
                     ->required()
                     ->multiple()
-                    ->relationship('services')
+                    ->relationship('services','title')
+                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->getTranslation('title','en')} - {$record->getTranslation('title','ar')}")
                     ->label(__('forms.fields.services'))
                     ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id')),
                 Section::make("working_times")->schema(GeneralSettings::daysListSchema()),
@@ -148,8 +150,6 @@ class SeatResource extends Resource {
         return $record->name;
     }
 
-    public static function getNavigationGroup(): ?string {
-        return __('menu.payments');
-    }
+
 
 }

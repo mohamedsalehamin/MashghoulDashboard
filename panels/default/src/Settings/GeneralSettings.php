@@ -16,6 +16,11 @@ class GeneralSettings extends Settings {
     public string $app_name;
     public string $app_email;
     public string $app_phone;
+    public string $reservations_fess;
+    public string $app_percentage;
+    public string $reservation_flow;
+    public string $enabled_free_fees_in_first_reservation;
+    public array $points;
     public string $app_whatsapp;
     public string $app_address;
     public float $taxes;
@@ -62,7 +67,7 @@ class GeneralSettings extends Settings {
 
                 Hidden::make("day_name")
                     ->statePath("$index.day_name")
-                    ->default($day),
+                    ->formatStateUsing(fn()=>$day),
 
                 TimePicker::make("from")
                     ->seconds(false)

@@ -2,10 +2,7 @@
 
 namespace App\DefaultPanel\Requests\Api\Order;
 
-use App\DefaultPanel\Rules\IsRequiredProductOptionsRepresentRule;
 use App\DefaultPanel\Rules\IsValidCoupon;
-use App\DefaultPanel\Rules\IsValidProductOptionsRule;
-use App\DefaultPanel\Rules\IsValidProductOptionValuesRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,11 +21,8 @@ class CartDetailsRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'products' => ['required', 'array'],
-            'products.*.id' => ['required', Rule::exists('products','id')->where('status',1), new IsRequiredProductOptionsRepresentRule()],
-            'products.*.quantity' => ['required', 'numeric', 'min:1'],
-            'products.*.options.*.id' => [new IsValidProductOptionsRule()],
-            'products.*.options.*.value_id' => [new IsValidProductOptionValuesRule()],
+            'services' => ['required', 'array'],
+            'services.*.id' => ['required', Rule::exists('services','id')->where('provider_id',$this->route('provider')->id)->where('status',1), ],
             'coupon_code' => ['nullable', 'exists:coupons,code',new IsValidCoupon()],
         ];
     }

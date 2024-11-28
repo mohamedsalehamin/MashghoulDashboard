@@ -2,8 +2,7 @@
 
 namespace App\UsersModule\Resources\CustomerResource\Pages;
 
-use App\ProviderPanel\Filament\Resources\CustomerResource;
-use App\ProviderPanel\Filament\Resources\PatientResource;
+use App\UsersModule\Resources\CustomerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

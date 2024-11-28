@@ -14,7 +14,7 @@ use App\DefaultPanel\Notifications\Notification;
 use App\DefaultPanel\Pages\ResetPassword;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\ReportsModule\ReportsPlugin;
-use App\ProviderPanel\Filament\Resources\PatientResource\Widgets\PatientsChart;
+use App\CatalogModule\Resources\PatientResource\Widgets\PatientsChart;
 use App\UsersModule\UsersPlugin;
 use App\UtilitiesModule\UtilitiesPlugin;
 use BezhanSalleh\FilamentLanguageSwitch\FilamentLanguageSwitchPlugin;
@@ -102,7 +102,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
 //                return Storage::disk('public')->exists($settings->app_logo ?? 'null') ? asset("storage/$settings->app_logo") : 'https://awscdn1.tasawk.com/wp-content/uploads/2018/08/logo-d.png';
 
             })
-            ->brandName('Tmoono')
+            ->brandName(env("app_name"))
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->plugins([
                 FilamentShieldPlugin::make(),

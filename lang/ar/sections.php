@@ -1,5 +1,6 @@
 <?php
 return [
+    "points"=>"النقاط",
     'provider_information' => 'معلومات المشغل',
     "working_times"=>"أوقات العمل",
     "bank_account_information"=>"بيانات الحساب البنكي",

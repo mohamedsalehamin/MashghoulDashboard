@@ -11,6 +11,7 @@ class BannerResource extends JsonResource {
         return [
             'id' => $this->id,
             'image' => $this->getFirstMediaUrl(app()->getLocale()),
+            'link' => $this->link,
         ];
     }
 

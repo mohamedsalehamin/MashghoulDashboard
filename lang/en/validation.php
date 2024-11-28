@@ -168,7 +168,7 @@ return [
         "coupon_code_is_expired"=>'Code is expired',
         "coupon_code_exceeds_the_number_of_usages_times"=>'Code exceeds the number of usages times',
         "coupon_code_already_used"=>'Code already used',
-
+        "coupon_code_not_found" => "Code not found",
 
 
     ],

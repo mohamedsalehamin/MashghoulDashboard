@@ -5,19 +5,19 @@ namespace App\ProviderPanel;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\ProviderPanel\Filament\Pages\AboutUsPage;
 use App\ProviderPanel\Filament\Pages\ContactPage;
-use App\DoctorPanel\Filament\Pages\EditProfilePage;
 use App\ProviderPanel\Filament\Pages\FaqsPage;
 use App\ProviderPanel\Filament\Pages\LoginPage;
 use App\ProviderPanel\Filament\Pages\PrivacyAndPolicyPage;
 use App\ProviderPanel\Filament\Pages\RequestPasswordReset;
 use App\ProviderPanel\Filament\Pages\TermsAndConditionsPage;
+use App\CatalogModule\Resources\ReservationResource;
+use App\CatalogModule\Resources\ReservationResource\Widgets\ReservationStats;
+
+use App\ProviderPanel\Filament\Resources\CustomerResource;
 use App\ProviderPanel\Filament\Resources\NotificationResource;
-use App\ProviderPanel\Filament\Resources\PatientResource;
-use App\DoctorPanel\Filament\Resources\PlanResource;
-use App\ProviderPanel\Filament\Resources\ReservationResource;
-use App\ProviderPanel\Filament\Resources\ReservationResource\Widgets\ReservationStats;
+use App\ProviderPanel\Filament\Resources\RateResource;
+use App\ProviderPanel\Filament\Resources\SeatResource;
 use App\ProviderPanel\Filament\Resources\ServiceResource;
-use App\DoctorPanel\Filament\Resources\SubscriptionResource;
 use App\ProviderPanel\Filament\Resources\WalletResource;
 use BezhanSalleh\FilamentLanguageSwitch\FilamentLanguageSwitchPlugin;
 use Filament\Http\Middleware\Authenticate;
@@ -73,7 +73,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 return Storage::disk('public')->exists($settings->app_logo ?? 'null') ? asset("storage/$settings->app_logo") : '';
 
             })
-            ->brandName('Tmoono')
+            ->brandName('Mashghoul')
             ->plugins([
                 FilamentFullCalendarPlugin::make()
                     ->selectable(false)
@@ -107,8 +107,11 @@ class ProviderPanelServiceProvider extends PanelProvider
             ])
             ->resources([
 
-                ReservationResource::class,
-//                ServiceResource::class,
+                \App\ProviderPanel\Filament\Resources\ReservationResource::class,
+                CustomerResource::class,
+                ServiceResource::class,
+                SeatResource::class,
+                RateResource::class,
                 NotificationResource::class,
                 WalletResource::class,
             ])

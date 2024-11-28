@@ -2,6 +2,7 @@
 
 
 use App\DefaultPanel\Lib\Breadcrumbs;
+use App\UsersModule\Models\Provider;
 
 function patient() {
     return auth()->user()->patient;
@@ -12,7 +13,7 @@ function doctor() {
 }
 
 function provider() {
-    return \App\UsersModule\Models\Provider::where('user_id', auth()->id())->first();
+    return Provider::where('user_id', auth()->id())->first();
 }
 
 function site(): object {
@@ -50,7 +51,7 @@ function site(): object {
                 public function date() {
 
                     $slot = explode(' - ', $this->slot())[0];
-                    $slot=!$slot?'00:00':$slot;
+                    $slot = !$slot ? '00:00' : $slot;
                     return \Carbon\Carbon::parse(session()->get('reservation_data')['date'])->setTimeFromTimeString($slot);
                 }
 

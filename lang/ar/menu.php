@@ -1,5 +1,11 @@
 <?php
 return [
+    "providers_reservations_dues"=>'مستحقات المشاغل',
+    "providersreservationsdues"=>'مستحقات المشاغل',
+    "rates"=>'التقييمات',
+    "rate"=>'تقييم',
+    "levels"=>'الشرائح',
+    "level"=>'شريحة',
     'providers' => 'مقدمي الخدمات',
     'provider' => 'مقدم خدمة',
     "seats" => "إدارة كراسي الخدمة",

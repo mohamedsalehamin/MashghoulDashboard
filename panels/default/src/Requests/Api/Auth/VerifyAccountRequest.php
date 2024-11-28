@@ -29,7 +29,7 @@ class VerifyAccountRequest extends FormRequest {
         return [
             'phone' => ['required', 'exists:users',new FormatPhoneRule],
 
-            'code' => ['required', 'numeric','digits:5', new IsValidVerificationCodeRule()],
+            'code' => ['required', 'numeric','digits:4', new IsValidVerificationCodeRule()],
         ];
     }
 

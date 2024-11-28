@@ -8,6 +8,7 @@ use Cknow\Money\Money;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
@@ -18,8 +19,10 @@ class Service extends Model implements HasMedia {
 
     public array $translatable = ['title', 'description'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'meta_data' => 'array'
+        'meta_data' => 'array',
+
     ];
 
     public function price(): Attribute {
@@ -29,7 +32,7 @@ class Service extends Model implements HasMedia {
         );
     }
 
-    public function products() {
+    public function products(): HasMany {
         return $this->hasMany(Product::class);
     }
 

@@ -2,19 +2,16 @@
 
 namespace App\DefaultPanel\Lib;
 
-use App\UsersModule\Models\Service;
+
+use App\CatalogModule\Models\Service;
+use App\ContentModule\Models\Coupon;
 use Cknow\Money\Money;
 use Darryldecode\Cart\Cart as CoreCart;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Helpers\Helpers;
 use Darryldecode\Cart\ItemCollection;
 use DB;
-use App\DoctorPanel\Filament\Resources\Product;
-use App\CrmModule\Models\Coupon;
-use App\DefaultPanel\Enum\CustomerTypeStatuses;
 use App\DefaultPanel\Settings\GeneralSettings;
-use App\Lib\Ecommerce;
-use App\Lib\Items;
 
 class Cart extends CoreCart {
     private $orderId;
@@ -32,20 +29,19 @@ class Cart extends CoreCart {
         $this->removeConditionsByType("coupon");
     }
 
-    function applyItem(Service|\App\UsersModule\Models\Lab\Service $product, $qty, $attributes, $conditions = []) {
-        $price = $product->sale_price?->getAmount() < $product->price->getAmount() && $product->sale_price?->getAmount() > 0 ? $product->sale_price->formatByDecimal() : $product->price->formatByDecimal();
+    function applyItem(Service $service, $price, $qty = 1, $attributes = [], $conditions = []) {
 
         $this->add(
-            md5($product->id),
-            $product->name,
+            md5($service->id),
+            $service->title,
             $price,
             $qty,
             [
-                "original_price" => $product->price->formatByDecimal(),
+                "original_price" => $price,
                 ...$attributes
             ],
             $conditions,
-            $product
+            $service
         );
     }
 
@@ -65,6 +61,43 @@ class Cart extends CoreCart {
             'order' => 1,
             'attributes' => [
                 'original_value' => "-" . $coupon_value,
+            ]
+        ];
+        $conditionData['attributes'] = $conditionData;
+        $this->condition(new CartCondition($conditionData));
+        return true;
+    }
+
+    function applyReservationsFees($fees): bool {
+
+        !$this->getConditionsByType("reservation_fees")->count() ?: $this->removeConditionsByType("reservation_fees");
+
+        $conditionData = [
+            'name' => "reservation_fees",
+            'type' => "reservation_fees",
+            'target' => "total",
+            'value' => $fees,
+            'order' => 1,
+            'attributes' => [
+                'original_value' => $fees,
+            ]
+        ];
+        $conditionData['attributes'] = $conditionData;
+        $this->condition(new CartCondition($conditionData));
+        return true;
+    }
+
+    function applyProducts($total): bool {
+
+        !$this->getConditionsByType("products")->count() ?: $this->removeConditionsByType("products");
+        $conditionData = [
+            'name' => 'products',
+            'type' => "products",
+            'target' => "subtotal",
+            'value' => $total,
+            'order' => 1,
+            'attributes' => [
+                'original_value' => "-" . $total,
             ]
         ];
         $conditionData['attributes'] = $conditionData;
@@ -212,6 +245,13 @@ class Cart extends CoreCart {
                 'attributes' => json_encode($condition->getAttributes()),
                 'model' => null,
             ]);
+            if ($condition->getType() == 'coupon') {
+                $coupon = Coupon::where('code', $condition->getName())->first();
+                $coupon->users()->attach([auth()->id() => [
+                    'order_id' => $this->getOrderID(),
+                    'used_at' => now(),
+                ]]);
+            }
         }
 
 
@@ -255,7 +295,7 @@ class Cart extends CoreCart {
             ]);
             DB::table('reservations_items_lines')->insert([
                 'reservation_id' => $this->getOrderID(),
-                'name' => $item->name[app()->getLocale()],
+                'name' => $item->name[app()->getLocale()] ?? $item->name,
                 'price' => $item->price,
                 'quantity' => $item->quantity,
                 'attributes' => json_encode($item->attributes),
@@ -355,9 +395,18 @@ class Cart extends CoreCart {
         return $this->getConditionsByType('coupon')?->first()?->getCalculatedValue($this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true)));
     }
 
+    public function getProductsTotal() {
+        return $this->getConditionsByType('products')?->first()?->getCalculatedValue($this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true)));
+    }
+
     public function cashOnDeliveryCost() {
 
         return $this->getConditionsByType('cash_on_delivery_cost')?->first()?->getValue() * 100;
+    }
+
+    public function getReservationFees() {
+
+        return $this->getConditionsByType('reservation_fees')?->first()?->getValue() * 100;
     }
 
     public function adminDiscount() {
@@ -376,13 +425,11 @@ class Cart extends CoreCart {
     public function totals(): array {
         $items_total_with_options = $this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true));
         return [
-//            'items_total_without_options' => $this->getSubTotalWithoutConditions(),
-//            'items_total_with_options' => $items_total_with_options,
-//            "discount" => $this->discount(),
+            'services_total' => $this->getSubTotalWithoutConditions(),
+            "products_total" => $this->getProductsTotal(),
+            "discount" => $this->discount(),
             "subtotal" => $this->getSubTotal(),
-//            "taxes" => $this->getConditionsByType("taxes")?->first()?->getCalculatedValue($items_total_with_options - $this->discount() - (float)$this->getConditionsByType("takeaway")?->first()?->getCalculatedValue($items_total_with_options)),
-//            "delivery" => floatval($this->getConditionsByType('delivery')->first()?->getValue()),
-//            "cash_on_delivery_fees" => $this->cashOnDeliveryCost(),
+            "reservation_fees" => $this->getReservationFees(),
             "total" => $this->getTotal()
         ];
     }

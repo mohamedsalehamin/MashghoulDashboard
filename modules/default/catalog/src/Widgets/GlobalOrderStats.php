@@ -26,33 +26,11 @@ class GlobalOrderStats extends BaseWidget {
 
         return [
 
-            Stat::make(__('panel.stats.patients_count'), Patient::count()),
-            Stat::make(__('panel.stats.active_patients_count'), Patient::where('active',UserStatus::ACTIVE)->count()),
-            Stat::make(__('panel.stats.inactive_patients_count'), Patient::where('active',UserStatus::IN_ACTIVE)->count()),
-            Stat::make(__('panel.stats.doctors_request_count'), Doctor::whereHas('user',fn($q) => $q->where('active',UserStatus::PENDING))->count()),
-            Stat::make(__('panel.stats.active_doctors_count'), Doctor::whereHas('user',fn($q) => $q->where('active',UserStatus::ACTIVE))->count()),
-            Stat::make(__('panel.stats.inactive_doctors_count'), Doctor::whereHas('user',fn($q) => $q->where('active',UserStatus::IN_ACTIVE))->count()),
-
-
-            Stat::make(__('panel.stats.labs_requests_count'), Lab::whereHas('user',fn($q) => $q->where('active',UserStatus::PENDING))->count()),
-            Stat::make(__('panel.stats.active_lab_count'), Lab::whereHas('user',fn($q) => $q->where('active',UserStatus::ACTIVE))->count()),
-            Stat::make(__('panel.stats.inactive_labs_count'), Lab::whereHas('user',fn($q) => $q->where('active',UserStatus::IN_ACTIVE))->count()),
-
             Stat::make(__('panel.stats.category_count'), Category::parent()->count()),
             Stat::make(__('panel.stats.cities_count'), City::count()),
             Stat::make(__('panel.stats.administrators_count'), User::whereHas('roles', fn($q) => $q->whereNotIn('name', ['panel_user', 'customer', 'super_admin']))->count()),
 
-
-
-
-            Stat::make(__('panel.stats.patients_contact_us_messages'), Contact::where('source',ContactSourceEnum::SITE)->count()),
-            Stat::make(__('panel.stats.doctors_contact_us_messages'), Contact::where('source',ContactSourceEnum::LAB)->count()),
-            Stat::make(__('panel.stats.labs_contact_us_messages'), Contact::where('source',ContactSourceEnum::DOCTOR)->count()),
-
-            Stat::make(__('panel.stats.doctors_total_transferred_dues'), Money::parse(Commission::belongsToDoctors()->where('transferred',1)->sum('amount'))->format()),
-            Stat::make(__('panel.stats.labs_total_transferred_dues'),  Money::parse(Commission::belongsToLabs()->where('transferred',1)->sum('amount'))->format()),
-            Stat::make(__('panel.stats.doctors_total_pending_dues'), Money::parse(Commission::belongsToDoctors()->where('transferred',0)->sum('amount'))->format()),
-            Stat::make(__('panel.stats.labs_total_pending_dues'),  Money::parse(Commission::belongsToLabs()->where('transferred',0)->sum('amount'))->format()),
+            Stat::make(__('panel.stats.patients_contact_us_messages'), Contact::where('source',ContactSourceEnum::PROVIDER)->count()),
 
         ];
     }

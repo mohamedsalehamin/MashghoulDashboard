@@ -38,12 +38,5 @@ class ContentServices {
         return Api::isOk(__("Frequently asked questions"), FaqResource::collection(Faq::enabled()->latest()->get()));
     }
 
-    public function chronicDiseases(): Core {
-        return Api::isOk(__("Chronic diseases"), PatientChronicDiseasesDataResource::collection(ChronicDisease::enabled()->get()));
-    }
-
-    public function titles() {
-        return Api::isOk("Titles list", TitleResource::collection(Title::get()));
-    }
 
 }

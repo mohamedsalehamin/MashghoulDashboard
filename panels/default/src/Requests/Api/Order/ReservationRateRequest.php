@@ -18,8 +18,12 @@ class ReservationRateRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            "rate" => ['required', 'numeric', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string', 'max:512']
+            "service" => ['required','array'],
+            'service.rate'=> ['required', 'numeric', 'min:1', 'max:5'],
+            'service.comment' => ['nullable', 'string', 'max:512'],
+            "place" => ['required','array'],
+            'place.rate'=> ['required', 'numeric', 'min:1', 'max:5'],
+            'place.comment' => ['nullable', 'string', 'max:512']
         ];
     }
 

@@ -3,31 +3,58 @@
 namespace App\UsersModule\Models;
 
 
+use App\CatalogModule\Models\Reservation;
+use App\CatalogModule\Models\Reservation\Rate;
+use App\CatalogModule\Models\Seat;
 use App\ContentModule\Models\City;
+use App\Models\User;
+use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use MatanYadaev\EloquentSpatial\Objects\Point;
+use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 use Theamostafa\Wallet\Traits\HasWallet;
 
 class Provider extends Model implements HasMedia {
-    use InteractsWithMedia,HasWallet;
-
+    use InteractsWithMedia, HasWallet,HasTranslations;
+    use Favoriteable;
+    use HasSpatial;
     protected $guarded = ['id'];
+    protected $translatable = ['name','bio'];
+
     protected $casts = [
         'location' => Point::class,
-        'meta_data'=>'array'
+        'meta_data' => 'array',
+//        'name'=>'array',
+//        'bio'=>'array',
     ];
 
     public function city() {
         return $this->belongsTo(City::class);
     }
+
     protected function location(): Attribute {
         return Attribute::make(
             set: function ($coordinate) {
                 return (new Point($coordinate['lat'], $coordinate['lng']))->toSqlExpression($this->getConnection());
             }
         );
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+    public function reservations(): MorphMany {
+        return $this->morphMany(Reservation::class, 'reservable');
+    }
+    public function seats() {
+        return $this->hasMany(Seat::class);
+    }
+    public function rate() {
+        return $this->hasManyThrough(Rate::class, Reservation::class, 'reservable_id', 'reservation_id');
     }
 }

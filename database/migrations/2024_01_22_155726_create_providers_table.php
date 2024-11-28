@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->json('name')->nullable();
             $table->json('bio')->nullable();
+            $table->foreignId('category_id')->nullable();
             $table->point('location')
                 ->nullable();
             $table->foreignId('city_id')

@@ -48,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Tasawk\Enum\OrderStatus;
 
 class Reservation extends Model {
     use Transactionable, FilterScope, AgoraSession;
@@ -58,8 +59,7 @@ class Reservation extends Model {
 
     protected $casts = [
         'date' => 'date',
-        'service_type' => ServicesTypeEnum::class,
-        'reserve_type' => TimesTypeEnum::class,
+
         'status' => ReservationStatus::class,
     ];
 
@@ -72,7 +72,7 @@ class Reservation extends Model {
 
         static::created(function (Reservation $reservation) {
             $settings = new GeneralSettings();
-            $percentage = $reservation->reservable->getMorphClass() == Doctor::class ? $settings->doctors_app_percentage : $settings->labs_app_percentage;
+            $percentage = 100 - $settings->app_percentage;
 
             $amount = ($reservation->price->formatByDecimal() / 100) * $percentage;
             $reservation->commission()->create([
@@ -83,29 +83,33 @@ class Reservation extends Model {
 
         });
         static::updating(function (Reservation $reservation) {
-            if ($reservation->getOriginal('status') != $reservation->status && !in_array($reservation->status, [ReservationStatus::COMPLETED, ReservationStatus::PATIENT_CANCELED, ReservationStatus::PATIENT_RESCHEDULED])) {
-
-                $reservation->patient->notify(new ReservationStatusChangedNotification($reservation));
-                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
-            }
-            if ($reservation->status == ReservationStatus::PATIENT_CANCELED) {
-                $reservation->patient->notify(new ReservationCanceledFromPatientNotification($reservation));
-                $reservation->reservable->user->notify(new ReservationCanceledFromPatientNotification($reservation));
-            }
-            if ($reservation->status == ReservationStatus::PATIENT_RESCHEDULED) {
-                $reservation->patient->notify(new ReservationScheduledNotification($reservation));
-                $reservation->reservable->user->notify(new ReservationScheduledNotification($reservation));
-            }
-            $reservation->addTimeline([
-                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
-                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'en')
-            ], $reservation->status);
+//            if ($reservation->getOriginal('status') != $reservation->status && !in_array($reservation->status, [ReservationStatus::COMPLETED, ReservationStatus::PATIENT_CANCELED, ReservationStatus::PATIENT_RESCHEDULED])) {
+//
+//                $reservation->patient->notify(new ReservationStatusChangedNotification($reservation));
+//                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
+//            }
+//            if ($reservation->status == ReservationStatus::PATIENT_CANCELED) {
+//                $reservation->patient->notify(new ReservationCanceledFromPatientNotification($reservation));
+//                $reservation->reservable->user->notify(new ReservationCanceledFromPatientNotification($reservation));
+//            }
+//            if ($reservation->status == ReservationStatus::PATIENT_RESCHEDULED) {
+//                $reservation->patient->notify(new ReservationScheduledNotification($reservation));
+//                $reservation->reservable->user->notify(new ReservationScheduledNotification($reservation));
+//            }
+//            $reservation->addTimeline([
+//                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
+//                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'en')
+//            ], $reservation->status);
         });
 
     }
 
+    public function getDurationAttribute() {
+        return __("panel.enums.minutes", ['minutes' => $this->as_cart->getContent()->sum(fn($item) => $item->associatedModel->duration)]);
+    }
+
     public function scopeBelongsToAuthUser($builder) {
-        return  $builder->where('reservable_type', Lab::class)->where('reservable_id', provider()?->id);
+        return $builder->where('reservable_type', Lab::class)->where('reservable_id', provider()?->id);
     }
 
     public function scopeStartSoon($builder) {
@@ -171,13 +175,6 @@ class Reservation extends Model {
         }
     }
 
-    public function isDoctorReservation(): bool {
-        return $this->reservable_type == \App\UsersModule\Models\Doctor::class;
-    }
-
-    public function isLabReservation(): bool {
-        return $this->reservable_type == Lab::class;
-    }
 
     public function completed() {
         return $this->status == ReservationStatus::COMPLETED;
@@ -215,7 +212,7 @@ class Reservation extends Model {
              * @throws InvalidConditionException
              */ fn($cond) => new CartCondition($cond))->toArray();
             $item['quantity'] = $item->quantity > 0 ? $item->quantity : 1;
-            $item['associatedModel'] = (object)$item->model;
+            $item['associatedModel'] = Service::find($item->model['id']);
             $item['new_conditions'] = $conditions;
             return $item;
         })->each(function ($item) use ($cart) {
@@ -240,37 +237,6 @@ class Reservation extends Model {
     }
 
 
-    public function cancellation(): HasOne {
-        return $this->hasOne(Cancellation::class);
-    }
-
-    public function cancel($reason) {
-        $fees = 10;
-        $reservationDateAgo = Carbon::parse($this->date_time)->diffInHours();
-        $reservationPrice = $this->price->formatByDecimal();
-
-        if ($reservationDateAgo < 24 && $reservationDateAgo > 3) {
-            $fees = 30;
-        }
-        if ($reservationDateAgo < 3) {
-            $fees = 50;
-        }
-        $fees = $reservationPrice * $fees / 100;
-
-        $amount = $reservationPrice - $fees;
-
-        $response = RefundTransaction::run($this->transaction->meta_data['invoiceId'], $amount);
-
-        $status = auth()->id() == $this->user_id ? ReservationStatus::PATIENT_CANCELED : ReservationStatus::DOCTOR_CANCELED;
-        $this->update(['status' => $status]);
-
-
-        $this->cancellation()->create(['reason_id' => $reason]);
-        $this->transaction->update(['status' => ReservationPaymentStatus::REFUNDED,'meta_data' => array_merge($this->transaction->meta_data,['refund_data' =>$response->Data])]);
-
-    }
-
-
     public function canRate(): bool {
         return !$this->rate()->exists() && $this->status == ReservationStatus::COMPLETED;
     }
@@ -287,83 +253,34 @@ class Reservation extends Model {
         return $this->hasOne(Report::class);
     }
 
-    public function isOnline(): bool {
-        return true;
-        return in_array($this->service_type, [ServicesTypeEnum::VOICE, ServicesTypeEnum::VIDEO]);
+
+    public function getAvailableStatus() {
+        $statuses = collect(ReservationStatus::cases())->map(fn($status) => $status->value);
+        $standardStatus = collect($statuses)
+            ->splice(1, $statuses->count())
+            ->map(function ($status) {
+                $statusLabel = $status;
+
+                return [
+                    'value' => $status,
+                    'label' => __("panel.enums." . $statusLabel)
+                ];
+            })
+            ->values();
+
+
+        return $standardStatus->values();
     }
 
-    public function schedule(): HasOne {
-        return $this->hasOne(Scheduled::class);
+    public function serviceRate() {
+        return $this->rate()->where('type', 'service');
     }
 
-    public function revisit(): HasOne {
-        return $this->hasOne(Revisit::class);
+    public function placeRate() {
+        return $this->rate()->where('type', 'place');
     }
 
-    public function sharedAnalysis(): BelongsToMany {
-        return $this->belongsToMany(ItemsLine::class, 'shared_analysis_reservation', 'reservation_id', 'analysis_id');
-    }
-
-    public function scheduleAppointment($date, $period, $causer = 'doctor'): void {
-        $status = $causer == 'doctor' ? ReservationStatus::DOCTOR_RESCHEDULED : ReservationStatus::PATIENT_RESCHEDULED;
-
-        $this->update(['status' => $status]);
-        $this->schedule()->create([
-            'date' => $date,
-            'period' => $period,
-            'status' => 'pending',
-            'causer_id' => $causer == 'doctor' ? $this->reservable?->user?->id : $this->user_id
-        ]);
-
-        $this->replicate()->fill(['date' => $date, 'period' => $period, 'parent_id' => $this->id])->save();
-        if ($causer == 'doctor') {
-            $this->patient->notify(new ReservationScheduledFromDoctorNotification($this));
-            $this->reservable->user->notify(new ReservationScheduledFromDoctorNotification($this));
-            return;;
-        }
-        $this->patient->notify(new ReservationScheduledNotification($this));
-        $this->reservable->user->notify(new ReservationScheduledNotification($this));
-    }
-
-    public function revisitAppointment($date, $period): void {
-
-        $this->revisit()->create([
-            'date' => $date,
-            'period' => $period,
-        ]);
-        $this->replicate()->fill(['date' => $date, 'period' => $period, 'parent_id' => $this->id])->save();
-    }
-
-    public function timeline() {
-        return $this->hasMany(Timeline::class);
-    }
-
-    public function canCancel() {
-        return $this->report()->doesntExist() && $this->cancellation()->doesntExist() && !$this->completed();
-    }
-
-    public function canReport() {
-        return $this->report()->doesntExist() && $this->cancellation()->doesntExist() && !$this->completed();
-    }
-
-    public function canReschedule(): bool {
-        if ($this->schedule()->exists()) {
-            return false;
-        }
-        if ($this->completed()) {
-            return false;
-        }
-        if ($this->isLabReservation()) {
-            return Carbon::parse($this->dateTime)->isFuture();
-        }
-
-        return now()->diffInHours(Carbon::parse($this->dateTime), false) > -24;
-    }
-
-    public function addTimeline($title, $status): void {
-        $this->timeline()->create([
-            'title' => $title,
-            'status' => $status,
-        ]);
+    public function seat() {
+        return $this->belongsTo(Seat::class);
     }
 }

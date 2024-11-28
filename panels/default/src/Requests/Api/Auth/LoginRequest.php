@@ -26,19 +26,11 @@ class LoginRequest extends FormRequest {
     public function rules() {
         return [
             'phone' => ['required', new FormatPhoneRule],
-            'password' => [
-                'required',
-            ],
         ];
     }
 
     /**
      * @throws APIException
      */
-    public function authenticated(): void {
-        if (!Auth::once($this->only("phone", 'password'))) {
-            throw new APIException(__('validation.api.invalid_credentials'));
-        }
-    }
 
 }

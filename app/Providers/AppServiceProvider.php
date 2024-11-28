@@ -125,7 +125,7 @@ class AppServiceProvider extends ServiceProvider {
         Table::configureUsing(function (Table $table): void {
             $table->modifyQueryUsing(function (Builder $query): void {
                 if ($query->getColumns()->getModel()->getCreatedAtColumn()) {
-                    $query->latest();
+                    $query->latest($query->getColumns()->getModel()->getTable().".created_at");
                 }
 
             });

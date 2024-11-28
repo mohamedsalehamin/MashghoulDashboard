@@ -30,14 +30,14 @@ Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoo
                     'ar' => __('panel.messages.reservation_created_successfully', [], 'ar'),
                     'en' => __('panel.messages.reservation_created_successfully', [], 'en')
                 ], 'created');
-                $reservation->patient->notify(new ReservationCreatedSuccessfullyNotification($reservation));
+//                $reservation->patient->notify(new ReservationCreatedSuccessfullyNotification($reservation));
                 $reservation->reservable->user->notify(new ReservationCreatedSuccessfullyNotification($reservation));
             }
 
 
         }
         session()->flash('reservation_id', $transaction->transactionable->id);
-        return redirect()->route('checkout.success');
+        return 'success';
     }
     return redirect()->route('checkout.error');
 })->name('webhooks.myfatoorah.transactions.callback');

@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->json('settings')->nullable();
             $table->foreignId('city_id')->nullable();
             $table->foreignId('gender')->default('male');
-            $table->foreignId('dob')->nullable();
+            $table->date('dob')->nullable();
             $table->json('data')->nullable();
             $table->timestamps();
         });

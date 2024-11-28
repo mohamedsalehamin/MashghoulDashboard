@@ -3,6 +3,7 @@
 namespace App\UtilitiesModule\Pages;
 
 use App\UsersModule\Models\User\Patient;
+use App\UsersModule\Models\Users\Customer;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
@@ -15,7 +16,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Notification;
-use App\CrmModule\Models\Customer;
 use App\DefaultPanel\Notifications\SendAdminMessagesNotification;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 
@@ -79,7 +79,7 @@ class SendNotifications extends Page implements HasForms {
                     Select::make("notifiable")
                         ->multiple()
                         ->visible(fn($get) => $get('notification_type') == 'specific')
-                        ->options(Patient::pluck('name', 'id'))
+                        ->options(Customer::pluck('name', 'id'))
                 ])
         ];
     }
@@ -88,7 +88,7 @@ class SendNotifications extends Page implements HasForms {
     public function submit() {
 
         $this->validate();
-        Notification::send(Patient::when($this->notification_type == 'specific', fn($builder) => $builder->whereIn('id', $this->notifiable))->get(), new SendAdminMessagesNotification($this->notification_title, $this->notification_body));
+        Notification::send(Customer::when($this->notification_type == 'specific', fn($builder) => $builder->whereIn('id', $this->notifiable))->get(), new SendAdminMessagesNotification($this->notification_title, $this->notification_body));
         $this->reset('notification_title', 'notification_body', 'notification_type', 'notifiable');
         \Filament\Notifications\Notification::make()->title(__('panel.messages.success'))
             ->body(__('panel.messages.notifications_sent_successfully'))

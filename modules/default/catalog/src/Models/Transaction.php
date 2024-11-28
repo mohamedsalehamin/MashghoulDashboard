@@ -28,7 +28,7 @@ class Transaction extends Model {
     }
 
     public function scopePaid($query) {
-        return $query->where('status', ReservationPaymentStatus::PAID);
+//        return $query->where('status', ReservationPaymentStatus::PAID);
     }
 
 

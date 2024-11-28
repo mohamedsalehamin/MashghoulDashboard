@@ -1,16 +1,15 @@
 <?php
 
-use App\DefaultPanel\Api\V1\Content\ArticleServices;
+use App\DefaultPanel\Api\V1\CartServices;
+use App\DefaultPanel\Api\V1\CategoryServices;
 use App\DefaultPanel\Api\V1\Content\BannerServices;
 use App\DefaultPanel\Api\V1\Content\ContentServices;
-use App\DefaultPanel\Api\V1\DoctorServices;
-use App\DefaultPanel\Api\V1\LabServices;
 use App\DefaultPanel\Api\V1\LocationServices;
 use App\DefaultPanel\Api\V1\NotificationServices;
 use App\DefaultPanel\Api\V1\ProductServices;
+use App\DefaultPanel\Api\V1\ProvidersServices;
 use App\DefaultPanel\Api\V1\SettingServices;
 use App\DefaultPanel\Api\V1\SharedProfileService;
-use App\DefaultPanel\Api\V1\SpecializationServices;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,34 +31,23 @@ Route::prefix('v1')->group(function () {
     Route::get('settings/report-reasons', [SettingServices::class, 'reportReasons']);
 
     Route::get('banners', [BannerServices::class, 'list']);
+    Route::get('categories', [CategoryServices::class, 'list']);
+    Route::get('categories/{category}', [CategoryServices::class, 'show']);
+    Route::post('/providers/{provider}/cart/details', [CartServices::class, 'details'])->middleware('auth:sanctum');
+    Route::post('/providers/{provider}/cart/checkout', [CartServices::class, 'checkout'])->middleware('auth:sanctum');
+
+
+    Route::get('providers', [ProvidersServices::class, 'index']);
+    Route::get('providers/{provider}', [ProvidersServices::class, 'show']);
+    Route::get('providers/{provider}/seats', [ProvidersServices::class, 'seats']);
+    Route::post('providers/{provider}/favorite/toggle', [ProvidersServices::class, 'toggleFavorite'])->middleware('auth:sanctum');
+
     Route::get('search', [ProductServices::class, 'search']);
-    Route::get('specializations', [SpecializationServices::class, 'list']);
-    Route::get('specializations/{specialization}', [SpecializationServices::class, 'show']);
-
-    Route::get('doctors', [DoctorServices::class, 'index']);
-    Route::get('doctors/{doctor}', [DoctorServices::class, 'show']);
-    Route::post('doctors/{doctor}/toggle-favorite', [DoctorServices::class, 'toggleFavorite'])->middleware('auth:sanctum');
-    Route::post('doctors/{doctor}/available-times', [DoctorServices::class, 'availableTimes'])->middleware('auth:sanctum');
-    Route::post('doctors/{doctor}/details', [DoctorServices::class, 'appointmentDetails'])->middleware('auth:sanctum');
-    Route::post('doctors/{doctor}/reserve', [DoctorServices::class, 'reserve'])->middleware('auth:sanctum');
-
-    Route::get('labs', [LabServices::class, 'index']);
-    Route::get('labs/{lab}', [LabServices::class, 'show']);
-    Route::post('labs/{lab}/toggle-favorite', [LabServices::class, 'toggleFavorite'])->middleware('auth:sanctum');
-    Route::post('labs/{lab}/available-times', [LabServices::class, 'availableTimes'])->middleware('auth:sanctum');
-    Route::post('labs/{lab}/details', [LabServices::class, 'appointmentDetails'])->middleware('auth:sanctum');
-    Route::post('labs/{lab}/reserve', [LabServices::class, 'reserve'])->middleware('auth:sanctum');
-
-
-    Route::get('chronic-diseases', [ContentServices::class, 'chronicDiseases']);
     Route::post('contacts', [ContentServices::class, 'contact']);
     Route::post('join', [ContentServices::class, 'join']);
     Route::get('pages/{slug}', [ContentServices::class, 'page']);
     Route::get('faqs', [ContentServices::class, 'faqs']);
     Route::get('customers-reviews', [ContentServices::class, 'customersReviews']);
-    Route::get('articles', [ArticleServices::class, 'index']);
-    Route::get('articles/categories', [ArticleServices::class, 'categories']);
-    Route::get('articles/{article}', [ArticleServices::class, 'show']);
 
     Route::get('titles', [ContentServices::class, 'titles']);
     Route::get('locations/countries', [LocationServices::class, 'countries']);

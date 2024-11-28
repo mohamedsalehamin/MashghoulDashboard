@@ -3,6 +3,7 @@
 namespace App\ProviderPanel\Filament\Resources;
 
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
+
 use App\ProviderPanel\Filament\Resources\WalletResource\Pages\ListWalletTransactions;
 use App\ProviderPanel\Filament\Resources\WalletResource\Widgets\WalletSummary;
 use Filament\Forms\Components\DatePicker;

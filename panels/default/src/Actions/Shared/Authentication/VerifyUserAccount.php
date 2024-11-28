@@ -15,7 +15,7 @@ class VerifyUserAccount {
         $user->update(['phone_verified_at' => now()]);
         UpdateUserToken::run($user);
         RemoveVerficationCodes::run($user);
-        Notification::send($user, new CustomerRegisteredNotification());
+//        Notification::send($user, new CustomerRegisteredNotification());
 
 
     }

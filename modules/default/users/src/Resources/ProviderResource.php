@@ -2,6 +2,7 @@
 
 namespace App\UsersModule\Resources;
 
+use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
@@ -109,8 +110,29 @@ class ProviderResource extends Resource {
                 ]),
                 Tabs\Tab::make(__("sections.provider_information"))->schema([
                     Group::make()->schema([
-                        TextInput::make('name')->required(),
-                        Textarea::make('bio')->required(),
+                        Tabs::make('Label')
+                            ->tabs([
+                                Tabs\Tab::make(__('panel.languages.arabic'))
+                                    ->schema([
+                                        TextInput::make('name.ar')
+
+                                            ->label(__('forms.fields.provider_name'))
+                                            ->required(),
+                                        Textarea::make('bio.ar')
+                                            ->label(__('forms.fields.bio'))
+                                            ->required(),
+                                    ]),
+                                Tabs\Tab::make(__('panel.languages.english'))
+                                    ->schema([
+                                        TextInput::make('name.en')
+                                            ->label(__('forms.fields.provider_name'))
+                                            ->required(),
+                                        Textarea::make('bio.en')
+                                            ->label(__('forms.fields.bio'))
+                                            ->required(),
+                                    ]),
+                            ]),
+
                         SpatieMediaLibraryFileUpload::make('image')
                             ->nullable(),
                         SpatieMediaLibraryFileUpload::make('images')
@@ -120,6 +142,12 @@ class ProviderResource extends Resource {
                             ->collection("commercial_register")
                             ->nullable(),
 
+                        Select::make('category_id')
+                            ->required()
+                            ->options(function ($get, $set, $record) {
+
+                                return Category::pluck('name', 'id');
+                            }),
                         Select::make('country_id')
                             ->live()
                             ->required()

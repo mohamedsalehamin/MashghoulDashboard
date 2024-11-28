@@ -3,6 +3,8 @@
 namespace App\ProviderPanel\Filament\Resources\ReservationResource\RelationManagers;
 
 use App\CatalogModule\Models\Reservation\ItemsLine;
+use App\CatalogModule\Models\Service;
+use App\DefaultPanel\Lib\Utils;
 use App\Notifications\LabReservationResultsAddedNotification;
 use Cknow\Money\Money;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -26,17 +28,26 @@ class ItemsLineRelationManager extends RelationManager {
             ->heading(__('sections.services'))
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('model.name.' . app()->getLocale())
+                Tables\Columns\TextColumn::make('model.id')
+                    ->formatStateUsing(fn( ItemsLine $record) => Service::find($record->model['id'])->title)
                     ->label(__('forms.fields.name')),
 
-                Tables\Columns\TextColumn::make('model.id')
+                Tables\Columns\TextColumn::make('products')
+                    ->state(function ($record){
+                        $text = [];
+                        foreach ($record['attributes']['products']??[] as $index => $option) {
+                            $option_name = Utils::getTranslatedField($option['title']);
+                            $price =Money::parse($option['price']['amount'])->format();
+                            $text[] = "{$option_name} ({$price}) ";
+                        }
+                        return $text;
 
-                    ->formatStateUsing(fn($record) => __('forms.fields.view_file'))
-                    ->url(fn($record) => $record->getFirstMediaUrl())
-                    ->openUrlInNewTab()
-                    ->label(__('forms.fields.file')),
+                    })
+                    ->listWithLineBreaks()
+                    ->label(__('forms.fields.products')),
 
                 Tables\Columns\TextColumn::make('total')
+                    ->label(__("forms.fields.service_price"))
                     ->state(function (ItemsLine $record) {
                         return Money::parse(($record->quantity * $record->price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
                     }),
@@ -47,17 +58,6 @@ class ItemsLineRelationManager extends RelationManager {
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                Tables\Actions\Action::make('upload_analysis')
-                    ->visible(fn(ItemsLine $record) => !$record->getFirstMediaUrl())
-                    ->label(__('forms.actions.upload_analysis'))
-                    ->icon('heroicon-o-arrow-up-on-square')
-                    ->action(fn($record)=>$record->reservation->patient->notify(new LabReservationResultsAddedNotification($record->reservation)))
-                    ->form([
-                        SpatieMediaLibraryFileUpload::make('file')
-                            ->columnSpan(2),
-                    ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

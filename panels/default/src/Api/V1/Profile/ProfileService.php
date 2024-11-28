@@ -11,6 +11,7 @@ use App\DefaultPanel\Requests\Api\Profile\ProfileSettingRequest;
 use App\DefaultPanel\Requests\Api\Profile\UpdateCustomerProfileRequest;
 use App\DefaultPanel\Requests\Api\Profile\UpdatePasswordRequest;
 use App\DefaultPanel\Requests\Api\Profile\VerifyAltPhoneRequest;
+use App\DefaultPanel\Resources\Api\CustomerResource;
 use App\DefaultPanel\Resources\Api\PatientDataResource;
 use App\DefaultPanel\Resources\Api\PatientResource;
 use App\DefaultPanel\Resources\Api\User\TransactionResources;
@@ -21,7 +22,7 @@ use Tasawk\Api\Facade\Api;
 
 class ProfileService {
     public function index() {
-        return Api::isOk(__("Patient information"))->setData(new PatientResource(patient()));
+        return Api::isOk(__("customer information"))->setData( CustomerResource::make(auth()->user()));
     }
 
     public function update(UpdateCustomerProfileRequest $request): Core {
@@ -30,13 +31,10 @@ class ProfileService {
         if (auth()->user()->phone !== $request->get('phone')) {
             ChangeUserPhone::run(auth()->user(), $request->get('phone'));
         }
-        return Api::isOk(__("Account information updated"))->setData(new PatientResource(auth()->user()));
+        return Api::isOk(__("Account information updated"))->setData(new CustomerResource(auth()->user()));
     }
 
-    public function updatePassword(UpdatePasswordRequest $request): Core {
-        UpdateUserPassword::run(auth()->user(), $request->get('password'));
-        return Api::isOk(__("Account information updated"))->setData(new PatientResource(auth()->user()));
-    }
+
 
     public function settings(ProfileSettingRequest $request): Core {
         auth()->user()->update(['settings' => $request->validated()]);
@@ -56,9 +54,7 @@ class ProfileService {
         return Api::isOk(__("Deleted"));
     }
 
-    public function healthData(): Core {
-        return Api::isOk(__("User information"))->setData(new PatientDataResource(patient()));
-    }
+
 
     public function transactions() {
 

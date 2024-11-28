@@ -257,6 +257,7 @@ return [
             "option_required" => ":title مطلوب",
 
         ],
+        "coupon_code_not_found" => "كود الخصم غير صحيح",
         "branch_not_available" => "الفرع حاليا غير متاح لاستقبال طلبات جديدة",
         "address_out_side_current_branch" => 'العنوان المختار خارج نطاق توصيل الفرع الحالي',
         "branch_in_maintenance_mode" => 'الفرع حاليا في وضع الصيانة،حاول بعد فترة',

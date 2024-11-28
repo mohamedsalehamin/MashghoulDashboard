@@ -2,6 +2,9 @@
 <?php
 return [
     'messages' => [
+        "pay_reservation_fees"=>"دفع رسوم الحجز",
+        "pay_reservation_totals"=>"دفع المبلغ الكلي",
+        "app_percentage"=>"نسبة التطبيق",
         "you_dont_have_enough_money_to_pay"=>"رصيدك لا يكفي لاتمام العملية الحالية",
         "pay_subscription_via_wallet"=>"تم دفع :amount نظير الاشتراك في الباقة رقم :id",
         'reservation_created_successfully' => 'تم إنشاء الحجز بنجاح',
@@ -82,6 +85,7 @@ return [
         '60_minutes' => '60 دقيقة',
         "90_minutes" => "90 دقيقة",
         "120_minutes" => "120 دقيقة",
+        "minutes" => ":minutes دقيقة",
         "provider" => "مقدم الخدمة",
         'offline' => 'استشارة حضورية',
         'video' => 'استشارة فديو',
