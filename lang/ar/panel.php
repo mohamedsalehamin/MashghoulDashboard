@@ -2,6 +2,11 @@
 <?php
 return [
     'messages' => [
+        'gift_for_register'=>'مكافأة لتسجيل الحساب',
+        "gift_for_reservation" => "مكافأة اتمام الحجز رقم :id",
+        "end_time_more_than_provider" => "وقت النهاية يجب أن يكون داخل اوقات العمل المشغل",
+        "start_time_less_than_provider" => "وقت البداية يجب أن يكون داخل اوقات العمل المشغل",
+        "working_day_not_set" => "اليوم الحالي غير متاح العمل فيه داخل المشغل",
         "pay_reservation_fees"=>"دفع رسوم الحجز",
         "pay_reservation_totals"=>"دفع المبلغ الكلي",
         "app_percentage"=>"نسبة التطبيق",

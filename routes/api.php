@@ -1,15 +1,15 @@
 <?php
 
-use App\DefaultPanel\Api\V1\CartServices;
-use App\DefaultPanel\Api\V1\CategoryServices;
-use App\DefaultPanel\Api\V1\Content\BannerServices;
-use App\DefaultPanel\Api\V1\Content\ContentServices;
-use App\DefaultPanel\Api\V1\LocationServices;
-use App\DefaultPanel\Api\V1\NotificationServices;
-use App\DefaultPanel\Api\V1\ProductServices;
-use App\DefaultPanel\Api\V1\ProvidersServices;
-use App\DefaultPanel\Api\V1\SettingServices;
-use App\DefaultPanel\Api\V1\SharedProfileService;
+use App\DefaultPanel\Api\V1\Customer\CartServices;
+use App\DefaultPanel\Api\V1\Customer\CategoryServices;
+use App\DefaultPanel\Api\V1\Customer\Content\BannerServices;
+use App\DefaultPanel\Api\V1\Customer\Content\ContentServices;
+use App\DefaultPanel\Api\V1\Customer\LocationServices;
+use App\DefaultPanel\Api\V1\Customer\NotificationServices;
+use App\DefaultPanel\Api\V1\Customer\ProductServices;
+use App\DefaultPanel\Api\V1\Customer\ProvidersServices;
+use App\DefaultPanel\Api\V1\Customer\SettingServices;
+use App\DefaultPanel\Api\V1\Customer\SharedProfileService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,14 +23,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+require_once __DIR__ . '/api/v1/customer.php';
+require_once __DIR__ . '/api/v1/provider.php';
+
 Route::prefix('v1')->group(function () {
     Route::get('settings/contacts/types', [SettingServices::class, 'contactTypes']);
     Route::get('settings', [SettingServices::class, 'all']);
     Route::get('settings/reservation-statuses', [SettingServices::class, 'reservationStatuses']);
-    Route::get('settings/cancellation-reasons', [SettingServices::class, 'cancellationReasons']);
-    Route::get('settings/report-reasons', [SettingServices::class, 'reportReasons']);
 
     Route::get('banners', [BannerServices::class, 'list']);
+    Route::get('plans', [ContentServices::class, 'points']);
     Route::get('categories', [CategoryServices::class, 'list']);
     Route::get('categories/{category}', [CategoryServices::class, 'show']);
     Route::post('/providers/{provider}/cart/details', [CartServices::class, 'details'])->middleware('auth:sanctum');
@@ -39,7 +41,9 @@ Route::prefix('v1')->group(function () {
 
     Route::get('providers', [ProvidersServices::class, 'index']);
     Route::get('providers/{provider}', [ProvidersServices::class, 'show']);
+    Route::post('providers/closest/coordinate', [ProvidersServices::class, 'getClosestBasedOnCoordinate']);
     Route::get('providers/{provider}/seats', [ProvidersServices::class, 'seats']);
+    Route::get('providers/{provider}/seats/{seat}/times/available', [ProvidersServices::class, 'availableTimes']);
     Route::post('providers/{provider}/favorite/toggle', [ProvidersServices::class, 'toggleFavorite'])->middleware('auth:sanctum');
 
     Route::get('search', [ProductServices::class, 'search']);
@@ -69,8 +73,6 @@ Route::prefix('v1')->group(function () {
 
 
 
-
-require_once __DIR__ . '/api/v1/index.php';
 
 
 

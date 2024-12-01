@@ -414,7 +414,7 @@ class Cart extends CoreCart {
     }
 
     public function walletDiscount() {
-        return $this->getConditionsByType('wallet')?->first()?->getValue();
+        return $this->getConditionsByType('wallet')?->first()?->getValue()* 100;
     }
 
     public function formattedTotals(): array {
@@ -430,6 +430,7 @@ class Cart extends CoreCart {
             "discount" => $this->discount(),
             "subtotal" => $this->getSubTotal(),
             "reservation_fees" => $this->getReservationFees(),
+            'wallet_discount' => $this->walletDiscount(),
             "total" => $this->getTotal()
         ];
     }

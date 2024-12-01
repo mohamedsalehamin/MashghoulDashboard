@@ -74,8 +74,7 @@
             "App\\ReportsModule\\": "modules/default/reports/src",
             "App\\UtilitiesModule\\": "modules/default/utilities/src",
             "App\\DefaultPanel\\": "panels/default/src",
-            "App\\ProviderPanel\\": "panels/providers/src",
-            "Packages\\Agora\\": "packages/agora/src"
+            "App\\ProviderPanel\\": "panels/providers/src"
         }
     },
     "autoload-dev": {

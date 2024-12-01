@@ -10,11 +10,14 @@ use App\CatalogModule\Resources\SeatResource\Pages\ListSeats;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
+use Closure;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -55,7 +58,9 @@ class SeatResource extends Resource {
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->getTranslation('title','en')} - {$record->getTranslation('title','ar')}")
                     ->label(__('forms.fields.services'))
                     ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id')),
-                Section::make("working_times")->schema(GeneralSettings::daysListSchema()),
+                Section::make("working_times")->schema([...GeneralSettings::daysListSchema(),
+
+                ]),
 
                 Toggle::make('status')->default(1)
                     ->onColor('success')

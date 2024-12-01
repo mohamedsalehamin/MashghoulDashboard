@@ -6,6 +6,7 @@ namespace App\Models;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\BanksAccount;
 use App\ContentModule\Models\City;
+use App\ContentModule\Models\Point;
 use App\DefaultPanel\Enum\UserStatus;
 use App\Notifications\YourAccountActivatedNotification;
 use App\Notifications\YourAccountInActivatedNotification;
@@ -172,4 +173,27 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     public function reservations(): HasMany {
         return $this->hasMany(Reservation::class, 'user_id');
     }
+
+    public function points() {
+        return $this->hasMany(Point::class, 'user_id');
+    }
+
+    public function pointsExchanges(): HasMany {
+        return $this->hasMany(PointsExchange::class, 'user_id');
+    }
+
+    public function getTotalPointsBalance() {
+        return PointsExchange::where('user_id', $this->id)->where('expired_at', ">", now())
+            ->where('used', 0)
+            ->sum('reset_price');
+    }
+
+    public function getTotalPoints() {
+
+        return $this
+            ->points()
+            ->where('transferred', false)
+            ->sum('reset_points');
+    }
+
 }

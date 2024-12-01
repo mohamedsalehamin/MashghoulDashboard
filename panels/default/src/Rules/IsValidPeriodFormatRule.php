@@ -22,7 +22,18 @@ class IsValidPeriodFormatRule implements Rule {
      * @return bool
      */
     public function passes($attribute, $value) {
-        return count(explode(' - ', $value)) == 2 && Carbon::parse(explode('-', $value)[0])->isBefore(Carbon::parse(explode('-', $value)[1]));
+        $seat = request()->route('provider')
+            ->seats()
+            ->where('id', request()->get('seat_id'))
+            ->first();
+
+        return collect($seat->getAvailablePeriodsOnDate(request()->date('date')))
+            ->where('from', request()->get('from'))
+            ->where('to', request()->get('to'))
+            ->where('reserved', false)
+            ->count();
+
+
 
     }
 

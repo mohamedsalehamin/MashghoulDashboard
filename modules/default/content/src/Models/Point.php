@@ -13,5 +13,8 @@ class Point extends Model implements HasMedia {
     use  Publishable, InteractsWithMedia;
 
     protected $guarded = ['id'];
+    protected $casts = [
+        'meta_data' => 'array'
+    ];
     use HasFactory;
 }

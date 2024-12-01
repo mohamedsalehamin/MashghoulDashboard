@@ -176,7 +176,6 @@ return [
         \App\DefaultPanel\DefaultPanelServiceProvider::class,
 
         ProviderPanelServiceProvider::class,
-        AgoraServiceProvider::class,
 
     ])->toArray(),
 

@@ -6,6 +6,7 @@ namespace App\UsersModule\Models;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Models\Seat;
+use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
@@ -20,11 +21,12 @@ use Spatie\Translatable\HasTranslations;
 use Theamostafa\Wallet\Traits\HasWallet;
 
 class Provider extends Model implements HasMedia {
-    use InteractsWithMedia, HasWallet,HasTranslations;
+    use InteractsWithMedia, HasWallet, HasTranslations;
     use Favoriteable;
     use HasSpatial;
+
     protected $guarded = ['id'];
-    protected $translatable = ['name','bio'];
+    protected $translatable = ['name', 'bio'];
 
     protected $casts = [
         'location' => Point::class,
@@ -48,13 +50,24 @@ class Provider extends Model implements HasMedia {
     public function user() {
         return $this->belongsTo(User::class);
     }
+
     public function reservations(): MorphMany {
         return $this->morphMany(Reservation::class, 'reservable');
     }
+
     public function seats() {
         return $this->hasMany(Seat::class);
     }
+
     public function rate() {
         return $this->hasManyThrough(Rate::class, Reservation::class, 'reservable_id', 'reservation_id');
+    }
+
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function avgRate(): float|int {
+        return (float)$this->rate()->avg('rate') ?? 0;
     }
 }

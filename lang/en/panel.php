@@ -1,8 +1,11 @@
 <?php
 return [
     'messages' => [
+        'gift_for_register' => 'Gift for register',
+        "gift_for_reservation" => "Gift for reservation no :id",
+        "working_day_not_set" => "Working day not set",
         'reservation_created_successfully' => 'Reservation created successfully',
-        'reservation_status_changed' => 'Reservation status changed',
+        'reservation_status_changed' => 'Reservation status changed to :status ',
         "you_dont_have_enough_money_to_pay" => "Your balance is not enough to pay current operation",
         'customer_can_enter_custom_value' => 'Customer can enter custom value',
         "pay_subscription_via_wallet" => "A sum of :شوخعرف was paid for the subscription to Package No. :id",
@@ -53,6 +56,7 @@ return [
         'delete' => 'Delete'
     ],
     'enums' => [
+        'completed' => 'Completed',
         "refunded" => "Refunded",
         'active' => 'Active',
         'deposit' => 'Deposit',

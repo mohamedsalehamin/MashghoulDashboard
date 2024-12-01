@@ -245,6 +245,8 @@ return [
         ]
     ],
     'api' => [
+        'insufficient_wallet_balance' => 'رصيد المحفظة غير كافي',
+        "overdue_wallet_balance" => 'الرصيد المدفوع اكبر من قيمة الطلب',
         'product' => [
             'not_exists' => 'المنتج رقم :index غير موجود',
             'not_available' => ":title غير متاح للحجز",
@@ -276,7 +278,9 @@ return [
         "coupon_code_exceeds_the_number_of_usages_times" => 'كود الخصم تجاوز عدد مرات الاستخدام',
         "coupon_code_already_used" => 'كود الخصم مستخدم مسبقا',
         'invalid_date_period' => 'الفترة غير متاحة للحجز',
-        'invalid_period' => 'فتره غير صحيحة',
+        'invalid_period' => 'الفترة المختارة غير صحيحة او تم حجزها من طرف عميل اخر',
+        'invalid_date' => 'التاريخ المختار خارج مواعيد العمل',
+
 
     ],
 

@@ -2,8 +2,10 @@
 
 namespace App\DefaultPanel\Settings;
 
+use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Closure;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -56,23 +58,117 @@ class GeneralSettings extends Settings {
             '120' => __("panel.enums.120_minutes"),
         ];
     }
+
     static public function daysListSchema(): array {
         $schema = [];
+
         foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $index => $day) {
             $schema [] = Group::make([
 
                 Checkbox::make("status")
                     ->label(__("forms.fields.weekdays.$day"))
-                    ->statePath("$index.status"),
+                    ->statePath("$index.status")
+                    ->rules([
+                        fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get, $index) {
+                            $providerTimes = Provider::find($get("../../provider_id"));
+                            if (!$get("$index.status")) {
+                                return;
+
+                            }
+                            if (!$providerTimes) {
+
+                                return;
+                            }
+
+                            $day = collect($providerTimes->meta_data['days_list'])
+                                ->where('status', true)
+                                ->where('day_name', $get("{$index}.day_name"))->first();
+
+
+                            if (!$day) {
+                                $fail(__("panel.messages.working_day_not_set"));
+                                return;
+                            }
+                            $providerStartTime = $day['from'];
+                            $providerEndTime = $day['to'];
+                            $currentStartTime = $get("{$index}.from");
+                            $currentEndTime = $get("{$index}.to");
+                            if ($currentStartTime < $providerStartTime) {
+                                $fail(__("panel.messages.start_time_less_than_provider"));
+                                return;
+                            }
+                            if ($currentEndTime > $providerEndTime) {
+                                $fail(__("panel.messages.end_time_more_than_provider"));
+                                return;
+                            }
+
+                        },
+                    ]),
 
                 Hidden::make("day_name")
                     ->statePath("$index.day_name")
-                    ->formatStateUsing(fn()=>$day),
+                    ->formatStateUsing(fn() => $day),
 
                 TimePicker::make("from")
+                    ->minutesStep(60)
+                    ->datalist([
+                        "00:00",
+                        "01:00",
+                        "02:00",
+                        "03:00",
+                        "04:00",
+                        "05:00",
+                        "06:00",
+                        "07:00",
+                        "08:00",
+                        "09:00",
+                        "10:00",
+                        "11:00",
+                        "12:00",
+                        "13:00",
+                        "14:00",
+                        "15:00",
+                        "16:00",
+                        "17:00",
+                        "18:00",
+                        "19:00",
+                        "20:00",
+                        "21:00",
+                        "22:00",
+                        "23:00",
+
+                    ])
                     ->seconds(false)
                     ->statePath("$index.from"),
                 TimePicker::make("to")
+                    ->minutesStep(60)
+                    ->datalist([
+                        "00:00",
+                        "01:00",
+                        "02:00",
+                        "03:00",
+                        "04:00",
+                        "05:00",
+                        "06:00",
+                        "07:00",
+                        "08:00",
+                        "09:00",
+                        "10:00",
+                        "11:00",
+                        "12:00",
+                        "13:00",
+                        "14:00",
+                        "15:00",
+                        "16:00",
+                        "17:00",
+                        "18:00",
+                        "19:00",
+                        "20:00",
+                        "21:00",
+                        "22:00",
+                        "23:00",
+
+                    ])
                     ->seconds(false)
                     ->statePath("$index.to"),
 

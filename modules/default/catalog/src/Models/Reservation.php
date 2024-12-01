@@ -48,7 +48,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Tasawk\Enum\OrderStatus;
 
 class Reservation extends Model {
     use Transactionable, FilterScope, AgoraSession;
@@ -96,10 +95,10 @@ class Reservation extends Model {
 //                $reservation->patient->notify(new ReservationScheduledNotification($reservation));
 //                $reservation->reservable->user->notify(new ReservationScheduledNotification($reservation));
 //            }
-//            $reservation->addTimeline([
-//                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
-//                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'en')
-//            ], $reservation->status);
+            $reservation->addTimeline([
+                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
+                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'en')], 'en')
+            ], $reservation->status);
         });
 
     }
@@ -134,7 +133,7 @@ class Reservation extends Model {
     }
 
     public function customer(): BelongsTo {
-        return $this->belongsTo(Customer::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function commission(): HasOne {
@@ -181,7 +180,7 @@ class Reservation extends Model {
     }
 
     public function getReservationNumberAttribute(): string {
-        return sprintf("%'.06d", $this->id);
+        return sprintf("6%'.09d", $this->id);
     }
 
 
@@ -280,7 +279,25 @@ class Reservation extends Model {
         return $this->rate()->where('type', 'place');
     }
 
+    public function rates() {
+        return $this->hasMany(Rate::class);
+    }
+
     public function seat() {
         return $this->belongsTo(Seat::class);
+    }
+    public function addTimeline($title, $status): void {
+        $this->timeline()->create([
+            'title' => $title,
+            'status' => $status,
+        ]);
+    }
+    public function timeline() {
+        return $this->hasMany(Timeline::class);
+    }
+
+    public function getPaymentStatus(): ReservationPaymentStatus {
+
+        return $this->transactions()->count() == $this->transactions()->where('status', 'paid')->count() ? ReservationPaymentStatus::PAID : ReservationPaymentStatus::PENDING;
     }
 }

@@ -80,8 +80,9 @@ class ReservationResource extends Resource {
                     ->color(fn($record) => $record?->status?->getColor())
                     ->badge(),
                 TextColumn::make('transaction.status')
+                    ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                     ->label(__('forms.fields.payment_status'))
-                    ->color(fn($record) => $record?->transaction?->status?->getColor())
+                    ->color(fn($record) => $record?->getPaymentStatus()?->getColor())
                     ->badge(),
 
                 TextColumn::make('price'),
@@ -151,9 +152,10 @@ class ReservationResource extends Resource {
                                     ->color(fn($record) => $record?->status?->getColor())
                                     ->badge(),
                                 TextEntry::make('transaction.status')
+                                    ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                                     ->label(__('forms.fields.payment_status'))
                                     ->helperText(fn($record) => isset($record->transaction->meta_data['refund_data']['RefundId']) ? "Refund status: " . GetRefundTransactionStatusAction::run($record->transaction->meta_data['refund_data']['RefundId']) : '')
-                                    ->color(fn($record) => $record?->transaction?->status?->getColor())
+                                    ->color(fn($record) => $record?->getPaymentStatus()->getColor())
                                     ->badge(),
                                 TextEntry::make('duration')
                                     ->label(__('forms.fields.duration')),

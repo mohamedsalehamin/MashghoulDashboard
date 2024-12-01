@@ -72,7 +72,8 @@ class ReservationResource extends Resource {
                     ->badge(),
                 TextColumn::make('transaction.status')
                     ->label(__('forms.fields.payment_status'))
-                    ->color(fn($record) => $record?->transaction?->status?->getColor())
+                    ->formatStateUsing(fn($record) => $record?->getPaymentStatus()?->getLabel())
+                    ->color(fn($record) => $record?->getPaymentStatus()?->getColor())
                     ->badge(),
 
                 TextColumn::make('price'),
@@ -143,20 +144,20 @@ class ReservationResource extends Resource {
                                     ->color(fn($record) => $record?->status?->getColor())
                                     ->badge(),
                                 TextEntry::make('transaction.status')
+                                    ->formatStateUsing(fn($record) => $record?->getPaymentStatus()?->getLabel())
                                     ->label(__('forms.fields.payment_status'))
-                                    ->helperText(fn($record) => isset($record->transaction->meta_data['refund_data']['RefundId']) ? "Refund status: " . GetRefundTransactionStatusAction::run($record->transaction->meta_data['refund_data']['RefundId']) : '')
-                                    ->color(fn($record) => $record?->transaction?->status?->getColor())
+                                    ->color(fn($record) => $record?->getPaymentStatus()->getColor())
                                     ->badge(),
                                 TextEntry::make('duration')
                                     ->label(__('forms.fields.duration')),
-                                Group::make()->schema(function ($record){
-                                    $totals= $record->as_cart->formattedTotals();
+                                Group::make()->schema(function ($record) {
+                                    $totals = $record->as_cart->formattedTotals();
                                     return [
-                                        TextEntry::make('services_total')->state(fn()=>$totals['services_total']),
-                                        TextEntry::make('products_total')->state(fn()=>$totals['products_total']),
-                                        TextEntry::make('discount')->state(fn()=>$totals['discount']),
+                                        TextEntry::make('services_total')->state(fn() => $totals['services_total']),
+                                        TextEntry::make('products_total')->state(fn() => $totals['products_total']),
+                                        TextEntry::make('discount')->state(fn() => $totals['discount']),
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
-                                        TextEntry::make('total')->state(fn()=>$totals['total']),
+                                        TextEntry::make('total')->state(fn() => $totals['total']),
                                     ];
                                 })
                                     ->columnSpan(4)
@@ -188,10 +189,11 @@ class ReservationResource extends Resource {
 
     public static function getNavigationBadge(): ?string {
         return static::getModel()::where('reservable_id', provider()->id)
-            ->where('status',ReservationStatus::PENDING)
+            ->where('status', ReservationStatus::PENDING)
             ->count();
 
     }
+
     public static function getWidgets(): array {
         return [
 //            CalendarWidget::make(),

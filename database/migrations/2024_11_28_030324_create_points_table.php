@@ -22,9 +22,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId("level_id")->nullable();
-            $table->integer('points');
-            $table->string('type'); //winning,exchanged,used
-            $table->timestamp("expired_at")->nullable();
+            $table->integer('value');
+            $table->boolean('transferred');
             $table->json('meta_data');
             $table->timestamps();
         });
