@@ -3,7 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer;
 
 use App\DefaultPanel\Notifications\SendAdminMessagesNotification;
-use App\DefaultPanel\Resources\Api\Provider\NotificationResource;
+use App\DefaultPanel\Resources\Api\Customer\NotificationResource;
 use Notification;
 use Tasawk\Api\Facade\Api;
 

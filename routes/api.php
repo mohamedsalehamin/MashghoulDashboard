@@ -41,7 +41,6 @@ Route::prefix('v1')->group(function () {
 
     Route::get('providers', [ProvidersServices::class, 'index']);
     Route::get('providers/{provider}', [ProvidersServices::class, 'show']);
-    Route::post('providers/closest/coordinate', [ProvidersServices::class, 'getClosestBasedOnCoordinate']);
     Route::get('providers/{provider}/seats', [ProvidersServices::class, 'seats']);
     Route::get('providers/{provider}/seats/{seat}/times/available', [ProvidersServices::class, 'availableTimes']);
     Route::post('providers/{provider}/favorite/toggle', [ProvidersServices::class, 'toggleFavorite'])->middleware('auth:sanctum');

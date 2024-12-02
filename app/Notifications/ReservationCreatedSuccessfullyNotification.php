@@ -64,7 +64,7 @@ class ReservationCreatedSuccessfullyNotification extends Notification {
     public function getTitle($notifiable) {
         return NotificationMessageParser::init($notifiable)
             ->customerMessage('panel.notifications.reservationcreatedsuccessfullynotification', ['id' => $this->reservation->id])
-            ->doctorMessage('panel.notifications.doctorreservationcreatedsuccessfullynotification', ['id' => $this->reservation->id])
+            ->adminMessage('panel.notifications.doctorreservationcreatedsuccessfullynotification', ['id' => $this->reservation->id])
             ->parse();
     }
 
@@ -72,7 +72,7 @@ class ReservationCreatedSuccessfullyNotification extends Notification {
 
         return NotificationMessageParser::init($notifiable)
             ->customerMessage('panel.notifications.reservationcreatedsuccessfullynotificationbody', ['id' => $this->reservation->id])
-            ->doctorMessage('panel.notifications.doctorreservationcreatedsuccessfullynotificationbody', ['id' => $this->reservation->id])
+            ->adminMessage('panel.notifications.doctorreservationcreatedsuccessfullynotificationbody', ['id' => $this->reservation->id])
             ->parse();
     }
 }

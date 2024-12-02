@@ -52,15 +52,21 @@ class Cart extends CoreCart {
         if (!$coupon) {
             return false;
         }
+        $total = $coupon->discount_value;
+        if ($coupon->discount_type->value == 'percentage') {
+            $discount = $this->getServicesTotalIncludeProducts() / 100 * $total;
+            $total = min($discount, $coupon->meta_data['max_discount'] ?? $discount);
+        }
+
         $coupon_value = $coupon->formattedValue();
         $conditionData = [
             'name' => $coupon->code,
             'type' => "coupon",
             'target' => "subtotal",
-            'value' => "-" . $coupon_value,
+            'value' => "-" . $total,
             'order' => 1,
             'attributes' => [
-                'original_value' => "-" . $coupon_value,
+                'original_value' => "-" . $total,
             ]
         ];
         $conditionData['attributes'] = $conditionData;
@@ -233,7 +239,8 @@ class Cart extends CoreCart {
         return true;
     }
 
-    public function setOrderConditions(): static {
+    public
+    function setOrderConditions(): static {
         foreach ($this->getConditions() as $condition) {
             DB::table('reservations_conditions')->insert([
                 'reservation_id' => $this->getOrderID(),
@@ -258,7 +265,8 @@ class Cart extends CoreCart {
         return $this;
     }
 
-    public function getOrderItemConditions($item): array {
+    public
+    function getOrderItemConditions($item): array {
         $conditions = [];
         foreach ($item->getConditions() as $condition) {
             $conditions[] = [
@@ -275,7 +283,8 @@ class Cart extends CoreCart {
         return $conditions;
     }
 
-    public function nativeItems() {
+    public
+    function nativeItems() {
         $ids = [];
         foreach ($this->getContent() as $item) {
             $ids[] = $item['associatedModel']->id;
@@ -283,7 +292,8 @@ class Cart extends CoreCart {
         return Items::whereIn('id', array_unique($ids))->get();
     }
 
-    private function setOrderItemsLine(): static {
+    private
+    function setOrderItemsLine(): static {
         /** @var ItemCollection $item */
         foreach ($this->getContent() as $item) {
             $model = collect($item->associatedModel)->only([
@@ -306,33 +316,39 @@ class Cart extends CoreCart {
         return $this;
     }
 
-    public function saveItemsToOrderAndClearAll($orderID) {
+    public
+    function saveItemsToOrderAndClearAll($orderID) {
         $this->saveItemsToOrder($orderID);
         parent::clearCartConditions();
         parent::clear();
     }
 
-    public function saveItemsToOrder($orderID) {
+    public
+    function saveItemsToOrder($orderID) {
         $this->setOrderID($orderID)
             ->setOrderItemsLine()
             ->setOrderConditions();
     }
 
 
-    public function setOrderID($orderID): static {
+    public
+    function setOrderID($orderID): static {
         $this->orderId = $orderID;
         return $this;
     }
 
-    public function getOrderID() {
+    public
+    function getOrderID() {
         return $this->orderId;
     }
 
-    public function foramtedTotal() {
+    public
+    function foramtedTotal() {
         return $this->getTotal() . ' ' . Ecommerce::currentSymbol();
     }
 
-    protected function updateQuantityRelative($item, $key, $value) {
+    protected
+    function updateQuantityRelative($item, $key, $value) {
         if (preg_match('/\-/', $value) == 1) {
             $value = (float)str_replace('-', '', $value);
 
@@ -350,17 +366,20 @@ class Cart extends CoreCart {
         return $item;
     }
 
-    protected function updateQuantityNotRelative($item, $key, $value) {
+    protected
+    function updateQuantityNotRelative($item, $key, $value) {
         $item[$key] = (float)$value;
         return $item;
     }
 
 
-    public function itemsTotalWithoutVat() {
+    public
+    function itemsTotalWithoutVat() {
         return $this->getContent()->sum(fn($i) => $i->getPriceSum());
     }
 
-    public function itemsVatTotal() {
+    public
+    function itemsVatTotal() {
         $itemsVatTotal = $this->getContent()->sum(function (ItemCollection $item) {
             return collect($item->getConditions())->sum(function ($cond) use ($item) {
                 return $cond->getCalculatedValue($item->getPriceSum());
@@ -375,54 +394,70 @@ class Cart extends CoreCart {
         return Money::parse($value)->format();
     }
 
-    public function hasDiscount(): bool {
+    public
+    function hasDiscount(): bool {
         return $this->getConditionsByType('coupon')->count();
     }
 
-    public function hasCashOnDeliveryFees(): bool {
+    public
+    function hasCashOnDeliveryFees(): bool {
         return $this->getConditionsByType('cash_on_delivery_cost')->count();
     }
 
-    public function hasAdminDiscount(): bool {
+    public
+    function hasAdminDiscount(): bool {
         return $this->getConditionsByType('discount')->count();
     }
 
-    public function hasWalletDiscount(): bool {
+    public
+    function hasWalletDiscount(): bool {
         return $this->getConditionsByType('wallet')->count();
     }
 
-    public function discount() {
+    public
+    function discount() {
         return $this->getConditionsByType('coupon')?->first()?->getCalculatedValue($this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true)));
     }
 
-    public function getProductsTotal() {
+    public
+    function getProductsTotal() {
         return $this->getConditionsByType('products')?->first()?->getCalculatedValue($this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true)));
     }
 
-    public function cashOnDeliveryCost() {
+    public
+    function cashOnDeliveryCost() {
 
         return $this->getConditionsByType('cash_on_delivery_cost')?->first()?->getValue() * 100;
     }
 
-    public function getReservationFees() {
+    public
+    function getReservationFees() {
 
         return $this->getConditionsByType('reservation_fees')?->first()?->getValue() * 100;
     }
 
-    public function adminDiscount() {
+    public
+    function adminDiscount() {
         return $this->getConditionsByType('discount')?->first()?->getCalculatedValue($this->getSubTotal());
     }
 
-    public function walletDiscount() {
-        return $this->getConditionsByType('wallet')?->first()?->getValue()* 100;
+    public
+    function walletDiscount() {
+        return $this->getConditionsByType('wallet')?->first()?->getValue() * 100;
     }
 
-    public function formattedTotals(): array {
+    public
+    function formattedTotals(): array {
         return array_map([$this, 'format'], $this->totals());
     }
 
+    public
+    function getServicesTotalIncludeProducts() {
+        return $this->totals()['services_total'] + $this->getProductsTotal();
+    }
 
-    public function totals(): array {
+    public
+    function totals(): array {
         $items_total_with_options = $this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true));
         return [
             'services_total' => $this->getSubTotalWithoutConditions(),

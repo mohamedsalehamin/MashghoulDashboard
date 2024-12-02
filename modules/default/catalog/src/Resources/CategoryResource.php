@@ -31,7 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class CategoryResource extends Resource implements HasShieldPermissions {
+class CategoryResource extends Resource  {
     use Translatable;
     use HasTranslationLabel;
 
@@ -83,10 +83,12 @@ class CategoryResource extends Resource implements HasShieldPermissions {
                     ),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])
             ->actions([
+                Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
@@ -134,14 +136,4 @@ class CategoryResource extends Resource implements HasShieldPermissions {
     }
 
 
-    public static function getPermissionPrefixes(): array {
-        return [
-            'view_any',
-            'view',
-            'create',
-            'update',
-            'delete',
-            'delete_any',
-        ];
-    }
 }

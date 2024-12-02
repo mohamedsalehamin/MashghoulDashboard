@@ -7,6 +7,7 @@ use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\SeatResource\Pages\CreateSeat;
 use App\CatalogModule\Resources\SeatResource\Pages\EditSeat;
 use App\CatalogModule\Resources\SeatResource\Pages\ListSeats;
+use App\CatalogModule\Resources\SeatResource\Pages\ViewSeat;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
@@ -19,6 +20,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Concerns\Translatable;
@@ -97,9 +99,11 @@ class SeatResource extends Resource {
 
             ])
             ->filters([
-
+        Tables\Filters\TrashedFilter::make()
             ])
             ->actions([
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
 
@@ -119,17 +123,22 @@ class SeatResource extends Resource {
     static public function infolist(Infolist $infolist): Infolist {
         return $infolist
             ->schema([
-                Grid::make()->schema([
-                    Section::make("basic_information")
-                        ->schema([
-                            TextEntry::make('id'),
-                            TextEntry::make('name'),
-                            TextEntry::make('status')
-                                ->formatStateUsing(fn(string $state): string => $state ? __('panel.enums.ACTIVE') : __('panel.enums.INACTIVE'))
-                                ->badge(),
-                        ])->columns(1),
+                TextEntry::make('id'),
+                TextEntry::make('provider.name'),
+                TextEntry::make('title'),
+                TextEntry::make('services_count')->state(fn($record)=>$record->services()->count()),
+                RepeatableEntry::make('meta_data.days_list')
+                    ->label(__("sections.working_days"))
+                    ->state(fn($record) => collect($record->meta_data['days_list'])->where('status',true))
+                    ->schema([
+                        TextEntry::make('day_name')
+                            ->formatStateUsing(fn($record,$state) => __("forms.fields.weekdays." . $state))
+                            ->label(__("forms.fields.day_name")),
+                        TextEntry::make('from'),
+                        TextEntry::make('to'),
+                    ])
+                    ->columns(3)
 
-                ])->columns(2)
             ]);
     }
 
@@ -143,6 +152,7 @@ class SeatResource extends Resource {
             'index' => ListSeats::route('/'),
             'create' => CreateSeat::route('/create'),
             'edit' => EditSeat::route('/{record}/edit'),
+            'view' => ViewSeat::route('/{record}/view'),
         ];
     }
 

@@ -177,5 +177,16 @@ class GeneralSettings extends Settings {
         }
         return $schema;
     }
+
+    public static function getPointsOnAction($action) {
+        $points = (new self())->points;
+        return match ($action) {
+            'register' => $points['customer_register_action'] ?? 0,
+            'dob' => $points['today_dob_customer'] ?? 0,
+            'reserve' => $points['customer_reserve_action'] ?? 0,
+            default => 0,
+        };
+
+    }
 }
 

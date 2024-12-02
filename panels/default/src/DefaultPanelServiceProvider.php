@@ -9,6 +9,9 @@ use App\CatalogModule\Resources\ConsultingReservationResource\Widgets\DoctorRese
 use App\CatalogModule\Resources\ConsultingReservationResource\Widgets\ReservationStats;
 use App\CatalogModule\Resources\MedicalTestReservationResource\Widgets\LabReservationsCountChart;
 use App\CatalogModule\Resources\MedicalTestReservationResource\Widgets\LabReservationsTotalsChart;
+use App\CatalogModule\Widgets\CustomersChart;
+use App\CatalogModule\Widgets\ReservationsCountChart;
+use App\CatalogModule\Widgets\ReservationsTotalsChart;
 use App\ContentModule\ContentPlugin;
 use App\DefaultPanel\Notifications\Notification;
 use App\DefaultPanel\Pages\ResetPassword;
@@ -115,7 +118,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 UsersPlugin::make(),
                 UtilitiesPlugin::make(),
             ])
-            ->databaseNotifications(false)
+            ->databaseNotifications(true)
             ->sidebarCollapsibleOnDesktop()
             ->navigationItems([
                 NavigationItem::make("roles")
@@ -140,7 +143,10 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 SetTheme::class,
             ])
             ->widgets([
-
+                CustomersChart::class,
+                ReservationsTotalsChart::class,
+                ReservationsCountChart::class,
+                \Contacts::class
 
             ])
             ->darkMode(false)

@@ -126,6 +126,24 @@ class ManageGeneral extends SettingsPage {
                 ])
                     ->columns(1)
                     ->collapsible(),
+                Forms\Components\Section::make("points")->schema([
+
+                    TextInput::make('points.customer_reserve_action')
+                        ->label(__('forms.fields.points_count_when_customer_reserve'))
+                        ->type('number')
+                        ->required()
+                    ,
+                    TextInput::make('points.customer_register_action')
+                        ->label(__('forms.fields.points_count_when_customer_register'))
+                        ->type('number')
+                        ->required()
+                    ,
+                    TextInput::make('points.today_dob_customer')
+                        ->label(__('forms.fields.points_count_when_customer_dob'))
+                        ->type('number')
+                        ->required(),
+
+                ]),
                 Forms\Components\Section::make("social_links")->schema([
 
                     Repeater::make("social_links")

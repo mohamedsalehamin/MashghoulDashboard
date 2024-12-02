@@ -13,9 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Coupon extends Model {
     use Publishable;
 
-    protected $guarded = [];
+    protected $guarded = ["id"];
     protected $casts = [
-        'discount_type' => CouponTypes::class
+        'discount_type' => CouponTypes::class,
+        'meta_data' => 'array',
     ];
 
     public function formattedValue() {

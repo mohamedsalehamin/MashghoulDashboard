@@ -141,6 +141,7 @@ return [
 
     ],
     'api' => [
+        "coupon_code_min_order_value" => 'Minimum order value must be :value to use this code',
         'product' => [
             'not_exists' => "Product with id :id not exists",
             'not_available' => ":title not available",

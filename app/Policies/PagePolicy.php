@@ -30,7 +30,7 @@ class PagePolicy
      */
     public function view(User $user, Page $page): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_page');
     }
 
     /**
@@ -88,7 +88,7 @@ class PagePolicy
      */
     public function forceDelete(User $user, Page $page): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_page');
     }
 
     /**
@@ -99,7 +99,7 @@ class PagePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_page');
     }
 
     /**
@@ -111,7 +111,7 @@ class PagePolicy
      */
     public function restore(User $user, Page $page): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_page');
     }
 
     /**
@@ -122,7 +122,7 @@ class PagePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_page');
     }
 
     /**

@@ -1,6 +1,14 @@
 <?php
 return [
     'fields' => [
+        'expire_after' => 'Expire after',
+        "bill" => "Bill",
+        "day_name" => "Day name",
+        "min_order_value" => "Min order value",
+        "max_discount" => "Max discount",
+        "points_count_when_customer_reserve" => "Points count when customer reserve",
+        "points_count_when_customer_register" => "Points count when customer register",
+        "points_count_when_customer_dob" => "Points count when customer dob",
         "id_number" => "ID Number",
         'domain'=>'Domain',
         'items_total'=>'Items total',

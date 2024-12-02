@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Resources\ReservationResource\Widgets;
 
+use App\CatalogModule\Models\Commission;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Users\Customer;
@@ -89,9 +90,13 @@ class ReservationStats extends BaseWidget {
         END) AS 'canceled'
 
 "))->first();
+        $balance =Commission::whereHas('reservation', fn($q) => $q->where("reservable_id", provider()->id))
+            ->where('transferred', 0)
+            ->sum('amount');
         return [
 
             Stat::make(__('panel.stats.customers'), Customer::whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id))->count()),
+            Stat::make(__('panel.stats.reserved_balance'), Money::parse($balance)),
             Stat::make(__('panel.stats.reservations_total'), Money::parse($totalsStats->all)->format()),
             Stat::make(__('panel.stats.new_reservations_total'), Money::parse($totalsStats->pending)->format()),
             Stat::make(__('panel.stats.in_processing_reservations_total'), Money::parse($totalsStats->in_processing)->format()),
@@ -104,7 +109,8 @@ class ReservationStats extends BaseWidget {
                 ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'processing'])),
             Stat::make(__('panel.stats.completed_reservations_count'), $sumStats->completed ?? 0)
                 ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'completed'])),
-
+            Stat::make(__('panel.stats.canceled_orders_count'), $sumStats->canceled ?? 0)
+                ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
 
         ];
     }

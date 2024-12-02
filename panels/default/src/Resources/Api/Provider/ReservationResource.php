@@ -22,7 +22,7 @@ class ReservationResource extends JsonResource {
             'date' => $this->date->format('Y-m-d'),
             'from' => Carbon::parse($this->from)->format('H:i'),
             'to' => Carbon::parse($this->to)->format('H:i'),
-            'logs'=> ReservationLogResource::collection($this->timeline),
+            'logs' => ReservationLogResource::collection($this->timeline),
             $this->mergeWhen($this->rate()->exists(), [
                 'rates' => RateResource::collection($this->rates),
             ]),
@@ -36,7 +36,7 @@ class ReservationResource extends JsonResource {
             ],
             'invoice_url' => route('reservations.invoice', $this),
             'transactions' => ReservationTransactionResource::collection($this->transactions),
-
+            'points' => $this->meta_data['points'] ?? 0,
             'totals' => $this->as_cart->formattedTotals()
         ];
     }

@@ -90,6 +90,9 @@ class ReservationResource extends Resource {
 
             ])
             ->filters([
+                Filter::make('today_orders')
+                    ->query(fn(Builder $query): Builder => $query->today())
+                    ->default(),
                 SelectFilter::make('status')
                     ->options(ReservationStatus::class),
                 Filter::make('created_at')

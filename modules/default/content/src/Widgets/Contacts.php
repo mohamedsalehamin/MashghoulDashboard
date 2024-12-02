@@ -1,6 +1,7 @@
 <?php
 
 
+use App\ContentModule\Models\Contact;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -12,8 +13,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Model;
-use App\CatalogModule\Models\Contact;
-use App\CatalogModule\Models\ContactType;
 
 class Contacts extends BaseWidget {
     use HasWidgetShield;
@@ -63,13 +62,6 @@ class Contacts extends BaseWidget {
                             Textarea::make('message')
                                 ->rows(10),
 
-                            Select::make('type')
-                                ->relationship("type", 'name')
-                                ->getOptionLabelFromRecordUsing(fn(ContactType $record) => "{$record->getTranslation('name','en')} - {$record->getTranslation('name','ar')}")
-                                ->required(),
-
-                            Select::make("user_id")
-                                ->relationship("user", 'name'),
 
                             TextInput::make('name')
                                 ->required(),

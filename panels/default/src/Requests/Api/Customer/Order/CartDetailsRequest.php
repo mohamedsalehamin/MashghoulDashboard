@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Requests\Api\Customer\Order;
 
+use App\DefaultPanel\Actions\BuildCartInstanceAction;
 use App\DefaultPanel\Rules\IsValidCoupon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,9 +24,12 @@ class CartDetailsRequest extends FormRequest {
         return [
             "seat_id" => ['required', 'exists:seats,id'],
             'services' => ['required', 'array'],
-            'services.*.id' => ['required', Rule::exists('services','id')->where('provider_id',$this->route('provider')->id)->where('status',1), ],
-            'coupon_code' => ['nullable', 'exists:coupons,code',new IsValidCoupon()],
+            'services.*.id' => ['required', Rule::exists('services', 'id')->where('provider_id', $this->route('provider')->id)->where('status', 1),],
+            'coupon_code' => ['nullable', 'exists:coupons,code', new IsValidCoupon($this->cart()->getServicesTotalIncludeProducts())],
         ];
     }
 
+    public function cart() {
+        return BuildCartInstanceAction::run($this);
+    }
 }

@@ -36,9 +36,10 @@ class NotificationMessageParser {
     }
 
     public function parse() {
+
         return match ($this->notifiable->roles()?->where('name','!=','panel_user')?->first()?->name) {
-            'patient' => $this->customerMessage,
-            default => $this->doctorMessage,
+            'customer' => $this->customerMessage,
+            default => $this->adminMessage,
         };
 
     }

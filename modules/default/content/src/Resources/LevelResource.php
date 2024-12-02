@@ -48,6 +48,11 @@ class LevelResource extends Resource {
                             ->label(__('forms.fields.points'))
                             ->numeric()->required(),
                         TextInput::make('price')->numeric()->required()->suffix(__('forms.suffixes.sar')),
+                        TextInput::make('duration')
+                            ->label(__('forms.fields.expire_after'))
+                            ->numeric()->required()
+                            ->suffix(__('forms.suffixes.days')),
+
                         Toggle::make('status')->default(1)
                             ->onColor('success')
                             ->offColor('danger')

@@ -30,7 +30,7 @@ class CityPolicy
      */
     public function view(User $user, City $city): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_city');
     }
 
     /**
@@ -88,7 +88,7 @@ class CityPolicy
      */
     public function forceDelete(User $user, City $city): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_city');
     }
 
     /**
@@ -99,7 +99,7 @@ class CityPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_city');
     }
 
     /**
@@ -111,7 +111,7 @@ class CityPolicy
      */
     public function restore(User $user, City $city): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_city');
     }
 
     /**
@@ -122,7 +122,7 @@ class CityPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_city');
     }
 
     /**

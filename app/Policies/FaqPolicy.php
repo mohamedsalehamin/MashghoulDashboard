@@ -30,7 +30,7 @@ class FaqPolicy
      */
     public function view(User $user, Faq $faq): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_faq');
     }
 
     /**
@@ -88,7 +88,7 @@ class FaqPolicy
      */
     public function forceDelete(User $user, Faq $faq): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_faq');
     }
 
     /**
@@ -99,7 +99,7 @@ class FaqPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_faq');
     }
 
     /**
@@ -111,7 +111,7 @@ class FaqPolicy
      */
     public function restore(User $user, Faq $faq): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_faq');
     }
 
     /**
@@ -122,7 +122,7 @@ class FaqPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_faq');
     }
 
     /**

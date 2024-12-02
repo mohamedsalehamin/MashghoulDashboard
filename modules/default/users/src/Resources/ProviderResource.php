@@ -14,18 +14,16 @@ use App\UsersModule\Models\Users\Provider;
 use App\UsersModule\Resources\ProviderResource\Pages\CreateProvider;
 use App\UsersModule\Resources\ProviderResource\Pages\EditProvider;
 use App\UsersModule\Resources\ProviderResource\Pages\ListProviders;
+use App\UsersModule\Resources\ProviderResource\Pages\WalletPage;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -265,6 +263,11 @@ class ProviderResource extends Resource {
                     ->options(ModelStatus::class)
             ])
             ->actions([
+                Action::make("wallet")
+                    ->icon('heroicon-o-wallet')
+                    ->url(fn($record) => static::getUrl('wallet', ['record'=>$record->id]))
+                    ->label(__('menu.wallet')),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -280,6 +283,7 @@ class ProviderResource extends Resource {
             'index' => ListProviders::route('/'),
             'create' => CreateProvider::route('/create'),
             'edit' => EditProvider::route('/{record}/edit'),
+            'wallet' => WalletPage::route('{record}/wallet'),
         ];
     }
 

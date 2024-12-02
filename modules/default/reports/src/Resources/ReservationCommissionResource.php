@@ -10,6 +10,7 @@ use App\ReportsModule\Resources\LabCommissionResource\Pages\ListLabCommissionsRe
 use App\ReportsModule\Resources\LabCommissionResource\Pages\ListReservationCommissionsResource;
 use App\UsersModule\Models\Lab;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -111,7 +112,7 @@ class ReservationCommissionResource extends Resource {
                     ->action(function (Commission $record) {
                         $record->reservation->reservable->user->notify(new AdminSendEntitlementsNotification());
                         $record->reservation->reservable->deposit(
-                            amount:$record->profit()->formatByDecimal(),
+                            amount:$record->amount->formatByDecimal(),
                             meta: [
                                 'description' =>[
                                     'ar'=> __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->amount,'ID'=>$record->reservation_id],'ar'),

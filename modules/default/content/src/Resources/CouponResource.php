@@ -47,6 +47,7 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->required(),
 
                     Forms\Components\Select::make('discount_type')
+                        ->live()
                         ->options(CouponTypes::class)
                         ->default(CouponTypes::FIXED),
 
@@ -71,6 +72,18 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->numeric()
                         ->required()
                         ->default(1),
+                    Forms\Components\TextInput::make('meta_data.min_order_value')
+                        ->label(__('forms.fields.min_order_value'))
+                        ->numeric()
+                        ->required()
+                        ->default(1),
+                    Forms\Components\TextInput::make('meta_data.max_discount')
+                        ->label(__('forms.fields.max_discount'))
+                        ->visible(fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE->value)
+                        ->numeric()
+                        ->required()
+                        ->default(1),
+
                     Select::make('providers')
                         ->multiple()
                         ->label(__("forms.fields.provider_name"))

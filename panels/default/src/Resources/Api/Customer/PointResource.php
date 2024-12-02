@@ -15,11 +15,13 @@ class PointResource extends JsonResource {
      */
 
     public function toArray($request) {
+
         return [
             'id' => $this->id,
             'title' =>$this->title,
             'value'=>$this->value,
             'price'=>$this->price,
+            'can_exchange'=>$this->canExchangeByUser(request()->user('sanctum')),
         ];
     }
 }

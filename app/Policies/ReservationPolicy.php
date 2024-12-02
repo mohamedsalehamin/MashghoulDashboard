@@ -18,7 +18,7 @@ class ReservationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_medical::test::reservation');
+        return $user->can('view_any_reservation');
     }
 
     /**
@@ -30,7 +30,7 @@ class ReservationPolicy
      */
     public function view(User $user, Reservation $reservation): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_reservation');
     }
 
     /**
@@ -41,7 +41,7 @@ class ReservationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_medical::test::reservation');
+        return $user->can('create_reservation');
     }
 
     /**
@@ -53,7 +53,7 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        return $user->can('update_medical::test::reservation');
+        return $user->can('update_reservation');
     }
 
     /**
@@ -65,7 +65,7 @@ class ReservationPolicy
      */
     public function delete(User $user, Reservation $reservation): bool
     {
-        return $user->can('delete_medical::test::reservation');
+        return $user->can('delete_reservation');
     }
 
     /**
@@ -76,7 +76,7 @@ class ReservationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_medical::test::reservation');
+        return $user->can('delete_any_reservation');
     }
 
     /**
@@ -88,7 +88,7 @@ class ReservationPolicy
      */
     public function forceDelete(User $user, Reservation $reservation): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_reservation');
     }
 
     /**
@@ -99,7 +99,7 @@ class ReservationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_reservation');
     }
 
     /**
@@ -111,7 +111,7 @@ class ReservationPolicy
      */
     public function restore(User $user, Reservation $reservation): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_reservation');
     }
 
     /**
@@ -122,7 +122,7 @@ class ReservationPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_reservation');
     }
 
     /**

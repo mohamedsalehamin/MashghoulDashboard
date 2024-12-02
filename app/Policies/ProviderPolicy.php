@@ -30,7 +30,7 @@ class ProviderPolicy
      */
     public function view(User $user, Provider $provider): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_provider');
     }
 
     /**
@@ -88,7 +88,7 @@ class ProviderPolicy
      */
     public function forceDelete(User $user, Provider $provider): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_provider');
     }
 
     /**
@@ -99,7 +99,7 @@ class ProviderPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_provider');
     }
 
     /**
@@ -111,7 +111,7 @@ class ProviderPolicy
      */
     public function restore(User $user, Provider $provider): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_provider');
     }
 
     /**
@@ -122,7 +122,7 @@ class ProviderPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_provider');
     }
 
     /**

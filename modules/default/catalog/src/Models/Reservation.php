@@ -28,6 +28,7 @@ use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Transactionable;
 use App\DoctorPanel\Scopes\DoctorScope;
 use App\Models\User;
+use App\Notifications\AdminSendEntitlementsNotification;
 use App\Notifications\ReservationCanceledFromPatientNotification;
 use App\Notifications\ReservationCreatedSuccessfullyNotification;
 use App\Notifications\ReservationScheduledFromDoctorNotification;
@@ -58,7 +59,7 @@ class Reservation extends Model {
 
     protected $casts = [
         'date' => 'date',
-
+        'meta_data' => 'array',
         'status' => ReservationStatus::class,
     ];
 
@@ -82,19 +83,29 @@ class Reservation extends Model {
 
         });
         static::updating(function (Reservation $reservation) {
-//            if ($reservation->getOriginal('status') != $reservation->status && !in_array($reservation->status, [ReservationStatus::COMPLETED, ReservationStatus::PATIENT_CANCELED, ReservationStatus::PATIENT_RESCHEDULED])) {
+            if ($reservation->getOriginal('status') != $reservation->status) {
+
+                $reservation->customer->notify(new ReservationStatusChangedNotification($reservation));
+                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
+            }
+//            if ($reservation->status == ReservationStatus::COMPLETED) {
+//                if ($reservation->commission()->exists() && !$reservation->commission->transferred) {
+//                    $reservation->reservable->user->notify(new AdminSendEntitlementsNotification());
+//                    $amount = $reservation?->commission?->amount->formatByDecimal();
+//                    $reservation->reservable->deposit(
+//                        amount: $amount,
+//                        meta: [
+//                            'description' => [
+//                                'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $amount, 'ID' => $reservation->id], 'ar'),
+//                                'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $amount, 'ID' => $reservation->id], 'en'),
+//                            ],
+//                        ]
+//                    );
+//                    $reservation?->commission->update(['transferred' => true, 'confirmed' => true]);
+//                }
 //
-//                $reservation->patient->notify(new ReservationStatusChangedNotification($reservation));
-//                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
 //            }
-//            if ($reservation->status == ReservationStatus::PATIENT_CANCELED) {
-//                $reservation->patient->notify(new ReservationCanceledFromPatientNotification($reservation));
-//                $reservation->reservable->user->notify(new ReservationCanceledFromPatientNotification($reservation));
-//            }
-//            if ($reservation->status == ReservationStatus::PATIENT_RESCHEDULED) {
-//                $reservation->patient->notify(new ReservationScheduledNotification($reservation));
-//                $reservation->reservable->user->notify(new ReservationScheduledNotification($reservation));
-//            }
+
             $reservation->addTimeline([
                 'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
                 'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'en')], 'en')
@@ -121,7 +132,7 @@ class Reservation extends Model {
 
     public function scopeToday($builder) {
 
-        return $builder->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()]);
+        return $builder->whereBetween('date', [now()->startOfDay(), now()->endOfDay()])->orderBy('from', 'asc');
     }
 
     public function scopeConsultations($builder) {
@@ -286,12 +297,14 @@ class Reservation extends Model {
     public function seat() {
         return $this->belongsTo(Seat::class);
     }
+
     public function addTimeline($title, $status): void {
         $this->timeline()->create([
             'title' => $title,
             'status' => $status,
         ]);
     }
+
     public function timeline() {
         return $this->hasMany(Timeline::class);
     }

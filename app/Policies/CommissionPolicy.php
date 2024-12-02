@@ -18,7 +18,7 @@ class CommissionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_lab::commission');
+        return $user->can('view_any_reservation::commission');
     }
 
     /**
@@ -30,7 +30,7 @@ class CommissionPolicy
      */
     public function view(User $user, Commission $commission): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_reservation::commission');
     }
 
     /**
@@ -41,7 +41,7 @@ class CommissionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_lab::commission');
+        return $user->can('create_reservation::commission');
     }
 
     /**
@@ -53,7 +53,7 @@ class CommissionPolicy
      */
     public function update(User $user, Commission $commission): bool
     {
-        return $user->can('update_lab::commission');
+        return $user->can('update_reservation::commission');
     }
 
     /**
@@ -65,7 +65,7 @@ class CommissionPolicy
      */
     public function delete(User $user, Commission $commission): bool
     {
-        return $user->can('delete_lab::commission');
+        return $user->can('delete_reservation::commission');
     }
 
     /**
@@ -76,7 +76,7 @@ class CommissionPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_lab::commission');
+        return $user->can('delete_any_reservation::commission');
     }
 
     /**
@@ -88,7 +88,7 @@ class CommissionPolicy
      */
     public function forceDelete(User $user, Commission $commission): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_reservation::commission');
     }
 
     /**
@@ -99,7 +99,7 @@ class CommissionPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_reservation::commission');
     }
 
     /**
@@ -111,7 +111,7 @@ class CommissionPolicy
      */
     public function restore(User $user, Commission $commission): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_reservation::commission');
     }
 
     /**
@@ -122,7 +122,7 @@ class CommissionPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_reservation::commission');
     }
 
     /**

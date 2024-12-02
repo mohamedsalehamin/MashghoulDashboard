@@ -30,7 +30,7 @@ class StatePolicy
      */
     public function view(User $user, State $state): bool
     {
-        return $user->can('{{ View }}');
+        return $user->can('view_state');
     }
 
     /**
@@ -88,7 +88,7 @@ class StatePolicy
      */
     public function forceDelete(User $user, State $state): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_state');
     }
 
     /**
@@ -99,7 +99,7 @@ class StatePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_state');
     }
 
     /**
@@ -111,7 +111,7 @@ class StatePolicy
      */
     public function restore(User $user, State $state): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_state');
     }
 
     /**
@@ -122,7 +122,7 @@ class StatePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_state');
     }
 
     /**

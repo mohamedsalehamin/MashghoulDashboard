@@ -70,8 +70,7 @@ class ContactResource extends Resource implements HasShieldPermissions {
                     ->state(fn(Model $record): string => $record?->user?->name ?? $record->name ?? '')
                     ->searchable(),
 
-                TextColumn::make('source')
-                    ->formatStateUsing(fn(Model $record): string => ContactSourceEnum::tryFrom($record->source)->getLabel()),
+
                 TextColumn::make('email')
                     ->state(fn(Model $record): string => $record?->user?->email ?? $record->email ?? '')
                     ->copyable()

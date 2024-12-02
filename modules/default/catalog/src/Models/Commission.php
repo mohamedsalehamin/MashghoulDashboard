@@ -34,9 +34,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Commission extends Model {
-    use FilterScope;
+class Commission extends Model implements HasMedia {
+    use FilterScope,InteractsWithMedia;
 
     protected $guarded = ['id'];
     protected $table = "reservations_commissions";

@@ -8,7 +8,7 @@ $mapper =fn($entityType,$entityID)=> match ($entityType) {
     'order' => route('filament.admin.resources.orders.view',$entityID),
     'branch' => route('filament.admin.resources.catalog.branches.edit',$entityID),
     'product' => route('filament.admin.resources.catalog.products.edit',$entityID),
-    'customer' => route('filament.admin.resources.crm.customers.edit',$entityID),
+    'customer' => route('filament.admin.resources.customers.edit',$entityID),
     default => null,
 };
 @endphp

@@ -3,8 +3,12 @@
 namespace App\ProviderPanel\Filament\Resources\WalletResource\Pages;
 
 use App\DefaultPanel\Enum\ReservationStatus;
+use App\DefaultPanel\Lib\Utils;
+use App\Notifications\ProviderDuesNotification;
 use App\ProviderPanel\Filament\Resources\WalletResource;
 use App\ProviderPanel\Filament\Resources\WalletResource\Widgets\WalletSummary;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Pages\ListRecords\Tab;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,12 +16,31 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListWalletTransactions extends ListRecords {
     protected static string $resource = WalletResource::class;
-    protected function getHeaderWidgets(): array
-    {
+
+    protected function getHeaderWidgets(): array {
         return [
-           WalletSummary::class,
+            WalletSummary::class,
         ];
     }
+
+    protected function getHeaderActions(): array {
+        return [
+
+            Action::make('request')
+                ->label(__('panel.enums.withdraw_request'))
+                ->requiresConfirmation()
+                ->modalHeading(__("panel.messages.make_sure_that_bank_account_info_is_right"))
+                ->action(function ($data) {
+                    \Notification::send(Utils::getAdministrationUsers(), new ProviderDuesNotification(provider()));
+                    Notification::make()
+                        ->title(__("panel.messages.success"))
+                        ->success()
+                        ->send();
+                })
+
+        ];
+    }
+
     public function getTabs(): array {
 
 

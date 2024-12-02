@@ -3,6 +3,7 @@
 namespace App\ContentModule\Models;
 
 use App\DefaultPanel\Traits\Publishable;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -17,5 +18,7 @@ class Level extends Model implements HasMedia {
     protected $table = 'points_levels';
     use HasFactory;
 
-
+    public function canExchangeByUser(User $user): bool {
+        return $user?->getTotalPoints() >= $this->value;
+    }
 }

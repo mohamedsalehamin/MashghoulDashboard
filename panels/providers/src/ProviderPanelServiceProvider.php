@@ -87,7 +87,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
 
             ])
-            ->databaseNotifications(false)
+            ->databaseNotifications(true)
             ->sidebarCollapsibleOnDesktop()
 
             ->middleware([

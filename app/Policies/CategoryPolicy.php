@@ -88,7 +88,7 @@ class CategoryPolicy
      */
     public function forceDelete(User $user, Category $category): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_category');
     }
 
     /**
@@ -99,7 +99,7 @@ class CategoryPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_category');
     }
 
     /**
@@ -111,7 +111,7 @@ class CategoryPolicy
      */
     public function restore(User $user, Category $category): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_category');
     }
 
     /**
@@ -122,7 +122,7 @@ class CategoryPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_category');
     }
 
     /**

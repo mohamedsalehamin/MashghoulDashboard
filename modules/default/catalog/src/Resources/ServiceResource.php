@@ -6,6 +6,7 @@ use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
 use App\CatalogModule\Resources\ServiceResource\Pages\EditService;
 use App\CatalogModule\Resources\ServiceResource\Pages\ListServices;
+use App\CatalogModule\Resources\ServiceResource\Pages\ViewService;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
@@ -75,12 +76,12 @@ class ServiceResource extends Resource {
                         ->label('')
                         ->schema([
                             TextInput::make('title.ar')
-                                ->formatStateUsing(fn($record)=>$record->getTranslation("title","ar"))
+                                ->formatStateUsing(fn($record) => $record->getTranslation("title", "ar"))
                                 ->label(__("forms.fields.title_ar"))->required(),
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
-                                ->formatStateUsing(fn($record)=>$record->getTranslation("title","en"))
+                                ->formatStateUsing(fn($record) => $record->getTranslation("title", "en"))
                                 ->required(),
-                            TextInput::make('price')->required()->formatStateUsing(fn($record) =>  $record?->price?->formatByDecimal()),
+                            TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
                         ])->relationship('products'),
                 ])->columnSpan(1),
 
@@ -115,9 +116,11 @@ class ServiceResource extends Resource {
 
             ])
             ->filters([
-
+                Tables\Filters\TrashedFilter::make()
             ])
             ->actions([
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
 
@@ -137,18 +140,12 @@ class ServiceResource extends Resource {
     static public function infolist(Infolist $infolist): Infolist {
         return $infolist
             ->schema([
-                Grid::make()->schema([
-                    Section::make("basic_information")
-                        ->schema([
-                            TextEntry::make('id'),
-                            TextEntry::make('name'),
-                            TextEntry::make('price'),
-                            TextEntry::make('status')
-                                ->formatStateUsing(fn(string $state): string => $state ? __('panel.enums.ACTIVE') : __('panel.enums.INACTIVE'))
-                                ->badge(),
-                        ])->columns(1),
-
-                ])->columns(2)
+                TextEntry::make('id'),
+                TextEntry::make('provider.name'),
+                TextEntry::make('title'),
+                TextEntry::make('description'),
+                TextEntry::make('duration'),
+                TextEntry::make('products_count')->state(fn($record) => $record->products()->count()),
             ]);
     }
 
@@ -162,6 +159,7 @@ class ServiceResource extends Resource {
             'index' => ListServices::route('/'),
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
+            'view' => ViewService::route('/{record}/view'),
         ];
     }
 
@@ -173,7 +171,6 @@ class ServiceResource extends Resource {
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
     }
-
 
 
 }

@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->integer('usages');
             $table->integer('usage_per_user');
             $table->boolean('status');
+            $table->json('meta_data')->nullable();
             $table->timestamps();
         });
     }

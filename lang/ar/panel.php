@@ -2,8 +2,13 @@
 <?php
 return [
     'messages' => [
+        'make_sure_that_bank_account_info_is_right' => ' يرجي التاكد من صحة بيانات الحساب البنكي قبل تاكيد الطلب , وقد تستغرق عملية التحويل ٤٨ ساعه',
         'gift_for_register'=>'مكافأة لتسجيل الحساب',
         "gift_for_reservation" => "مكافأة اتمام الحجز رقم :id",
+        "you_are_gain_points_for_reservation" => "لقد حصلت على :points نقطة لاتمام الحجز رقم :id",
+        "your_are_gain_points_for_register" => "لقد حصلت على :points نقطة لتسجيل الحساب",
+        "send_gift_for_customer_whose_birthday_today"=>"لقد حصلت على :points نقطة لمناسبة عيد ميلادك",
+        "gift_for_birthday"=>"مكافأة بمناسبة عيد ميلادك",
         "end_time_more_than_provider" => "وقت النهاية يجب أن يكون داخل اوقات العمل المشغل",
         "start_time_less_than_provider" => "وقت البداية يجب أن يكون داخل اوقات العمل المشغل",
         "working_day_not_set" => "اليوم الحالي غير متاح العمل فيه داخل المشغل",
@@ -16,6 +21,7 @@ return [
         'reservation_status_changed' => 'تم تغير حالة الحجز الي :status',
         'admin_withdraw_balance_from_wallet_text' => '  تم سحب مبلغ :AMOUNT من المحفظة',
         'admin_transfer_lab_commission' => 'تم تحويل مبلغ :AMOUNT نظيرا الحجر رقم :ID',
+
         'send_otp_code' => 'إرسال كود التحقق',
         'category_has_many_subcategories' => 'لا يمكنك حذف القسم :category لوجود أقسام فرعية مرتبطة به',
         'shipping_error' => 'حدث خطأ أثناء عملية الشحن',
@@ -75,6 +81,7 @@ return [
 
     ],
     'enums' => [
+        "withdraw_request" => "طلب سحب",
         "refunded" => "مستردة",
 
         'voice'=>'استشارة صوتية',
@@ -155,6 +162,7 @@ return [
 
     ],
     'notifications' => [
+        'congrats' => 'تهانينا',
         'reservationcreatedsuccessfullynotification' => 'تم إنشاء الحجز بنجاح',
         'reservationcreatedsuccessfullynotificationbody' => 'تم إنشاء الحجز رقم :id بنجاح',
         "reservationstatuschangednotification" => "تم تغير حالة الحجز رقم :id",
@@ -214,7 +222,7 @@ return [
         "order_not_responded" => "نعتذر لعدم استكمال الطلب رقم :id",
         "order_not_responded_body" => "بسبب عدم توافر بعض المنتجات في طلبكم يمكنك الطلب من فرع اخر",
         "new_customer_registered" => "تهانينا",
-        "new_customer_registered_body" => "تم تسجيل حسابك بنجاح في تطبيق أنعامكم، اطلب ألإن",
+        "new_customer_registered_body" => "تم تسجيل حسابك بنجاح في تطبيق مشغول، اطلب ألإن",
         "new_product_created_title" => "منتج جديد تم إضافته",
         "new_product_created_body" => " تم إضافة  :product_name يمكن تجربته ألإن",
         "order_status_changed" => "تم تغير حالة الطلب ",
@@ -228,9 +236,15 @@ return [
         'order_canceled' => 'تم إلغاء الطلبية',
         'order_canceled_text' => ' لقد قمنا  بإلغاء الطلبية رقم :ID',
         'customer_status_changed' => ' تم تغير حالة حسابك',
-        'customer_status_changed_body' => 'تم تغير حالة حسابك  من قبل آلإدارة الي :status'
+        'customer_status_changed_body' => 'تم تغير حالة حسابك  من قبل آلإدارة الي :status',
+        'providerduesnotification' => 'طلب مستحقات جديد',
+        "providerduesnotificationbody" => "تم طلب مستحقاتك من قبل المشغل :name",
+        "customer_registered" => " حساب جديد",
+        "customer_registered_body"=>"قام :name بتسجيل حساب جديد",
     ],
     'stats' => [
+        "providers_wallet_balance_totals" => "اجمالي محافظ مقدمي الخدمات",
+        "providers_count" => "عدد مقدمي الخدمة",
         'doctors_total_transferred_dues' => 'إجمالي مبالغ الحجوزات المحولة للأطباء',
         'labs_total_transferred_dues' => 'إجمالي مبالغ الحجوزات المحولة للمعامل',
         'doctors_total_pending_dues' => 'إجمالي مبالغ الحجوزات المعلقة للأطباء',
@@ -252,13 +266,13 @@ return [
         'doctors_contact_us_messages' => 'رسائل التواصل للأطباء',
         'patients_contact_us_messages' => 'رسائل التواصل للمرضى',
         'patients_count' => 'عدد المرضى',
-        'doctors_reservations_status_title' => 'عدد حجوزات الاطباء',
-        'doctors_reservations_status_description' => ' عدد حجوزات الاطباء وفقا ل حالة الحجز',
+        'reservations_status_title' => 'عدد الحجوزات',
+        'reservations_status_description' => ' عدد الحجوزات  وفقا ل حالة الحجز',
         'labs_reservations_status_title' => 'عدد حجوزات المعامل',
         'labs_reservations_status_description' => ' عدد حجوزات المعامل وفقا ل حالة الحجز',
 
-        'doctors_total_reservations_status_title' => 'اجمالي حجوزات الاطباء',
-        'doctors_total_reservations_status_description' => ' اجمالي حجوزات الاطباء وفقا ل حالة الحجز',
+        'total_reservations_status_title' => 'اجمالي الحجوزات ',
+        'total_reservations_status_description' => ' اجمالي حجوزات  وفقا ل حالة الحجز',
         'labs_total_reservations_status_title' => 'اجمالي حجوزات المعامل',
         'labs_total_reservations_status_description' => ' اجمالي  حجوزات المعامل وفقا ل حالة الحجز',
         'doctors_count' => 'عدد الأطباء',
@@ -270,6 +284,8 @@ return [
         'pending_reservations_count' => 'عدد الحجوزات الجديدة',
         'in_processing_reservations_count' => 'عدد الحجوزات قيد المعالجة',
         'completed_reservations_count' => 'عدد الحجوزات المكتملة',
+        "canceled_orders_count" => "عدد الحجوزات الملغية",
+        "reserved_balance" => "الرصيد المستحق",
         'reservations_canceled_by_you_count' => 'عدد الحجوزات الملغية من قبلك',
         'reservations_canceled_by_patient_count' => 'عدد الحجوزات الملغية من قبل المريض',
         'reservations_doctor_rescheduled_count' => 'عدد الحجوزات المؤجلة من قبل الطبيب',

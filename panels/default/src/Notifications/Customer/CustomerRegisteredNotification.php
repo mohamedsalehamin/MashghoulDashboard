@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Notifications\Customer;
 
+use App\UsersModule\Models\Users\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use App\DefaultPanel\Lib\Firebase;
@@ -14,7 +15,7 @@ class CustomerRegisteredNotification extends Notification {
     /**
      * Create a new notification instance.
      */
-    public function __construct() {
+    public function __construct(public  Customer $customer) {
     }
 
     /**
@@ -50,7 +51,7 @@ class CustomerRegisteredNotification extends Notification {
             'body' => json_encode($this->getBody($notifiable)),
             'format' => 'filament',
             'viewData' => [
-                'entity_id' => $notifiable->id,
+                'entity_id' => $this->customer->id,
                 'entity_type' => 'customer',
             ],
             'duration' => 'persistent'
@@ -60,14 +61,14 @@ class CustomerRegisteredNotification extends Notification {
 
     public function getTitle($notifiable) {
         return  NotificationMessageParser::init($notifiable)
-            ->customerMessage('panel.notifications.new_customer_registered')
+            ->adminMessage('panel.notifications.customer_registered')
             ->parse();
     }
 
     public function getBody($notifiable) {
 
         return  NotificationMessageParser::init($notifiable)
-            ->customerMessage('panel.notifications.new_customer_registered_body')
+            ->adminMessage('panel.notifications.customer_registered_body',['name'=>$this->customer->name])
             ->parse();
     }
 }

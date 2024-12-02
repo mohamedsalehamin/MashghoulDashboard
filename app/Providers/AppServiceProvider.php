@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Page;
 use Cache;
 use Filament\Forms\Components\Field;
@@ -124,7 +125,9 @@ class AppServiceProvider extends ServiceProvider {
 
         Table::configureUsing(function (Table $table): void {
             $table->modifyQueryUsing(function (Builder $query): void {
-                if ($query->getColumns()->getModel()->getCreatedAtColumn()) {
+
+                if ($query->getColumns()->getModel()->getCreatedAtColumn() && get_class($query->getColumns()->getModel()) !=Reservation::class) {
+
                     $query->latest($query->getColumns()->getModel()->getTable().".created_at");
                 }
 

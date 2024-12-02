@@ -1,6 +1,14 @@
 <?php
 return [
     'fields' => [
+        'expire_after' => 'تنتهي بعد',
+        "bill" => "الفاتورة",
+        "day_name" => "اسم اليوم",
+        "min_order_value" => "الحد الأدنى لاجمالي للطلب لاستخدام الكوبون",
+        "max_discount" => "الحد الأقصى للخصم",
+        "points_count_when_customer_reserve" => "عدد النقاط المكتسبة عند حجز العميل",
+        "points_count_when_customer_register" => "عدد النقاط المكتسبة عند تسجيل العميل",
+        "points_count_when_customer_dob" => "عدد النقاط المكتسبة عندما يكون تاريح اليوم هوعيد  ميلاد العميل",
         "reservation_flow" => "طريقة الدفع",
         "reservations_fess" => "رسوم الحجز",
         "enabled_free_fees_in_first_reservation"=>"تفعيل الحجز المجاني لأول أول حجز",
@@ -277,7 +285,7 @@ return [
         'service_quality' => 'جودة الخدمة',
         "delivery_speed" => 'سرعة التوصيل',
         "serving_food_quality" => 'طريقة تقديم الطعام',
-        'today_orders' => 'طلبات اليوم',
+        'today_orders' => 'حجوزات اليوم',
         'min_time_to_deliver_order' => 'الحد الأدنى من الوقت لتسليم الطلب',
         'max_time_to_deliver_order' => 'الحد الأقصى من الوقت لتسليم الطلب',
         'role' => 'الدور',

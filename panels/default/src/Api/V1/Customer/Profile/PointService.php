@@ -60,7 +60,7 @@ class PointService {
             'price' => $plan->price,
             'reset_price' => $plan->price,
             'used' => false,
-            'expired_at' => now()->addDays(30),
+            'expired_at' => now()->addDays($plan->duration),
         ]);
         return Api::isOk(__("Points converted successfully"));
     }
