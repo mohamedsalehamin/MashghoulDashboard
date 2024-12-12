@@ -99,7 +99,7 @@
 <script src="{{asset('assets/js/owl.carousel.min.js')}}"></script>
 
 <!-- ScrollrevealMin JS (for animations) -->
-<script src="{{asset('assets/js/scrollReveal.min.js')}}"></script>
+<script src="{{asset('assets/js/scrollreveal.min.js')}}"></script>
 
 <!-- WOW.js (for reveal animations) -->
 <script src="{{asset('assets/js/wow.min.js')}}"></script>
