@@ -1,7 +1,11 @@
 <?php
 return [
     'cancel_reservation'=>'Cancel reservation',
-
+    "landing_page" => "Landing page",
+    "footer"=>"Footer",
+    "header" => "Header",
+    "about_us" => "About us",
+    "our_features" => "Our features",
     'timeline' => 'Timeline',
     'shared_analysis' => 'Shared analysis',
     'services'=>'Services',

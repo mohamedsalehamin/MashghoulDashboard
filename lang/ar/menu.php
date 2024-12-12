@@ -2,6 +2,7 @@
 return [
     "providers_reservations_dues"=>'مستحقات المشاغل',
     "providersreservationsdues"=>'مستحقات المشاغل',
+    'landing_page' => 'صفحة الهبوط',
     "rates"=>'التقييمات',
     "rate"=>'تقييم',
     "levels"=>'الشرائح',

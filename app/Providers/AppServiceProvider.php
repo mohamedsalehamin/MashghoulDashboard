@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Page;
+use App\DefaultPanel\Settings\LandingSettings;
 use Cache;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Section;
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider {
         $this->cart();
         view()->composer('*', function ($view,) {
             $settings = new GeneralSettings();
+            $landingSettings = new LandingSettings();
 
             $pages = Cache::remember('pages', 60 * 60, function () use ($settings) {
                 return collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider {
                 });
             });
             return $view
+                ->with('landing_settings', $landingSettings)
                 ->with('settings', $settings)
                 ->with('social_links', $settings->social_links)
                 ->with('pages', $pages);

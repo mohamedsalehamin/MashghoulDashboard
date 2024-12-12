@@ -3,7 +3,7 @@ return [
     'about_us' => 'About us',
     'terms_and_conditions' => 'Terms and conditions',
     'privacy_policy' => 'Privacy policy',
-
+'landing_page' => 'Landing page',
     'districts'=>'Districts',
     'district'=>'District',
     'customers' => 'Customers',

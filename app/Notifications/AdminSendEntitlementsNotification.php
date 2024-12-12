@@ -57,7 +57,8 @@ class AdminSendEntitlementsNotification extends Notification
 
     public function getTitle($notifiable) {
         return NotificationMessageParser::init($notifiable)
-            ->doctorMessage('panel.notifications.adminsendentitlementsnotification')
+            ->adminMessage('panel.notifications.adminsendentitlementsnotification')
+            ->customerMessage('panel.notifications.adminsendentitlementsnotification')
             ->parse();
     }
 
@@ -66,6 +67,7 @@ class AdminSendEntitlementsNotification extends Notification
         return NotificationMessageParser::init($notifiable)
 
             ->doctorMessage('panel.notifications.adminsendentitlementsnotificationbody')
+            ->customerMessage('panel.notifications.adminsendentitlementsnotificationbody')
             ->parse();
     }
 }

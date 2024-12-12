@@ -1,5 +1,10 @@
 <?php
 return [
+    "landing_page" => "صفحة الهبوط",
+    "header" => "الهيدر",
+    "about_us" => "من نحن",
+    "our_features" => "مميزاتنا",
+    "footer"=>"الفوتر",
     "points"=>"النقاط",
     'provider_information' => 'معلومات المشغل',
     "working_times"=>"أوقات العمل",

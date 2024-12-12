@@ -17,6 +17,7 @@
         "cheesegrits/filament-google-maps": "^3.0",
         "christiankuri/laravel-favorite": "^1.4",
         "cknow/laravel-money": "^7.2",
+        "cviebrock/eloquent-sluggable": "^10.0",
         "darryldecode/cart": "^4.2",
         "dompdf/dompdf": "^2.0",
         "edamov/pushok": "^0.16.0",
