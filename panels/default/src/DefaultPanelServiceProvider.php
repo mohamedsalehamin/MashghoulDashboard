@@ -44,6 +44,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Models\Role;
+use Storage;
 
 class DefaultPanelServiceProvider extends PanelProvider {
 
@@ -102,7 +103,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 Dashboard::class,
             ])
             ->brandLogo(function (GeneralSettings $settings) {
-//                return Storage::disk('public')->exists($settings->app_logo ?? 'null') ? asset("storage/$settings->app_logo") : 'https://awscdn1.tasawk.com/wp-content/uploads/2018/08/logo-d.png';
+                return Storage::disk('public')->exists($settings->app_logo ?? 'null') ? asset("storage/$settings->app_logo") : 'https://awscdn1.tasawk.com/wp-content/uploads/2018/08/logo-d.png';
 
             })
             ->brandName(env("app_name"))
