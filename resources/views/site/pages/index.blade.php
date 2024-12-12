@@ -104,7 +104,7 @@
                             <div class="feature-image-container">
                                 <div class="features-img">
                                     @php($imagePath = isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]:data_get($feature,'image'))
-                                    <img src="{{$imagePath}}"
+                                    <img src="{{asset("storage/$imagePath")}}"
                                          alt="Feature 1">
                                 </div>
                                 <div class="feature-icon">
