@@ -3,7 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer\Profile;
 
 
-use App\DefaultPanel\Resources\Api\Provider\LightProviderResource;
+use App\DefaultPanel\Resources\Api\Customer\LightProviderResource;
 use App\UsersModule\Models\Provider;
 use Tasawk\Api\Core;
 use Tasawk\Api\Facade\Api;
