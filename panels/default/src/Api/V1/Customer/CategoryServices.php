@@ -3,8 +3,8 @@
 namespace App\DefaultPanel\Api\V1\Customer;
 
 use App\ContentModule\Models\Category;
-use App\DefaultPanel\Resources\Api\Provider\CategoryResource;
-use App\DefaultPanel\Resources\Api\Provider\CategoryWithChildrenResource;
+use App\DefaultPanel\Resources\Api\Customer\CategoryResource;
+use App\DefaultPanel\Resources\Api\Customer\CategoryWithChildrenResource;
 use Tasawk\Api\Facade\Api;
 
 

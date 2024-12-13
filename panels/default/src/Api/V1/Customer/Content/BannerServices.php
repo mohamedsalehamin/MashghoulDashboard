@@ -3,7 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer\Content;
 
 use App\ContentModule\Models\Banner;
-use App\DefaultPanel\Resources\Api\Provider\BannerResource;
+use App\DefaultPanel\Resources\Api\Customer\BannerResource;
 use Tasawk\Api\Facade\Api;
 
 class BannerServices  {
