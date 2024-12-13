@@ -76,10 +76,10 @@ class ServiceResource extends Resource {
                         ->label('')
                         ->schema([
                             TextInput::make('title.ar')
-                                ->formatStateUsing(fn($record) => $record->getTranslation("title", "ar"))
+                                ->formatStateUsing(fn($record) => $record?->getTranslation("title", "ar"))
                                 ->label(__("forms.fields.title_ar"))->required(),
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
-                                ->formatStateUsing(fn($record) => $record->getTranslation("title", "en"))
+                                ->formatStateUsing(fn($record) => $record?->getTranslation("title", "en"))
                                 ->required(),
                             TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
                         ])->relationship('products'),
