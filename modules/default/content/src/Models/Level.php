@@ -18,7 +18,7 @@ class Level extends Model implements HasMedia {
     protected $table = 'points_levels';
     use HasFactory;
 
-    public function canExchangeByUser(User $user): bool {
+    public function canExchangeByUser(User|null $user): bool {
         return $user?->getTotalPoints() >= $this->value;
     }
 }
