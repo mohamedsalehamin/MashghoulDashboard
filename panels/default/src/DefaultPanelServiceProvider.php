@@ -61,7 +61,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
             ->spa()
             ->passwordReset(resetAction: ResetPassword::class)
             ->userMenuItems([
-                'profile' => MenuItem::make()->label(fn() => __('menu.edit_profile'))->url(fn() => route('filament.admin.pages.profile')),
+                'profile' => MenuItem::make()->label(fn() => __('menu.edit_profile'))->url(fn() => route('filament.admin.profile')),
             ])
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->navigationGroups([
@@ -111,7 +111,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
             ->plugins([
                 FilamentShieldPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
-                FilamentLanguageSwitchPlugin::make(),
+
                 ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
                 CatalogPlugin::make(),
                 ContentPlugin::make(),

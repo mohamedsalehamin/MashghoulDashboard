@@ -35,17 +35,4 @@ class State extends Model {
     public function cities(): HasMany {
         return $this->hasMany(City::class);
     }
-
-    public function patients() {
-        return $this->hasManyThrough(Patient::class,City::class,);
-    }
-
-    public function doctors() {
-        return $this->hasManyThrough(Clinic::class,City::class);
-
-    }
-
-    public function labs() {
-        return $this->hasManyThrough(Lab::class,City::class);
-    }
 }

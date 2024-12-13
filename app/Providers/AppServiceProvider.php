@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Settings\LandingSettings;
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Cache;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Section;
@@ -71,7 +72,9 @@ class AppServiceProvider extends ServiceProvider {
     public function boot(): void {
         $this->app->bind(BaseNotification::class, Notification::class);
         $this->translateLabels();
-
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch->locales(['ar', 'en']);
+        });
         $settings = new DeveloperSetting();
         view()->share('settings', new GeneralSettings());
         config()->set("app.debug", $settings->debug_mode);

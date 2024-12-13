@@ -60,10 +60,7 @@ class StateResource extends Resource {
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('name'),
-                TextColumn::make('country.name'),
-                TextColumn::make('patients_count')->counts('patients'),
-                TextColumn::make('doctors_count')->counts('doctors'),
-                TextColumn::make('labs_count')->counts('labs'),
+                TextColumn::make('country.name')->label(__("forms.fields.country_name")),
                 IconColumn::make('status')
                     ->boolean()
                     ->action(

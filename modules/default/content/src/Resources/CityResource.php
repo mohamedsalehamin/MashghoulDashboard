@@ -56,13 +56,10 @@ class CityResource extends Resource {
             ->columns([
                 TextColumn::make('id')->searchable(),
                 TextColumn::make('name')->searchable(['name->ar', 'name->en']),
-                TextColumn::make('state.name'),
+                TextColumn::make('state.name')->label(__("forms.fields.state_name")),
                 TextColumn::make('state.country.name')
                     ->label(__('forms.fields.country_id')),
 
-                TextColumn::make('patients_count')->counts('patients'),
-                TextColumn::make('doctors_count')->counts('doctors'),
-                TextColumn::make('labs_count')->counts('labs'),
 
                 IconColumn::make('status')
                     ->boolean()

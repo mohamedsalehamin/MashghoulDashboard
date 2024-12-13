@@ -83,7 +83,7 @@ class ProviderPanelServiceProvider extends PanelProvider
 
 //                FilamentShieldPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
-                FilamentLanguageSwitchPlugin::make(),
+
                 ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
 
             ])
