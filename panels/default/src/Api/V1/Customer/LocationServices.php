@@ -4,8 +4,8 @@ namespace App\DefaultPanel\Api\V1\Customer;
 
 use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
-use App\DefaultPanel\Resources\Api\Provider\CityResource;
-use App\DefaultPanel\Resources\Api\Provider\StateResource;
+use App\DefaultPanel\Resources\Api\Customer\CityResource;
+use App\DefaultPanel\Resources\Api\Customer\StateResource;
 use Tasawk\Api\Facade\Api;
 
 class LocationServices {
