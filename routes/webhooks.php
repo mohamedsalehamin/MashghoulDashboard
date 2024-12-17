@@ -54,9 +54,9 @@ Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoo
 
         }
         session()->flash('reservation_id', $transaction->transactionable->id);
-        return 'success';
+        return redirect()->route('checkout.success');
     }
-    return redirect()->route('checkout.error');
+    return redirect()->route('checkout.fail');
 })->name('webhooks.myfatoorah.transactions.callback');
 Route::get('categories/arrange', function () {
     foreach (request()->get("list") as $record) {

@@ -17,3 +17,6 @@ Route::get('reservations/{reservation}/invoice',function (\App\CatalogModule\Mod
     $suffix="{$reservation->id}_".date("Y_m_d");
     return $pdf->download("invoice_$suffix.pdf");
 })->name('reservations.invoice');
+
+Route::get('/checkout/success',fn()=>'success')->name('checkout.success');
+Route::get('/checkout/fail',fn()=>'fail')->name('checkout.fail');
