@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer;
 
 use App\CatalogModule\Models\Reservation;
+use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\BuildCartInstanceAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Requests\Api\Customer\Order\CartCheckoutRequest;
@@ -45,7 +46,7 @@ class CartServices {
         if ($cart->getTotal() > 0) {
             $reservation->pay($cart->getTotal());
         }
-
+        AddReservationCommissionAction::run($reservation);
         return Api::isOk(__("Reservation created"), ReservationResource::make($reservation));
     }
 

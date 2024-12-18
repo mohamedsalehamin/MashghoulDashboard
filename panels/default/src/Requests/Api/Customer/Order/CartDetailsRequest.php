@@ -20,11 +20,13 @@ class CartDetailsRequest extends FormRequest {
      *
      * @return array
      */
+
     public function rules(): array {
+
         return [
             "seat_id" => ['required', 'exists:seats,id'],
             'services' => ['required', 'array'],
-            'services.*.id' => ['required', Rule::exists('services', 'id')->where('provider_id', $this->route('provider')->id)->where('status', 1),],
+            'services.*.id' => ['required', Rule::exists('seat_service', 'service_id')->where('seat_id', $this->get('seat_id')),],
             'coupon_code' => ['nullable', 'exists:coupons,code', new IsValidCoupon($this->cart()->getServicesTotalIncludeProducts())],
         ];
     }

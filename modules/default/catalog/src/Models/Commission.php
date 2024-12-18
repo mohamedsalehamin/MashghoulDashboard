@@ -38,13 +38,13 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Commission extends Model implements HasMedia {
-    use FilterScope,InteractsWithMedia;
+    use FilterScope, InteractsWithMedia;
 
     protected $guarded = ['id'];
     protected $table = "reservations_commissions";
 
     public function reservation(): BelongsTo {
-        return $this->belongsTo(Reservation::class,'reservation_id','id');
+        return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
 
     public function scopeBelongsToDoctors($builder) {
@@ -58,6 +58,7 @@ class Commission extends Model implements HasMedia {
             $query->where('reservable_type', Lab::class);
         });
     }
+
     public function amount(): Attribute {
 
         return Attribute::make(
@@ -66,8 +67,9 @@ class Commission extends Model implements HasMedia {
     }
 
     public function profit() {
-        return $this->reservation->price->subtract($this->amount);
-}
+        return Money::parse($this->reservation->as_cart->getNetProfitTotal())->subtract($this->amount);
+    }
+
     public function status(): Attribute {
 
         return Attribute::make(
