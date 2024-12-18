@@ -22,10 +22,11 @@ class Notification extends DatabaseNotification {
     protected function url(): Attribute {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
+
                 $data = json_decode($attributes['data'], true)['viewData'];
                 return match ($data['entity_type']) {
                     'branch' => route('filament.admin.resources.reservation.view', $data['entity_id']),
-                    'branch' => route('filament.admin.resources.catalog.branches.edit', $data['entity_id']),
+                    'order' => route('filament.admin.resources.catalog.branches.edit', $data['entity_id']),
                     default => 'javascript:void(0)',
                 };
 

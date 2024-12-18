@@ -10,7 +10,6 @@ use Tasawk\Api\Facade\Api;
 
 class NotificationServices {
     public function all() {
-        auth()->user()->notifications->markAsRead();
         $notifications = NotificationResource::collection(auth()->user()->notifications()->latest()->paginate());
         return Api::isOk(__("Notification list"))->setData($notifications);
     }
@@ -20,6 +19,12 @@ class NotificationServices {
             ? auth()->user()->notifications()->delete()
             : auth()->user()->notifications()->where("id", $notification)->delete();
         return Api::isOk(__("Notification has been deleted"));
+    }
+
+    public function seen(\App\Models\Notification $notification) {
+
+        $notification->markAsRead();
+        return Api::isOk("done");
     }
 
     public function fcm() {

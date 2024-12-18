@@ -1,5 +1,8 @@
 <?php
 return [
+    "providers"=>"مقدمي الخدمة",
+    "seats"=>"كراسي الخدمة",
+    "levels"=>"الشرائج",
     "landing_page" => "صفحة الهبوط",
     "header" => "الهيدر",
     "about_us" => "من نحن",

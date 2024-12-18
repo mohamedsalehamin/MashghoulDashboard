@@ -14,6 +14,7 @@ use App\ProviderPanel\Filament\Resources\ReservationResource\RelationManagers\It
 use App\UsersModule\Models\Lab;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
@@ -54,16 +55,23 @@ class ReservationResource extends Resource {
             )
             ->columns([
                 TextColumn::make('id')->searchable(),
-                TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),
+//                TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),
                 TextColumn::make('customer.name')->label(__('forms.fields.customer_name'))->searchable(),
+                TextColumn::make('customer.phone')->label(__('forms.fields.phone'))->searchable(),
+                TextColumn::make('seat.title')->label(__('forms.fields.seat_name'))->searchable(),
+                TextColumn::make('duration')
+                    ->formatStateUsing(fn($record) => $record->duration)
+                    ->label(__('forms.fields.duration'))->searchable(),
+
+
+                TextColumn::make('from')->searchable(),
+                TextColumn::make('to')->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->searchable(),
                 TextColumn::make('date')
                     ->date()
                     ->searchable(),
-                TextColumn::make('from')->searchable(),
-                TextColumn::make('to')->searchable(),
                 TextColumn::make('price')
                     ->searchable(),
                 TextColumn::make('status')
@@ -71,8 +79,8 @@ class ReservationResource extends Resource {
                     ->color(fn($record) => $record?->status?->getColor())
                     ->badge(),
                 TextColumn::make('transaction.status')
+                    ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                     ->label(__('forms.fields.payment_status'))
-                    ->formatStateUsing(fn($record) => $record?->getPaymentStatus()?->getLabel())
                     ->color(fn($record) => $record?->getPaymentStatus()?->getColor())
                     ->badge(),
 
@@ -136,7 +144,9 @@ class ReservationResource extends Resource {
                         Section::make("basic_information")
                             ->schema([
                                 TextEntry::make('id'),
+//                                TextEntry::make('reservable.name')->label(__("forms.fields.provider_name")),
                                 TextEntry::make('customer.name'),
+                                TextEntry::make('customer.phone'),
                                 TextEntry::make('seat.title')->label(__("forms.fields.seat_name")),
                                 TextEntry::make('date')->date(),
                                 TextEntry::make('from'),
@@ -147,12 +157,13 @@ class ReservationResource extends Resource {
                                     ->color(fn($record) => $record?->status?->getColor())
                                     ->badge(),
                                 TextEntry::make('transaction.status')
-                                    ->formatStateUsing(fn($record) => $record?->getPaymentStatus()?->getLabel())
+                                    ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                                     ->label(__('forms.fields.payment_status'))
+                                    ->helperText(fn($record) => isset($record->transaction->meta_data['refund_data']['RefundId']) ? "Refund status: " . GetRefundTransactionStatusAction::run($record->transaction->meta_data['refund_data']['RefundId']) : '')
                                     ->color(fn($record) => $record?->getPaymentStatus()->getColor())
                                     ->badge(),
-                                TextEntry::make('duration')
-                                    ->label(__('forms.fields.duration')),
+                                TextEntry::make('duration')->label(__('forms.fields.duration')),
+                                TextEntry::make('meta_data.points')->label(__('forms.fields.wining_points')),
                                 Group::make()->schema(function ($record) {
                                     $totals = $record->as_cart->formattedTotals();
                                     return [
@@ -168,6 +179,40 @@ class ReservationResource extends Resource {
 
                             ])
                             ->columns(4),
+                        ActivitySection::make('timeline')
+                            ->label(__('sections.timeline'))
+                            ->schema(components: [
+                                ActivityTitle::make('title.' . app()->getLocale()),
+                                ActivityDate::make('created_at')
+                                    ->date('F j, Y h:i a'),
+                                ActivityIcon::make('status')
+                                    ->icon(fn(string $state) => ReservationStatus::tryFrom($state)?->getIcon())
+                                    ->color(fn(string|null $state): string|null => ReservationStatus::tryFrom($state)->getColor()),
+                            ]),
+                        Section::make("rate")
+                            ->visible(fn($record) => $record->rate()->exists())
+                            ->schema([
+                                Fieldset::make('place')
+                                    ->label(__('forms.fields.place_rate'))
+                                    ->relationship('placeRate')
+                                    ->schema([
+                                        TextEntry::make('rate'),
+                                        TextEntry::make('comment'),
+
+                                    ])
+                                    ->columnSpan(1),
+                                Fieldset::make('service')
+                                    ->label(__('forms.fields.service_rate'))
+                                    ->relationship('serviceRate')
+                                    ->schema([
+                                        TextEntry::make('rate'),
+                                        TextEntry::make('comment'),
+
+                                    ])
+                                    ->columnSpan(1)
+                            ])
+                            ->columnSpan(1)
+                            ->columns(2),
                     ])
 
 

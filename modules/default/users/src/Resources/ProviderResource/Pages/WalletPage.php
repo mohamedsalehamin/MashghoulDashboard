@@ -7,6 +7,7 @@ use App\Notifications\AdminSendEntitlementsNotification;
 use App\UsersModule\Resources\DoctorResource;
 use App\UsersModule\Resources\LabResource;
 use App\UsersModule\Resources\ProviderResource;
+use App\UsersModule\Resources\ProviderResource\Widgets\WalletStats;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +19,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,6 +30,7 @@ class WalletPage extends Page implements HasTable {
     use InteractsWithRecord;
     use HasTabs;
     use InteractsWithTable;
+
 //    public ?array $tableFilters = null;
     public string|int|null|\Illuminate\Database\Eloquent\Model $record;
 
@@ -42,8 +45,13 @@ class WalletPage extends Page implements HasTable {
 
     public function table(Table $table): Table {
         return $table->query($this->getTableQuery())
-
+            ->emptyStateHeading(__("site.no_data"))
             ->filters([
+                SelectFilter::make('type')
+                    ->options([
+                        'deposit' => __('panel.enums.deposit'),
+                        'withdraw' => __('panel.enums.withdraw'),
+                    ]),
                 Filter::make('created_at')
                     ->form([
                         DatePicker::make('date_from'),
@@ -63,19 +71,17 @@ class WalletPage extends Page implements HasTable {
             ])
             ->headerActions([
                 Action::make('pay')
-                    ->visible(fn() => $this->record->provider->wallet->balance > 0)
+                    ->visible(fn() => $this->record->provider?->wallet?->balance > 0)
                     ->label(__('forms.actions.reduction'))
-
                     ->form([
                         TextInput::make('amount')
-                            ->rules(['lte:'.$this->record->provider->wallet->balance])
+                            ->rules(['lte:' . $this->record->provider?->wallet?->balance])
                             ->label(__('forms.fields.amount'))
                             ->required(),
                         SpatieMediaLibraryFileUpload::make('receipt')
-
                             ->columnSpan(2),
                     ])
-                    ->before(function ($record,$data,) {
+                    ->before(function ($record, $data) {
 //                        dd($data);
                     })
                     ->action(function ($data) {
@@ -91,19 +97,19 @@ class WalletPage extends Page implements HasTable {
                     })
             ])
             ->columns([
-                TextColumn::make('id')
-                    ->translateLabel()
-                    ->searchable(),
+                TextColumn::make('id')->translateLabel()
+                    ->searchable(false),
 
                 TextColumn::make('type')
                     ->label(__('forms.fields.transaction_type'))
                     ->formatStateUsing(fn($state) => __("panel.enums.$state"))
-                    ->searchable(),
-                TextColumn::make('amount')->searchable(),
+                    ->searchable(false),
+                TextColumn::make('amount')->searchable(false),
                 TextColumn::make('meta.description')
-                    ->formatStateUsing(fn($record) => $record->meta['description'][app()->getLocale()]),
+                    ->formatStateUsing(fn($record) => $record->meta['description'][app()->getLocale()])
+                    ->searchable(false),
                 TextColumn::make('created_at')
-                    ->date()
+                    ->date()->searchable(false)
             ])
             ->striped();
 
@@ -139,6 +145,12 @@ class WalletPage extends Page implements HasTable {
             __('menu.dashboard'),
             $this->record->provider->title,
             __('menu.wallet')
+        ];
+    }
+
+    protected function getHeaderWidgets(): array {
+        return [
+            WalletStats::make(['record' => $this->record->provider])
         ];
     }
 }

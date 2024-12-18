@@ -32,6 +32,7 @@ class CustomerResource extends JsonResource {
             'gender' => GenderEnum::from($this->gender)->getLabel(),
             'gender_enum' => GenderEnum::from($this->gender)->value,
             'balance' =>$this->getTotalPointsBalance(),
+            'points'=>$this->getTotalPoints(),
             'notification_status' => $this->settings['notification_status'] ?? 1,
             'unread_notifications_count' => $this->unreadNotifications()->count(),
             'preferred_language' => $this->settings['preferred_language'] ?? 'ar',

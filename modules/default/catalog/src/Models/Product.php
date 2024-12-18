@@ -13,7 +13,7 @@ class Product extends Model {
 
     use HasFactory, Publishable, HasTranslations;
 
-    public array $translatable = ['title'];
+    public array $translatable = [];
     protected $guarded = ['id'];
     protected $casts = [
         'title' => 'array'

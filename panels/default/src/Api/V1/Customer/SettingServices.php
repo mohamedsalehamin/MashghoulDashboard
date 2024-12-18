@@ -23,6 +23,11 @@ class SettingServices {
             "phone" => $settings->app_phone,
             "whatsapp" => $settings->app_whatsapp,
             'social_media' => $this->socialMedia($settings->social_links),
+            'applications_links' => $settings->applications_links,
+            'actions_text' => [
+                'complete_order' => $settings->texts[app()->getLocale()]['text_when_order_completed'] ?? ''
+            ]
+
         ]);
     }
 
@@ -34,8 +39,6 @@ class SettingServices {
         })->pluck('link', 'id');
 
     }
-
-
 
 
     public function reservationStatuses() {

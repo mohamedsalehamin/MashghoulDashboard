@@ -79,7 +79,7 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->default(1),
                     Forms\Components\TextInput::make('meta_data.max_discount')
                         ->label(__('forms.fields.max_discount'))
-                        ->visible(fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE->value)
+                        ->visible(fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE)
                         ->numeric()
                         ->required()
                         ->default(1),

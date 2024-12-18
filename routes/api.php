@@ -4,6 +4,7 @@ use App\DefaultPanel\Api\V1\Customer\CartServices;
 use App\DefaultPanel\Api\V1\Customer\CategoryServices;
 use App\DefaultPanel\Api\V1\Customer\Content\BannerServices;
 use App\DefaultPanel\Api\V1\Customer\Content\ContentServices;
+use App\DefaultPanel\Api\V1\Customer\Content\SliderServices;
 use App\DefaultPanel\Api\V1\Customer\LocationServices;
 use App\DefaultPanel\Api\V1\Customer\NotificationServices;
 use App\DefaultPanel\Api\V1\Customer\ProductServices;
@@ -32,6 +33,7 @@ Route::prefix('v1')->group(function () {
     Route::get('settings/reservation-statuses', [SettingServices::class, 'reservationStatuses']);
 
     Route::get('banners', [BannerServices::class, 'list']);
+    Route::get('sliders', [SliderServices::class, 'list']);
     Route::get('plans', [ContentServices::class, 'points']);
     Route::get('categories', [CategoryServices::class, 'list']);
     Route::get('categories/{category}', [CategoryServices::class, 'show']);
@@ -47,6 +49,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('search', [ProductServices::class, 'search']);
     Route::post('contacts', [ContentServices::class, 'contact']);
+    Route::get('contacts/types', [ContentServices::class, 'types']);
     Route::post('join', [ContentServices::class, 'join']);
     Route::get('pages/{slug}', [ContentServices::class, 'page']);
     Route::get('faqs', [ContentServices::class, 'faqs']);
@@ -63,6 +66,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('users/delete-account', [SharedProfileService::class, 'deleteAccount']);
 
         Route::get('users/notifications', [NotificationServices::class, 'all']);
+        Route::put('users/notifications/{notification}', [NotificationServices::class, 'seen']);
         Route::delete('users/notifications/{id?}', [NotificationServices::class, 'destroy']);
         Route::post('users/notifications/fcm', [NotificationServices::class, 'fcm']);
     });

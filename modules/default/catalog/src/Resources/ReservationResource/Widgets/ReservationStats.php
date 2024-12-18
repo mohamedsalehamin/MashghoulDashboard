@@ -3,6 +3,7 @@
 namespace App\CatalogModule\Resources\ReservationResource\Widgets;
 
 use App\CatalogModule\Models\Commission;
+use App\CatalogModule\Models\Seat;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Users\Customer;
@@ -103,6 +104,7 @@ class ReservationStats extends BaseWidget {
             Stat::make(__('panel.stats.completed_reservations_total'), Money::parse($totalsStats->completed)->format()),
             Stat::make(__('panel.stats.canceled_reservations_total'), Money::parse($totalsStats->canceled)->format()),
             Stat::make(__('panel.stats.reservations_count'), $sumStats->all),
+            Stat::make(__('panel.stats.seats_count'), Seat::where("provider_id",provider()->id)->count()),
             Stat::make(__('panel.stats.pending_reservations_count'), $sumStats->pending ?? 0)
                 ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'pending'])),
             Stat::make(__('panel.stats.in_processing_reservations_count'), $sumStats->in_processing ?? 0)
@@ -111,6 +113,9 @@ class ReservationStats extends BaseWidget {
                 ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'completed'])),
             Stat::make(__('panel.stats.canceled_orders_count'), $sumStats->canceled ?? 0)
                 ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
+            Stat::make(__('panel.stats.rates_count'),(float)provider()->rate()->count()/2??0),
+//
+            Stat::make(__('panel.stats.avg_rate'),(float)provider()->rate()->avg('rate')??0),
 
         ];
     }

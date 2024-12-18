@@ -3,11 +3,13 @@
 namespace App\ProviderPanel\Filament\Resources;
 
 use App\CatalogModule\Models\Service;
+use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\ServiceResource\Pages\CreateService;
 use App\ProviderPanel\Filament\Resources\ServiceResource\Pages\EditService;
 use App\ProviderPanel\Filament\Resources\ServiceResource\Pages\ListServices;
+use App\ProviderPanel\Filament\Resources\ServiceResource\Pages\ViewService;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -19,6 +21,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Concerns\Translatable;
@@ -70,15 +74,16 @@ class ServiceResource extends Resource {
                 Section::make('products')->schema([
                     Repeater::make('products')
                         ->label('')
+                        ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
                         ->schema([
                             TextInput::make('title.ar')
-                                ->formatStateUsing(fn($record)=>$record?->getTranslation("title","ar"))
+                                ->formatStateUsing(fn($record) => $record?->title['ar'] ?? '')
                                 ->label(__("forms.fields.title_ar"))->required(),
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
-                                ->formatStateUsing(fn($record)=>$record?->getTranslation("title","en"))
+                                ->formatStateUsing(fn($record) => $record?->title['en'] ?? '')
                                 ->required(),
-                            TextInput::make('price')->required()->formatStateUsing(fn($record) =>  $record?->price?->formatByDecimal()),
+                            TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
                         ])->relationship('products'),
                 ])->columnSpan(1),
 
@@ -89,15 +94,12 @@ class ServiceResource extends Resource {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('provider_id', provider()->id))
             ->columns([
-                TextColumn::make('id')
-                    ->translateLabel()
-                    ->searchable(),
-                TextColumn::make('provider.name')
-                    ->label(__('forms.fields.provider_name'))
-                    ->searchable(),
+                TextColumn::make('index')->rowIndex(),
+                TextColumn::make('id')->translateLabel()->searchable(),
+
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('price')->searchable(),
-                TextColumn::make('products_count')->counts("products")->searchable(),
+                TextColumn::make('products_count')->counts("products")->searchable(false),
 
 
                 IconColumn::make('status')
@@ -117,6 +119,7 @@ class ServiceResource extends Resource {
 
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
 
@@ -136,23 +139,21 @@ class ServiceResource extends Resource {
     static public function infolist(Infolist $infolist): Infolist {
         return $infolist
             ->schema([
-                Grid::make()->schema([
-                    Section::make("basic_information")
-                        ->schema([
-                            TextEntry::make('id'),
-                            TextEntry::make('name'),
-                            TextEntry::make('price'),
-                            TextEntry::make('status')
-                                ->formatStateUsing(fn(string $state): string => $state ? __('panel.enums.ACTIVE') : __('panel.enums.INACTIVE'))
-                                ->badge(),
-                        ])->columns(1),
+                TextEntry::make('id'),
 
-                ])->columns(2)
+
+                TextEntry::make('provider.name'),
+                TextEntry::make('title'),
+                TextEntry::make('description'),
+                TextEntry::make('duration'),
+                TextEntry::make('products_count')->state(fn($record) => $record->products()->count()),
+                SpatieMediaLibraryImageEntry::make('image')->label(__('forms.fields.image')),
             ]);
     }
 
     public static function getRelations(): array {
         return [
+            ProductsRelationManager::class
         ];
     }
 
@@ -161,17 +162,19 @@ class ServiceResource extends Resource {
             'index' => ListServices::route('/'),
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
+            'view' => ViewService::route('/{record}'),
         ];
     }
 
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::where('provider_id',provider()->id)->count();
+        return static::getModel()::where('provider_id', provider()->id)->count();
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
     }
+
     public static function can(string $action, ?Model $record = null): bool {
 
         return true;

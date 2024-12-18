@@ -2,7 +2,10 @@
 
 namespace App\ContentModule\Resources;
 
+use App\ContentModule\Models\Category;
 use App\ContentModule\Resources\BannerResource\Pages\ListBanners;
+use App\UsersModule\Models\Provider;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -48,11 +51,30 @@ class BannerResource extends Resource {
                 ->label(__('forms.fields.image_ar'))
                 ->collection('ar')
                 ->required(),
-            TextInput::make('link')
-                ->url()
-                ->translateLabel(),
-            Toggle::make('status')->default(1)
+            Select::make("object_type")
+                ->live()
+                ->options([
+                    'link' => __("forms.fields.external_link"),
+                    'category' => __("forms.fields.category"),
+                    'provider' => __("forms.fields.provider"),
+                ]),
 
+            Select::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'category')
+                ->label(__('forms.fields.category'))
+                ->options(Category::pluck('name', 'id'))
+                ->required(),
+            Select::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'provider')
+                ->label(__('forms.fields.provider'))
+                ->options(Provider::pluck('name', 'id'))
+                ->required(),
+            TextInput::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'link')
+                ->label(__('forms.fields.link'))
+                ->url(),
+
+            Toggle::make('status')->default(1)
                 ->onColor('success')
                 ->offColor('danger')
                 ->translateLabel()

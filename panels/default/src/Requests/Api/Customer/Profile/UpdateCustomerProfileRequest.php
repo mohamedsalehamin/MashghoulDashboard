@@ -40,7 +40,8 @@ class UpdateCustomerProfileRequest extends FormRequest {
             'email' => ['required', 'email', Rule::unique('users')->ignore(auth()->id())],
             'state_id' => ['required', 'exists:states,id'],
             'city_id' => ['required', 'exists:cities,id'],
-            'avatar'=>['nullable','image']
+            'dob' => ['required', 'date', 'before:' . today()->toDateString()],
+            'avatar'=>['nullable', 'image']
 
         ];
     }

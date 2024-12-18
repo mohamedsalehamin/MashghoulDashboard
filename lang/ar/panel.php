@@ -136,7 +136,7 @@ return [
         'doctor_late' => 'ﺗﻢ اﻟﺘﺨﻠﻒ ﻋﻦ اﻟﻤﻮﻋﺪ ﻣﻦ قبل الطبيب',
         'patient_canceled' => 'ملغي  ﻣﻦ قبل المريض',
         'doctor_canceled' => 'ملغي  ﻣﻦ قبل الطبيب',
-        'canceled' => 'ملغي',
+        'canceled' => 'لم يتم تنفيذ الخدمة',
         'problematic' => 'بة مشكلة',
         'paid' => 'تم الدفع',
 
@@ -243,6 +243,9 @@ return [
         "customer_registered_body"=>"قام :name بتسجيل حساب جديد",
     ],
     'stats' => [
+        'rates_count'=>'عدد التقييمات',
+        'avg_rate'=>'متوسط التقييم',
+        'seats_count'=>'عدد كراسي الخدمة',
         "providers_wallet_balance_totals" => "اجمالي محافظ مقدمي الخدمات",
         "providers_count" => "عدد مقدمي الخدمة",
         'doctors_total_transferred_dues' => 'إجمالي مبالغ الحجوزات المحولة للأطباء',
@@ -339,7 +342,8 @@ return [
         "lab_reservations_count_charts"=>"الرسم البياني لعدد حجوزات المعامل",
         "doctor_reservations_totals_charts"=>"الرسم البياني لاجمالي حجوزات الاطباء",
         "lab_reservations_totals_charts"=>"الرسم البياني لاجمالي حجوزات المعامل",
-
+        'reservations_count_charts'=>'احصائيات عدد الحجوزات',
+        'reservations_totals_charts'=>'احصائيات اجمالي الحجوزات',
         'chosen_for_you_tables' => 'منتجات مختارة لك',
         'deal_of_the_days' => 'صفقات اليوم',
         'order_stats' => 'إحصائيات الطلبات',

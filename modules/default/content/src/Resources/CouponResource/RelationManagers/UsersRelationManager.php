@@ -36,6 +36,7 @@ class UsersRelationManager extends RelationManager {
                     ->label(__("forms.fields.used_at"))
                     ->dateTime()->searchable()->toggleable(false),
             ])
+            ->emptyStateHeading(__('site.no_data'))
 
             ->filters([
                 //

@@ -14,6 +14,8 @@ class Banner extends Model implements HasMedia {
     protected array $translatable = ['name','image'];
     protected $fillable = [
         'status',
+        'object_type',
+        'object_id',
     ];
 
 

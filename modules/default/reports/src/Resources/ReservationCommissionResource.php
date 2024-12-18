@@ -62,7 +62,7 @@ class ReservationCommissionResource extends Resource {
 
                 TextColumn::make('percentage')
                     ->formatStateUsing(fn($record) => $record->percentage . '%')
-                    ->label(__('forms.fields.app_percentage'))
+                    ->label(__('forms.fields.provider_commission_percentage'))
 
                     ->searchable(),
 

@@ -5,6 +5,7 @@ namespace App\ProviderPanel\Filament\Resources;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\RateResource\Pages\ListRates;
+use App\ProviderPanel\Filament\Resources\RateResource\Widgets\RateSummary;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -31,11 +32,11 @@ class RateResource extends Resource {
             ->columns([
                 TextColumn::make('id')->searchable(),
 
-                TextColumn::make('reservation.customer.name'),
-                TextColumn::make('reservation.customer.phone'),
+                TextColumn::make('reservation.customer.name')->searchable(),
+                TextColumn::make('reservation.customer.phone')->searchable(),
                 TextColumn::make('type')->formatStateUsing(fn($record) => __("forms.fields.".$record->type."_rate")),
-                TextColumn::make('rate'),
-                TextColumn::make('comment'),
+                TextColumn::make('rate')->searchable(),
+                TextColumn::make('comment')->searchable(),
                 TextColumn::make('created_at')->searchable()->date(),
 
 

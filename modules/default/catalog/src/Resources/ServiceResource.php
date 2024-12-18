@@ -7,6 +7,7 @@ use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
 use App\CatalogModule\Resources\ServiceResource\Pages\EditService;
 use App\CatalogModule\Resources\ServiceResource\Pages\ListServices;
 use App\CatalogModule\Resources\ServiceResource\Pages\ViewService;
+use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
@@ -19,6 +20,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Concerns\Translatable;
@@ -72,17 +74,19 @@ class ServiceResource extends Resource {
                 ])->columnSpan(2),
                 Section::make('products')->schema([
                     Repeater::make('products')
+                        ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
                         ->label('')
                         ->schema([
                             TextInput::make('title.ar')
-                                ->formatStateUsing(fn($record) => $record?->getTranslation("title", "ar"))
+                                ->formatStateUsing(fn($record) => $record->title['ar']??'')
                                 ->label(__("forms.fields.title_ar"))->required(),
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
-                                ->formatStateUsing(fn($record) => $record?->getTranslation("title", "en"))
+                                ->formatStateUsing(fn($record) => $record->title['en']??'')
                                 ->required(),
                             TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
-                        ])->relationship('products'),
+                        ])
+                        ->relationship('products'),
                 ])->columnSpan(1),
 
             ])->columns(3);
@@ -96,10 +100,13 @@ class ServiceResource extends Resource {
                     ->searchable(),
                 TextColumn::make('provider.name')
                     ->label(__('forms.fields.provider_name'))
-                    ->searchable(),
+                    ->searchable(true,fn($query,$search) => $query->whereHas('provider',fn($q) => $q
+                        ->where('name->ar','like',"%$search%")
+                        ->orWhere('name->en','like',"%$search%")
+                    )),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('price')->searchable(),
-                TextColumn::make('products_count')->counts("products")->searchable(),
+                TextColumn::make('products_count')->counts("products")->searchable(false),
 
 
                 IconColumn::make('status')
@@ -141,16 +148,20 @@ class ServiceResource extends Resource {
         return $infolist
             ->schema([
                 TextEntry::make('id'),
+
+
                 TextEntry::make('provider.name'),
                 TextEntry::make('title'),
                 TextEntry::make('description'),
                 TextEntry::make('duration'),
                 TextEntry::make('products_count')->state(fn($record) => $record->products()->count()),
+                SpatieMediaLibraryImageEntry::make('image')->label(__('forms.fields.image')),
             ]);
     }
 
     public static function getRelations(): array {
         return [
+            ProductsRelationManager::class,
         ];
     }
 

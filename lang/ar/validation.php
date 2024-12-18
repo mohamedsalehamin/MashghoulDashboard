@@ -242,6 +242,9 @@ return [
         ],
         'end_date' => [
             'today' => 'الان'
+        ],
+        'before' => [
+            'today' => 'الان'
         ]
     ],
     'api' => [

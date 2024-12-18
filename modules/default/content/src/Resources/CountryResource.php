@@ -35,7 +35,7 @@ class CountryResource extends Resource {
                 Section::make('basic_information')
                     ->schema([
                         TextInput::make('name')->required(),
-                        TextInput::make('phone_code')->required(),
+                        TextInput::make('phone_code')->numeric()->required(),
 
                         Toggle::make('status')->default(1)
                             ->onColor('success')

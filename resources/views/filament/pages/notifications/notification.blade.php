@@ -4,13 +4,15 @@
 
     $color = $getColor() ?? 'gray';
     $isInline = $isInline();
+
 $mapper =fn($entityType,$entityID)=> match ($entityType) {
-    'order' => route('filament.admin.resources.orders.view',$entityID),
+    'reservation' => provider()?->id?\App\ProviderPanel\Filament\Resources\ReservationResource::getUrl('view',[$entityID]):\App\CatalogModule\Resources\ReservationResource::getUrl('view',[$entityID]),
     'branch' => route('filament.admin.resources.catalog.branches.edit',$entityID),
     'product' => route('filament.admin.resources.catalog.products.edit',$entityID),
     'customer' => route('filament.admin.resources.customers.edit',$entityID),
     default => null,
 };
+
 @endphp
 <x-filament-notifications::notification
     :notification="$notification"
@@ -58,7 +60,8 @@ $mapper =fn($entityType,$entityID)=> match ($entityType) {
         ) => ! ($isInline || $color === 'gray'),
     ])
 >
-    <div @isset($getViewData()['entity_type'],$getViewData()['entity_id']) onclick="location.href='{{$mapper($getViewData()['entity_type'],$getViewData()['entity_id'])}}'" @endisset
+    <div
+        @isset($getViewData()['entity_type'],$getViewData()['entity_id']) onclick="location.href='{{$mapper($getViewData()['entity_type'],$getViewData()['entity_id'])}}'" @endisset
         @class([
             'flex w-full gap-3 p-4',
             match ($color) {
@@ -102,6 +105,6 @@ $mapper =fn($entityType,$entityID)=> match ($entityType) {
             @endif
         </div>
 
-        <x-filament-notifications::close-button />
+        <x-filament-notifications::close-button/>
     </div>
 </x-filament-notifications::notification>

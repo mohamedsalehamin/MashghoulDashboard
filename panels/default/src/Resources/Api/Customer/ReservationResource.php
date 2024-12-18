@@ -31,7 +31,7 @@ class ReservationResource extends JsonResource {
                 'status' => $this->status,
             ],
             'invoice_url' => route('reservations.invoice', $this),
-            'transactions' => ReservationTransactionResource::make($this->transactions),
+            'transactions' => ReservationTransactionResource::collection($this->transactions),
             'totals' => $this->as_cart->formattedTotals()
         ];
     }
