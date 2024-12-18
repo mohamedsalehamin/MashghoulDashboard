@@ -15,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
+use Filament\Resources\Components\Tab;
 use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Forms\Components\SelectFontAwesomeIcon;
@@ -22,6 +23,7 @@ use App\DefaultPanel\Settings\GeneralSettings;
 
 class ManageGeneral extends SettingsPage {
     use HasPageShield;
+
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static string $settings = GeneralSettings::class;
     protected static ?string $slug = 'settings/general';
@@ -54,25 +56,37 @@ class ManageGeneral extends SettingsPage {
 //                    Textarea::make('app_address')
 //                        ->minLength(3)
 //                        ->required(),
-                    TextInput::make('taxes')
-                        ->label(__("forms.fields.taxes"))
-                        ->type('number')
-                        ->suffix("%")
-                        ->rules(['numeric','min:1','max:100'])
-                        ->required(),
+//                    TextInput::make('taxes')
+//                        ->label(__("forms.fields.taxes"))
+//                        ->type('number')
+//                        ->suffix("%")
+//                        ->rules(['numeric','min:1','max:100'])
+//                        ->required(),
+
+                    Tabs::make('tabs')
+                        ->schema([
+                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                Textarea::make('ar.text_when_order_completed')
+                            ]),
+                            Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                Textarea::make('en.text_when_order_completed')
+                            ])
+                        ])->statePath('texts'),
 
                     TextInput::make('reservations_fess')
                         ->type('number')
+                        ->suffix(__("forms.suffixes.sar"))
                         ->required(),
                     TextInput::make('app_percentage')
+                        ->suffix(__("forms.suffixes.percentage"))
                         ->type('number')
                         ->required(),
 
                     Select::make('reservation_flow')
-                    ->options([
-                        'total'=>__("panel.messages.pay_reservation_totals"),
-                        'fees'=>__("panel.messages.pay_reservation_fees")
-                    ]),
+                        ->options([
+                            'total' => __("panel.messages.pay_reservation_totals"),
+                            'fees' => __("panel.messages.pay_reservation_fees")
+                        ]),
                     Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
 
                 ]),
@@ -92,22 +106,22 @@ class ManageGeneral extends SettingsPage {
                 ])->columns(1),
                 Forms\Components\Section::make("app_pages")->schema([
                     Forms\Components\Fieldset::make(__("sections.app_pages"))
-                    ->schema([
-                        Select::make('app_pages.about_us')
-                            ->label(__('forms.fields.about_us'))
-                            ->options(Page::pluck('title', 'id')->toArray()),
+                        ->schema([
+                            Select::make('app_pages.about_us')
+                                ->label(__('forms.fields.about_us'))
+                                ->options(Page::pluck('title', 'id')->toArray()),
 
-                        Select::make('app_pages.terms_and_conditions')
-                            ->options(Page::pluck('title', 'id')->toArray())
-                            ->label(__('forms.fields.terms_and_conditions')),
-                        Select::make('app_pages.privacy_policy')
-                            ->options(Page::pluck('title', 'id')->toArray())
-                            ->label(__('forms.fields.privacy_policy')),
+                            Select::make('app_pages.terms_and_conditions')
+                                ->options(Page::pluck('title', 'id')->toArray())
+                                ->label(__('forms.fields.terms_and_conditions')),
+                            Select::make('app_pages.privacy_policy')
+                                ->options(Page::pluck('title', 'id')->toArray())
+                                ->label(__('forms.fields.privacy_policy')),
 
-                        Select::make('app_pages.return_policy')
-                            ->options(Page::pluck('title', 'id')->toArray())
-                            ->label(__('forms.fields.return_policy')),
-                    ]),
+                            Select::make('app_pages.return_policy')
+                                ->options(Page::pluck('title', 'id')->toArray())
+                                ->label(__('forms.fields.return_policy')),
+                        ]),
                     Forms\Components\Fieldset::make(__("sections.labs_pages"))
                         ->schema([
                             Select::make('about_us')
@@ -176,9 +190,11 @@ class ManageGeneral extends SettingsPage {
     public static function getNavigationGroup(): ?string {
         return __('menu.settings');
     }
+
     public function getTitle(): string|Htmlable {
         return __('sections.global_settings');
     }
+
     public function workingDaysSchema(): Repeater {
         $schema = [];
         foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
@@ -197,9 +213,10 @@ class ManageGeneral extends SettingsPage {
             ->minItems(1)
             ->maxItems(1);
     }
+
     public function getBreadcrumbs(): array {
         return [
-            null =>static::getNavigationGroup(),
+            null => static::getNavigationGroup(),
             static::getUrl() => static::getNavigationLabel(),
         ];
     }

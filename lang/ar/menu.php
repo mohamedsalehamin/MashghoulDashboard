@@ -1,5 +1,7 @@
 <?php
 return [
+    "sliders"=>"السلايدر",
+    "slider"=>"سلايدر",
     "providers_reservations_dues"=>'مستحقات المشاغل',
     "providersreservationsdues"=>'مستحقات المشاغل',
     'landing_page' => 'صفحة الهبوط',

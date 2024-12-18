@@ -12,6 +12,7 @@ class UpdateCustomerProfile {
             'name' => $request->get('first_name') . ' ' . $request->get('last_name'),
             'email' => $request->get('email'),
             'city_id' => $request->get('city_id'),
+            'dob'=>$request->get("dob"),
             'data' => [
                 'first_name' => $request->get('first_name'),
                 'last_name' => $request->get('last_name'),

@@ -76,10 +76,10 @@ class LevelResource extends Resource {
                     ->boolean()
                     ->action(
                         Action::make('Active')
-                            ->label(fn(Page $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
+                            ->label(fn( $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
                             ->disabled(fn(Model $record): bool => !auth()->user()->can('update', $record))
                             ->requiresConfirmation()
-                            ->action(fn(Page $record) => $record->toggleStatus())
+                            ->action(fn( $record) => $record->toggleStatus())
 
 
                     )

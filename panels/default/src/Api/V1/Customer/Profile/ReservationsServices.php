@@ -5,26 +5,21 @@ namespace App\DefaultPanel\Api\V1\Customer\Profile;
 
 use Api;
 use App\CatalogModule\Models\Reservation;
-use App\DefaultPanel\Enum\OrderStatus;
 use App\DefaultPanel\Requests\Api\Customer\Order\ReservationRateRequest;
-use App\DefaultPanel\Requests\Api\Order\OrderRateRequest;
-use App\DefaultPanel\Requests\Api\Order\ReportOrderRequest;
-use App\DefaultPanel\Resources\Api\Provider\ReservationResource;
-use App\DefaultPanel\Resources\Api\Orders\LightOrderResource;
-use App\DefaultPanel\Resources\Api\Orders\OrdersResource;
-use Tasawk\Agora\AgoraFactory;
-use Tasawk\Ecommerce\Notifications\ReservationCompletedNotification;
-use Tasawk\Orders\Models\OnlineReservation;
-use Tasawk\Orders\Models\OnlineReservationStatuses;
-use Tasawk\Orders\Models\Order\Timeline;
-use Tasawk\Orders\Models\OrderStatuses;
+use App\DefaultPanel\Resources\Api\Customer\ReservationResource;
 
 class ReservationsServices {
 
 
     public function index() {
-
-        return Api::isOk("rated successfully", ReservationResource::collection(auth()->user()->reservations()->latest()->get()));
+        $status = is_array(request('status')) ? request('status') : [request('status')];
+        return Api::isOk("rated successfully", ReservationResource::collection(
+            auth()->user()->reservations()
+                ->when(request()->has('status'), fn($query) => $query->whereIn('status', $status))
+                ->when(request()->filled('id'), fn($query) => $query->where('id', request('id')))
+                ->when(request()->filled('direction'), fn($query) => $query->orderBy('date', request('direction')))
+                ->latest()->get()
+        ));
 
     }
 

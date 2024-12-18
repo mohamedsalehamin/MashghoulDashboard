@@ -1,0 +1,54 @@
+<?php
+
+namespace App\CatalogModule\Resources\ServiceResource\RelationManagers;
+
+use App\CatalogModule\Models\Reservation\ItemsLine;
+use App\CatalogModule\Models\Service;
+use App\DefaultPanel\Lib\Utils;
+use App\Notifications\LabReservationResultsAddedNotification;
+use Cknow\Money\Money;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+
+class ProductsRelationManager extends RelationManager {
+    protected static string $relationship = 'products';
+
+    public function form(Form $form): Form {
+        return $form
+            ->schema([
+
+            ]);
+    }
+
+    public function table(Table $table): Table {
+        return $table
+            ->heading(__('sections.services'))
+            ->recordTitleAttribute('name')
+            ->columns([
+
+                Tables\Columns\TextColumn::make('index')->rowIndex(),
+                Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
+                Tables\Columns\TextColumn::make('price'),
+
+
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+
+}

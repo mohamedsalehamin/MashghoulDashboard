@@ -20,7 +20,7 @@ return [
         'upload_logo' => 'ارفاق الشعار',
         'clinic_images' => 'صور العيادة',
         'license' => 'رقم مزاولة المهنة',
-        'doctor_bio' => ' نبذة عن الطبيب',
+        'doctor_bio' => ' نبذة عن المشغل',
         'lab_bio' => ' نبذة عن المختبر',
         'current_job' => ' الوظيفة الحالية',
         'country' => 'الدولة',

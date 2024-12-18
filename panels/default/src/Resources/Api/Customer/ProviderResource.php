@@ -18,6 +18,9 @@ class ProviderResource extends JsonResource {
             $this->mergeWhen(request()->filled('latitude') && request()->filled('longitude'), [
                 'distance'=>round($this->distance/1000,2),
             ]),
+            'country'=>CountryResource::make($this->city?->state?->country),
+            'state'=>StateResource::make($this->city?->state),
+            'city'=>CityResource::make($this->city),
             'location' => [
                 'lat'=>$this->location->getCoordinates()[1],
                 'lng'=>$this->location->getCoordinates()[0],

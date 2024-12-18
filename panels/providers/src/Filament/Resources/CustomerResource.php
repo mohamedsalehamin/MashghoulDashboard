@@ -6,10 +6,15 @@ use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\CustomerResource\Pages\ListCustomers;
+use App\ProviderPanel\Filament\Resources\CustomerResource\Pages\ViewCustomer;
 use App\UsersModule\Models\Users\Customer;
+use App\UsersModule\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -32,19 +37,22 @@ class CustomerResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id)))
+//            ->modifyQueryUsing(fn($query) => $query->whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id)))
             ->columns([
                 TextColumn::make('id')->searchable(),
 
                 TextColumn::make('data.first_name')
-                    ->searchable("data->first_name"),
+                    ->searchable(true, fn(Builder $query, $search) => $query->where('data->first_name', 'like', '%' . $search . '%')),
                 TextColumn::make('data.last_name')
-                    ->searchable("data->last_name"),
+                    ->searchable(true, fn(Builder $query, $search) => $query->where('data->last_name', 'like', '%' . $search . '%')),
                 TextColumn::make('phone')
                     ->searchable(),
                 TextColumn::make('created_at')->searchable()->date(),
 
 
+            ])
+            ->actions([
+                ViewAction::make()
             ])
             ->filters([
                 Filter::make('ID')
@@ -71,13 +79,29 @@ class CustomerResource extends Resource {
     public static function getPages(): array {
         return [
             'index' => ListCustomers::route('/'),
+            'view' => ViewCustomer::route('/{record}'),
 
         ];
     }
+    public static function infolist(Infolist $infolist): Infolist {
+        return $infolist->schema([
+            TextEntry::make("id"),
+            TextEntry::make("data.first_name")->label(__('forms.fields.first_name')),
+            TextEntry::make("data.last_name")->label(__('forms.fields.last_name')),
+            TextEntry::make("phone"),
+            TextEntry::make("email"),
+            TextEntry::make("city.state.country.name")->label(__('forms.fields.country_id')),
+            TextEntry::make("city.state.name")->label(__('forms.fields.state')),
+            TextEntry::make("city.name")->label(__("forms.fields.city_name")),
+            TextEntry::make("created_at")->label(__('forms.fields.created_at')),
+            TextEntry::make("active")->label(__("forms.fields.status")),
+            TextEntry::make("points")->label(__("forms.fields.points"))->state(fn($record) => $record->getTotalPoints()),
 
+        ]);
+    }
     public static function getRelations(): array {
         return [
-
+            ReservationsRelationManager::make()
 
         ];
     }

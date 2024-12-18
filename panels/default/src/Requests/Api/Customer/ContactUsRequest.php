@@ -23,6 +23,7 @@ class ContactUsRequest extends FormRequest {
             "phone" => ["required_without:user_id"],
             "title" => ["required", 'min:3'],
             "message" => ["required", "min:25"],
+            'contact_type_id' => ['required'],
             'subject' => [],
         ];
     }

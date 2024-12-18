@@ -74,7 +74,7 @@ class Reservation extends Model {
             $settings = new GeneralSettings();
             $percentage = 100 - $settings->app_percentage;
 
-            $amount = ($reservation->price->formatByDecimal() / 100) * $percentage;
+            $amount = ($reservation->as_cart->totals()->formatByDecimal() / 100) * $percentage;
             $reservation->commission()->create([
                 'percentage' => $percentage,
                 'amount' => $amount
@@ -251,9 +251,7 @@ class Reservation extends Model {
         return !$this->rate()->exists() && $this->status == ReservationStatus::COMPLETED;
     }
 
-    public function prescription(): HasOne {
-        return $this->hasOne(Prescription::class);
-    }
+
 
     public function reservable(): MorphTo {
         return $this->morphTo();

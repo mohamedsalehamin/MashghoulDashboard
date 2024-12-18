@@ -85,7 +85,7 @@ class ContactResource extends Resource implements HasShieldPermissions {
                     ->copyMessage('Phone address copied')
                     ->copyMessageDuration(1500),
 
-
+                TextColumn::make('type.name')->label(__("forms.fields.message_type")),
                 TextColumn::make('title')
                     ->label(__("forms.fields.message_title"))
                     ->limit(50)

@@ -12,6 +12,8 @@ use App\UsersModule\Models\Users\Customer;
 use App\UsersModule\Resources\CustomerResource\Pages\CreateCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\EditCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\ListCustomers;
+use App\UsersModule\Resources\CustomerResource\Pages\ViewCustomer;
+use App\UsersModule\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -20,6 +22,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -78,28 +82,21 @@ class CustomerResource extends Resource {
 
 
                     TextInput::make('email')
-                        ->required()
+//                        ->required()
                         ->email()
-                        ->unique(ignoreRecord: true)
+//                        ->unique(ignoreRecord: true)
                         ->autocomplete("off"),
 
-                    TextInput::make('password')
-                        ->password()
-                        ->required(fn(string $operation): bool => $operation === 'create')
-                        ->confirmed()
-                        ->autocomplete("new-password"),
-
-                    TextInput::make('password_confirmation')
-                        ->password()
-                        ->required(fn(string $operation): bool => $operation === 'create')
-                        ->autocomplete("off"),
+                    Hidden::make('password')->default('password'),
 
                     Select::make('gender')
+                        ->required()
                         ->options(array(
                             'male' => __("panel.enums.male"),
                             'female' => __("panel.enums.female"),
                         )),
-                    DatePicker::make('dob'),
+                    DatePicker::make('dob')
+                        ->before(now()->toDateString()),
                     Select::make('country_id')
                         ->live()
                         ->required()
@@ -137,9 +134,9 @@ class CustomerResource extends Resource {
                 TextColumn::make('id')->searchable(),
 
                 TextColumn::make('data.first_name')
-                    ->searchable("data->first_name"),
+                    ->searchable(true, fn(Builder $query, $search) => $query->where('data->first_name', 'like', '%' . $search . '%')),
                 TextColumn::make('data.last_name')
-                    ->searchable("data->last_name"),
+                    ->searchable(true, fn(Builder $query, $search) => $query->where('data->last_name', 'like', '%' . $search . '%')),
                 TextColumn::make('phone')
                     ->searchable(),
                 TextColumn::make('city.state.country.name')
@@ -149,6 +146,7 @@ class CustomerResource extends Resource {
                     ->label(__('forms.fields.state'))
                     ->searchable(),
                 TextColumn::make('city.name')
+                    ->label(__("forms.fields.city_name"))
                     ->searchable(),
                 TextColumn::make('created_at')->searchable()->date(),
                 TextColumn::make('active')
@@ -193,6 +191,7 @@ class CustomerResource extends Resource {
                     ->options(ModelStatus::class)
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -208,12 +207,13 @@ class CustomerResource extends Resource {
             'index' => ListCustomers::route('/'),
             'create' => CreateCustomer::route('/create'),
             'edit' => EditCustomer::route('/{record}/edit'),
+            'view' => ViewCustomer::route('/{record}'),
         ];
     }
 
     public static function getRelations(): array {
         return [
-
+            ReservationsRelationManager::make()
 
         ];
     }
@@ -224,5 +224,22 @@ class CustomerResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.crew');
+    }
+
+    public static function infolist(Infolist $infolist): Infolist {
+        return $infolist->schema([
+            TextEntry::make("id"),
+            TextEntry::make("data.first_name")->label(__('forms.fields.first_name')),
+            TextEntry::make("data.last_name")->label(__('forms.fields.last_name')),
+            TextEntry::make("phone"),
+            TextEntry::make("email"),
+            TextEntry::make("city.state.country.name")->label(__('forms.fields.country_id')),
+            TextEntry::make("city.state.name")->label(__('forms.fields.state')),
+            TextEntry::make("city.name")->label(__("forms.fields.city_name")),
+            TextEntry::make("created_at")->label(__('forms.fields.created_at')),
+            TextEntry::make("active")->label(__("forms.fields.status")),
+            TextEntry::make("points")->label(__("forms.fields.points"))->state(fn($record) => $record->getTotalPoints()),
+
+        ]);
     }
 }

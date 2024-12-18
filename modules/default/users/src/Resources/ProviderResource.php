@@ -81,7 +81,7 @@ class ProviderResource extends Resource {
 
 
                     TextInput::make('email')
-                        ->required()
+//                        ->required()
                         ->email()
                         ->unique(ignoreRecord: true)
                         ->autocomplete("off"),
@@ -134,6 +134,7 @@ class ProviderResource extends Resource {
                         SpatieMediaLibraryFileUpload::make('image')
                             ->nullable(),
                         SpatieMediaLibraryFileUpload::make('images')
+                            ->multiple()
                             ->collection("images")
                             ->required(),
                         SpatieMediaLibraryFileUpload::make('commercial_register')
@@ -253,7 +254,7 @@ class ProviderResource extends Resource {
                     }),
                 SelectFilter::make('city_id')
                     ->searchable()
-                    ->query(fn(Builder $query, $data) => $query->when($data['value'], fn($query) => $query->where('city_id', $data['value'])))
+                    ->query(fn(Builder $query, $data) => $query->when($data['value'], fn($query) => $query->whereHas('provider', fn($query) => $query->where('city_id', $data['value']))))
                     ->options(fn(HasTable $livewire) => City::pluck('name', 'id')),
                 SelectFilter::make('gender')
                     ->searchable()

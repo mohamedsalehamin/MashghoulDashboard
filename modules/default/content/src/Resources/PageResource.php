@@ -43,7 +43,7 @@ class PageResource extends Resource {
                                 'xl' => 2,
                             ])
                             ->translateLabel(),
-                        Forms\Components\MarkdownEditor::make('description')
+                        Forms\Components\RichEditor::make('description')
                             ->required()
                             ->columnSpan([
                                 'xl' => 2,

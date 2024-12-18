@@ -48,9 +48,8 @@ class CategoryResource extends Resource  {
                         TextInput::make('name')
                             ->required(),
 
-                        SpatieMediaLibraryFileUpload::make('image')
-                            ->image()
-                            ->required(),
+                        SpatieMediaLibraryFileUpload::make('image_ar')->collection('ar')->image()->required(),
+                        SpatieMediaLibraryFileUpload::make('image_en')->collection('en')->image()->required(),
 
                         Forms\Components\Select::make("parent_id")
                             ->label(__('forms.fields.category_parent_id'))

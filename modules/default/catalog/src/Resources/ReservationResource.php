@@ -4,6 +4,7 @@ namespace App\CatalogModule\Resources;
 
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
+use App\CatalogModule\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
 use App\DefaultPanel\Actions\GetRefundTransactionStatusAction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -12,7 +13,6 @@ use App\DefaultPanel\Enum\TimesTypeEnum;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\CatalogModule\Resources\ReservationResource\Pages\ListReservations;
 use App\CatalogModule\Resources\ReservationResource\Pages\ViewReservation;
-use App\CatalogModule\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
 use App\CatalogModule\Resources\ReservationResource\Widgets\CalendarWidget;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Lab;
@@ -60,19 +60,27 @@ class ReservationResource extends Resource {
     public static function table(Table $table): Table {
 
         return $table
-            ->modifyQueryUsing(fn($query) => $query->paid())
+
+            ->modifyQueryUsing(fn($query) => $query->paid()->latest())
             ->columns([
                 TextColumn::make('id')->searchable(),
                 TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),
                 TextColumn::make('customer.name')->label(__('forms.fields.customer_name'))->searchable(),
+                TextColumn::make('customer.phone')->label(__('forms.fields.phone'))->searchable(),
+                TextColumn::make('seat.title')->label(__('forms.fields.seat_name'))->searchable(),
+                TextColumn::make('duration')
+                    ->formatStateUsing(fn($record) => $record->duration)
+                    ->label(__('forms.fields.duration'))->searchable(),
+
+
+                TextColumn::make('from')->searchable(),
+                TextColumn::make('to')->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->searchable(),
                 TextColumn::make('date')
                     ->date()
                     ->searchable(),
-                TextColumn::make('from')->searchable(),
-                TextColumn::make('to')->searchable(),
                 TextColumn::make('price')
                     ->searchable(),
                 TextColumn::make('status')
@@ -130,6 +138,7 @@ class ReservationResource extends Resource {
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
             ])
+
             ->striped();
     }
 
@@ -160,8 +169,8 @@ class ReservationResource extends Resource {
                                     ->helperText(fn($record) => isset($record->transaction->meta_data['refund_data']['RefundId']) ? "Refund status: " . GetRefundTransactionStatusAction::run($record->transaction->meta_data['refund_data']['RefundId']) : '')
                                     ->color(fn($record) => $record?->getPaymentStatus()->getColor())
                                     ->badge(),
-                                TextEntry::make('duration')
-                                    ->label(__('forms.fields.duration')),
+                                TextEntry::make('duration')->label(__('forms.fields.duration')),
+                                TextEntry::make('meta_data.points')->label(__('forms.fields.wining_points')),
                                 Group::make()->schema(function ($record) {
                                     $totals = $record->as_cart->formattedTotals();
                                     return [
@@ -177,6 +186,16 @@ class ReservationResource extends Resource {
 
                             ])
                             ->columns(4),
+                        ActivitySection::make('timeline')
+                            ->label(__('sections.timeline'))
+                            ->schema(components: [
+                                ActivityTitle::make('title.' . app()->getLocale()),
+                                ActivityDate::make('created_at')
+                                    ->date('F j, Y h:i a'),
+                                ActivityIcon::make('status')
+                                    ->icon(fn(string $state) => ReservationStatus::tryFrom($state)?->getIcon())
+                                    ->color(fn(string|null $state): string|null => ReservationStatus::tryFrom($state)->getColor()),
+                            ]),
                         Section::make("rate")
                             ->visible(fn($record) => $record->rate()->exists())
                             ->schema([

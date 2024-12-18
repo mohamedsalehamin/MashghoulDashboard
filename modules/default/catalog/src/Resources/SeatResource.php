@@ -30,6 +30,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Tasawk\Models\Catalog\Category;
 
@@ -54,6 +55,7 @@ class SeatResource extends Resource {
                     ->label(__('forms.fields.title'))
                     ->required(),
                 Select::make('services')
+
                     ->required()
                     ->multiple()
                     ->relationship('services','title')
@@ -79,10 +81,11 @@ class SeatResource extends Resource {
                     ->searchable(),
 
                 TextColumn::make('provider.name')
+
                     ->label(__('forms.fields.provider_name'))
-                    ->searchable(),
+                    ->searchable(true,fn(Builder $query, $search) => $query->whereHas('provider', fn($q) => $q->where('name->ar', 'like', "%$search%")->orWhere('name->en', 'like', "%$search%"))),
                 TextColumn::make('title')->searchable(),
-                TextColumn::make('services_count')->counts("services")->searchable(),
+                TextColumn::make('services_count')->counts("services")->searchable(false),
 
 
                 IconColumn::make('status')

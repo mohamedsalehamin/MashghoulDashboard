@@ -9,8 +9,9 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\Action;
 
 class ChangeReservationStatusAction {
-    static public function make() {
-        return Action::make('changeStatus')
+    static public function make($show=false) {
+        $action = $show?\Filament\Actions\Action::make('changeStatus'):Action::make('changeStatus');
+        return $action
             ->label(__('panel.actions.change_status'))
             ->icon('heroicon-o-bolt')
             ->disabled(fn(Reservation $record) => !$record->status == ReservationStatus::COMPLETED)

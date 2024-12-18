@@ -43,14 +43,15 @@ class GlobalOrderStats extends BaseWidget {
             Stat::make(__('panel.stats.completed_reservations_total'), Money::parse($totalsStats->completed)->format()),
             Stat::make(__('panel.stats.canceled_reservations_total'), Money::parse($totalsStats->canceled)->format()),
             Stat::make(__('panel.stats.reservations_count'), $sumStats->all),
+
             Stat::make(__('panel.stats.pending_reservations_count'), $sumStats->pending ?? 0)
-                ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'pending'])),
+                ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'pending'])),
             Stat::make(__('panel.stats.in_processing_reservations_count'), $sumStats->in_processing ?? 0)
-                ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'processing'])),
+                ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'processing'])),
             Stat::make(__('panel.stats.completed_reservations_count'), $sumStats->completed ?? 0)
-                ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'completed'])),
+                ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'completed'])),
             Stat::make(__('panel.stats.canceled_orders_count'), $sumStats->canceled ?? 0)
-                ->url(route('filament.lab-panel.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
+                ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
 
             Stat::make(__('panel.stats.customers_count'), Customer::count()),
             Stat::make(__('panel.stats.providers_count'), Provider::count()),

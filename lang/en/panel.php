@@ -1,6 +1,10 @@
 <?php
 return [
     'messages' => [
+        "pay_reservation_totals" => "Pay reservation totals",
+        "pay_reservation_fees" => "Pay reservation fees",
+        'admin_withdraw_balance_from_wallet_text' => ':AMOUNT has been withdrawn from your wallet',
+        'admin_transfer_lab_commission' => ':AMOUNT has been transferred to your wallet',
         "make_sure_that_bank_account_info_is_right" => "Make Sure that bank account information is right , transaction may be talk 48h to to be processd",
         'gift_for_register' => 'Gift for register',
         "gift_for_reservation" => "Gift for reservation no :id",
@@ -57,6 +61,11 @@ return [
         'delete' => 'Delete'
     ],
     'enums' => [
+        "minutes" => ":minutes minutes",
+        "30_minutes" => "30 minutes",
+        "90_minutes" => "90 minutes",
+        "120_minutes" => "120 minutes",
+        "60_minutes" => "60 minutes",
         "withdraw_request" => "Withdraw request",
         'completed' => 'Completed',
         "refunded" => "Refunded",
@@ -123,7 +132,7 @@ return [
     ],
     'notifications' => [
         "customer_registered" => "Customer registered",
-        "customer_registered_body"=>":name has been registered in the application",
+        "customer_registered_body" => ":name has been registered in the application",
         'congrats' => 'Congratulations',
         "you_are_gain_points_for_reservation" => "You have gained :points points for reservation",
         "send_gift_for_customer_whose_birthday_today" => "You have gained :points points for your birthday",
@@ -196,6 +205,11 @@ return [
         "providerduesnotificationbody" => "You have a new dues request from provider :name",
     ],
     'stats' => [
+        'reservations_total' => "Reservations total",
+        'providers_count' => "Providers count",
+        'rates_count' => 'Rates count',
+        'avg_rate' => 'Average rate',
+        'seats_count' => 'Seats count',
         "providers_wallet_balance_totals" => "Providers wallet balance totals",
         'canceled_orders_count' => 'Canceled orders count',
         "reserved_balance" => "Reserved balance",
@@ -278,6 +292,26 @@ return [
         'total_reservations_status_description' => 'Number of total reservations during the specified period',
     ],
     'widgets' => [
+
+        'chosen_for_you_tables' => 'Chosen for you tables',
+        'deal_of_the_days' => 'Deal of the days',
+        'global_order_stats' => 'Global order stats',
+        'order_stats' => 'Order stats',
+        'order_receipt_methods' => 'Order receipt methods',
+        'orders_chart' => 'Orders chart',
+        'customers_chart' => 'Customers chart',
+        'latest_orders' => 'Latest orders',
+        'best_selling_products' => 'Best selling products',
+        'top_branches' => 'Top branches',
+        'branches_in_heavy_load_modes' => 'Branches in heavy load modes',
+        'branches_in_maintenance_modes' => 'Branches in maintenance modes',
+        'contacts' => 'Contacts',
+        'orders_group_by_branches' => 'Orders group by branches',
+    ],
+    'widget' => [
+        'customers_charts' => 'customers charts',
+        'reservations_count_charts'=>'reservations count charts',
+        'reservations_totals_charts'=>'reservations totals charts',
         'chosen_for_you_tables' => 'Chosen for you tables',
         'deal_of_the_days' => 'Deal of the days',
         'global_order_stats' => 'Global order stats',

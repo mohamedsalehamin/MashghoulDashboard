@@ -13,6 +13,9 @@
     body {
         overflow: hidden!important;
     }
+    .fi-timeline-item-heading{
+        justify-content: space-between!important;
+    }
 </style>
 @viteReactRefresh
 @vite('resources/js/index.jsx')

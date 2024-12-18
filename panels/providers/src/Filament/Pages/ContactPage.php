@@ -3,7 +3,9 @@
 namespace App\ProviderPanel\Filament\Pages;
 
 use App\ContentModule\Models\Contact;
+use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Enum\ContactSourceEnum;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -17,6 +19,8 @@ class ContactPage extends Page {
     public $phone;
     #[Validate('required')]
     public $email;
+    #[Validate('required')]
+    public $contact_type_id;
     #[Validate('required')]
     public $subject;
     #[Validate('required')]
@@ -37,7 +41,9 @@ class ContactPage extends Page {
 
             TextInput::make('phone')
                 ->required(),
-
+            Select::make('contact_type_id')
+                ->options(ContactType::pluck('name', 'id'))
+                ->label(__("forms.fields.message_type")),
             TextInput::make('subject')
                 ->required(),
 
