@@ -71,14 +71,7 @@ class Reservation extends Model {
         parent::boot();
 
         static::created(function (Reservation $reservation) {
-            $settings = new GeneralSettings();
-            $percentage = 100 - $settings->app_percentage;
 
-            $amount = ($reservation->as_cart->totals()->formatByDecimal() / 100) * $percentage;
-            $reservation->commission()->create([
-                'percentage' => $percentage,
-                'amount' => $amount
-            ]);
 
 
         });

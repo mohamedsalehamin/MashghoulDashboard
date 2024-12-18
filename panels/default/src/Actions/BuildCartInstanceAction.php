@@ -29,7 +29,7 @@ class BuildCartInstanceAction {
         $cart->clear();
         $settings = new GeneralSettings();
 
-
+        $pay_fees_mode = $settings->reservation_flow == "fees";
         $services = Service::findMany(request()->collect('services')->pluck("id"));
         $productPrice = 0;
         foreach ($services as $service) {
@@ -38,11 +38,11 @@ class BuildCartInstanceAction {
                 ->where('id', $service->id)
                 ->first();
             $products = Product::where('service_id', $service->id)->whereIn("id", $_service['products'] ?? [])->get();
-            $price = $service->price->formatByDecimal();
+            $price = !$pay_fees_mode ? $service->price->formatByDecimal() : 0;
             $productPrice += $products->sum(fn($product) => $product->price->formatByDecimal());
             $cart->applyItem($service, $price, 1, ['products' => $products]);
         }
-        $cart->applyProducts($productPrice);
+        $cart->applyProducts(!$pay_fees_mode ? $productPrice : 0);
         $cart->applyCoupon($request->get('coupon_code'));
 
         if (auth()->user()->reservations()->count() != 0 && !$settings->enabled_free_fees_in_first_reservation) {

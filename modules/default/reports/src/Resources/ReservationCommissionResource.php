@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Money\Money;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
@@ -37,7 +38,7 @@ class ReservationCommissionResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-//            ->modifyQueryUsing(fn($query) => $query->whereHas('reservation.reservable')->whereHas('reservation', fn(Builder $query) => $query->where('status',ReservationStatus::COMPLETED->value)))
+            ->modifyQueryUsing(fn($query) => $query->where('amount',">",0))
             ->columns([
 
 
@@ -58,6 +59,7 @@ class ReservationCommissionResource extends Resource {
 
                 TextColumn::make('reservation.price')
                     ->label(__("forms.fields.reservation_total"))
+                    ->formatStateUsing(fn($record) => \Cknow\Money\Money::parse($record->reservation->as_cart->getNetProfitTotal())->format())
                     ->searchable(),
 
                 TextColumn::make('percentage')

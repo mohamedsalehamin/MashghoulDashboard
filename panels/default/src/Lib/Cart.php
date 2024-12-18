@@ -456,8 +456,12 @@ class Cart extends CoreCart {
         return $this->totals()['services_total'] + $this->getProductsTotal();
     }
 
-    public
-    function totals(): array {
+    public function getNetProfitTotal() {
+//        dd($this->totals()['subtotal']);
+        return $this->totals()['subtotal'] - $this->totals()['wallet_discount'];
+    }
+
+    public function totals(): array {
         $items_total_with_options = $this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true));
         return [
             'services_total' => $this->getSubTotalWithoutConditions(),
