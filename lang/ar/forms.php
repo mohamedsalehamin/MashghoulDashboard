@@ -1,6 +1,7 @@
 <?php
 return [
     'fields' => [
+        "pros"=>"ميزات فرعية",
         "text_when_order_completed" => "نص الرسالة عند انتهاء الطلب",
         'expire_after' => 'تنتهي بعد',
         "bill" => "الفاتورة",
@@ -368,6 +369,9 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "accept"=>'قبول',
+        "reject"=>'رفض',
+        'activities'=>'سجل التغيرات',
         'subscribe' => 'اشترك',
         'subscribe_via_online' => 'اشترك أونلاين',
         'subscribe_via_wallet' => 'اشترك من خلال رصيد محفظتك',

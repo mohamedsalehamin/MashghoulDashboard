@@ -28,21 +28,7 @@
                             </li>
                         </ul>
                     </nav>
-                    <div class="lastSide">
-                        <a href="#" class="join_Us">
-                            <div>
-                                انضم كمقدم خدمة
-                            </div>
-                        </a>
-                        <div class="menu-icons open-me d-lg-none">
-                            <label for="check" class="">
-                                <input type="checkbox" id="check">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </label>
-                        </div>
-                    </div>
+                    @livewire('register-button')
                 </div>
             </div>
         </header>
@@ -53,20 +39,21 @@
                         <div class="row align-items-center">
                             <div class="col-xl-4 col-lg-6 col-sm-12">
                                 <div class="slid-body">
-                                    <h3 class="slid-tit">{{data_get($landing_settings,'content.header.title')}}</h3>
+                                    <h3 class="slid-tit">جمالك يبدأ معنا!</h3>
                                     <div class="slid-desc">
                                         <p>
-                                            {{data_get($landing_settings,'content.header.description')}}
+                                            تطبيق التجميل الأول في السعودية. خدمات متكاملة، ولاء يكافئك، وحجوزات
+                                            تفاعلية سهلة
                                         </p>
                                     </div>
-
                                     <div class="btns-url">
-                                        <a href="{{data_get($settings,'applications_links.google_play_link')}}">
+                                        <a href="#" class="button-wrapper">
                                             <div class="button">
                                                 <img src="assets/img/play.png" alt="Google Play">
                                             </div>
+                                            <div class="popover">حمل التطبيق الآن</div>
                                         </a>
-                                        <a href="{{data_get($settings,'applications_links.apple_store_link')}}">
+                                        <a href="#">
                                             <div class="button">
                                                 <img src="assets/img/store.png" alt="App Store">
                                             </div>
@@ -76,7 +63,7 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-sm-12">
                                 <div class="image-slider">
-                                    <img src="assets/img/sliderImg.png" alt="slider-img">
+                                    <img src="assets/img/slider.png" alt="slider-img">
                                 </div>
                             </div>
                         </div>
@@ -95,37 +82,46 @@
             </div>
         </div>
     </section>
+
     <section id="features" class="block features">
         <div class="container">
             @foreach(data_get($landing_settings,'content.features') as $feature)
+                @php($imagePath = isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]:data_get($feature,'image'))
+                @php($title=data_get($feature,'title'))
+                @php($description=data_get($feature,'description'))
                 <div class="features_item">
                     <div class="row">
                         <div class="col-lg-6 wow animate__animated animate__bounceInLeft" data-wow-delay="0.2s">
                             <div class="feature-image-container">
                                 <div class="features-img">
-                                    @php($imagePath = isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]:data_get($feature,'image'))
-                                    <img src="{{asset("storage/$imagePath")}}"
-                                         alt="Feature 1">
-                                </div>
-                                <div class="feature-icon">
-                                    <img src="assets/img/air.png" alt="Feature 2">
-                                </div>
-                                <div class="feature-icon">
-                                    <img src="assets/img/woman.png" alt="Feature 3">
-                                </div>
-                                <div class="feature-icon">
-                                    <img src="assets/img/hair.png" alt="Feature 4">
-                                </div>
-                                <div class="feature-icon">
-                                    <img src="assets/img/hair2.png" alt="Feature 5">
+                                    <img src="{{asset("storage/$imagePath")}}" alt="Feature 1">
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 wow animate__animated animate__bounceInRight"
-                             data-wow-delay="0.2s">
+                        <div class="col-lg-6 wow animate__animated animate__bounceInRight" data-wow-delay="0.2s">
                             <div class="features-content">
-                                <h4 class="features-title">{{data_get($feature,'title')}}</h4>
-                                <p class="feature-desc">{{data_get($feature,'description')}}</p>
+                                <h4 class="features-title">{{$title}}</h4>
+                                <p class="feature-desc">{{$description}}</p>
+                                @if(isset($feature['pros'])&& count($feature['pros']))
+                                    <div class="row itemsPro">
+
+                                        <div class="col-6">
+                                            <ul class="list-unstyled">
+                                                @foreach(collect($feature['pros'])->pluck('en.title') as $pros)
+                                                    <li>{{$pros}}</li>
+                                                @endforeach
+
+                                            </ul>
+                                        </div>
+                                        <div class="col-6">
+                                            <ul class="list-unstyled">
+                                                @foreach(collect($feature['pros'])->pluck('ar.title') as $pros)
+                                                    <li>{{$pros}}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                @endisset
                             </div>
                         </div>
                     </div>

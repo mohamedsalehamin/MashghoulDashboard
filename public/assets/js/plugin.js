@@ -66,7 +66,7 @@ jQuery(function () {
 
 
             const offset = jQuery(window).scrollTop() < 1
-                ? -(stickHeight + paddingTop + paddingBottom) * 2
+                ? -(stickHeight + paddingTop + paddingBottom)*2
                 : -(3 + stickHeight + paddingTop + paddingBottom);
 
 
@@ -271,7 +271,6 @@ jQuery(function () {
         });
     }
 
-
     if (jQuery(window).width() > 768) {
         jQuery(window).on("scroll", function () {
             var windowHeight = jQuery(window).height();
@@ -291,32 +290,93 @@ jQuery(function () {
     }
 
 
-// ************************ popUp ************************
-    jQuery('.join_Us').on('click', function (e) {
-        e.preventDefault();
-        jQuery('#joinServiceModal').fadeIn();
-    });
+    //********************  Shopping Progress ********************//
+    const prevBtns = jQuery(".btn-prev button");
+    const nextBtns = jQuery(".btn-next button");
+    const progress = jQuery("#progress");
+    const shoppingSteps = jQuery(".shopping-step");
+    const progressSteps = jQuery(".progress-step");
 
-    jQuery('#closeModal').on('click', function () {
-        jQuery('#joinServiceModal').fadeOut();
-    });
+    let shoppingStepsNum = 0;
 
-    jQuery('#joinServiceForm').on('submit', function (e) {
-        e.preventDefault();
-
-        jQuery('#joinServiceForm').fadeOut(400, function () {
-            jQuery('#successMessage').fadeIn(400);
-            setTimeout(function () {
-                jQuery('#joinServiceModal').fadeOut(400);
-            }, 2500);
+    nextBtns.each(function () {
+        jQuery(this).on("click", function () {
+            shoppingStepsNum++;
+            updateshoppingSteps();
+            updateProgressbar();
         });
     });
 
-    jQuery(document).on('keydown', function (e) {
-        if (e.key === "Escape" || e.keyCode === 27) {
-            jQuery('#joinServiceModal').fadeOut(400);
+    prevBtns.each(function () {
+        jQuery(this).on("click", function () {
+            shoppingStepsNum--;
+            updateshoppingSteps();
+            updateProgressbar();
+        });
+    });
+
+    function updateshoppingSteps() {
+        shoppingSteps.each(function () {
+            jQuery(this).slideUp();
+        });
+
+        jQuery(shoppingSteps[shoppingStepsNum]).slideDown();
+    }
+
+    // ************************ for checking ************************
+    jQuery("#terms").on("change", function () {
+        if (jQuery(this).is(":checked")) {
+            jQuery("#nextButton").prop("disabled", false);
+        } else {
+            jQuery("#nextButton").prop("disabled", true);
         }
     });
+    function updateProgressbar() {
+        progressSteps.each(function (idx) {
+            if (idx < shoppingStepsNum + 1) {
+                jQuery(this).addClass("progress-step-active");
+            } else {
+                jQuery(this).removeClass("progress-step-active");
+            }
+        });
+
+        const progressActive = jQuery(".progress-step-active");
+        progress.css("width", ((progressActive.length - 1) / (progressSteps.length - 1)) * 100 + "%");
+    }
+
+// Initialize by hiding all steps except the first one
+    jQuery(document).ready(function () {
+        shoppingSteps.hide();
+        jQuery(shoppingSteps[0]).show();
+    });
+
+
+// ************************ popUp ************************
+//     jQuery('.join_Us').on('click', function (e) {
+//         e.preventDefault();
+//         jQuery('#joinServiceModal').fadeIn();
+//     });
+//
+//     jQuery('#closeModal').on('click', function () {
+//         jQuery('#joinServiceModal').fadeOut();
+//     });
+//
+//     jQuery('#joinServiceForm').on('submit', function (e) {
+//         e.preventDefault();
+//
+//         jQuery('#joinServiceForm').fadeOut(400, function () {
+//             jQuery('#successMessage').fadeIn(400);
+//             setTimeout(function () {
+//                 jQuery('#joinServiceModal').fadeOut(400);
+//             }, 2500);
+//         });
+//     });
+//
+//     jQuery(document).on('keydown', function (e) {
+//         if (e.key === "Escape" || e.keyCode === 27) {
+//             jQuery('#joinServiceModal').fadeOut(400);
+//         }
+//     });
 
 
     const sr = ScrollrevealMin({
@@ -374,9 +434,5 @@ wow = new WOW(
 )
 new WOW().init();
 
-
-if (jQuery(window).width() < 768) {
-
-    jQuery(".nav-list li ").addClass("link");
-    jQuery(".foot-menu li ").addClass("link");
-}
+jQuery(".nav-list li ").addClass("link");
+jQuery(".foot-menu li ").addClass("link");

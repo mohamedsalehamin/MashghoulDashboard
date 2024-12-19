@@ -4,6 +4,7 @@
 use App\Http\Controllers\SiteController;
 
 Route::view('/','site.pages.index')->name('site.home');
+Route::view('/register','site.pages.register')->name('site.pages.register');
 Route::get('/{page}',[SiteController::class,'page'])->name('site.page');
 Route::get('reservations/{reservation}/invoice',function (\App\CatalogModule\Models\Reservation $reservation){
 //    return pdf()

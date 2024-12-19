@@ -1,5 +1,7 @@
 <?php
 return [
+    "join_requests" => "Join requests",
+    "join_request" => "Join request",
     'seats' => 'Seats',
     'seat' => 'Seat',
     "levels" => "Levels",

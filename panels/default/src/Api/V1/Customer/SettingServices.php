@@ -24,6 +24,7 @@ class SettingServices {
             "whatsapp" => $settings->app_whatsapp,
             'social_media' => $this->socialMedia($settings->social_links),
             'applications_links' => $settings->applications_links,
+            'reservation_fee' => $settings->reservations_fess,
             'actions_text' => [
                 'complete_order' => $settings->texts[app()->getLocale()]['text_when_order_completed'] ?? ''
             ]
