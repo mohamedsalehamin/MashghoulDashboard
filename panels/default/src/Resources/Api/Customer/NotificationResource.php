@@ -21,7 +21,7 @@ class NotificationResource extends JsonResource {
             'created_date' => $this->created_at->toDateTimeString(),
             'formatted_date' => $this->created_at->format("Y-m-d h:i a"),
             'data' => isset($this->data['viewData']) ? (object)$this->data['viewData'] : (object)[],
-            'read_at' => $this->read_at->format("Y-m-d h:i a"),
+            'read_at' => $this->read_at?->format("Y-m-d h:i a"),
         ];
     }
 }
