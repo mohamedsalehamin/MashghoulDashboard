@@ -19,7 +19,10 @@ class ProvidersServices {
             'lat' => request()->get('latitude', 0),
             'lng' => request()->get('longitude', 0),
         ];
-        $providers = Provider::when(request()->filled('term'), fn($query) => $query->where('name', 'like', '%' . request('term') . '%'))
+        $providers = Provider::when(request()->filled('term'), fn($query) => $query
+            ->where('name->ar', 'like', '%' . request('term') . '%')
+            ->where('name->en', 'like', '%' . request('term') . '%')
+        )
             ->when(request()->filled('city_id'), fn($query) => $query->where('city_id', request('city_id')))
             ->when(request()->filled('category_id'), fn($query) => $query->where('category_id', request('category_id')))
             ->when(request()->get('order_by') == 'nearest', fn($query) => $query->orderBy('distance', 'asc'))
