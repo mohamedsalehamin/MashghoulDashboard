@@ -55,7 +55,18 @@ class ManageLanding extends SettingsPage {
                             Textarea::make('description')
                                 ->label(__('forms.fields.description'))
                                 ->required(),
-                            FileUpload::make('image')->label(__("forms.fields.image"))
+                            FileUpload::make('image')->label(__("forms.fields.image")),
+                            Repeater::make('pros')->schema([
+                                Tabs::make('tabs')->schema([
+                                    Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                            TextInput::make('title')
+                                        ])->statePath("ar"),
+                                    Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                            TextInput::make('title')
+                                        ])->statePath("en")
+                                ])
+                            ])
+
                         ])
                     ])->statePath('content'),
                 Forms\Components\Section::make("footer")

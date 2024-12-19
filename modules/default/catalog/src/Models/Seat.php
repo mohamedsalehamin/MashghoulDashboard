@@ -15,12 +15,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 use function Clue\StreamFilter\fun;
 
 class Seat extends Model {
 
-    use HasFactory, Publishable, HasTranslations,SoftDeletes;
+    use HasFactory, Publishable, HasTranslations, SoftDeletes;
+    use LogsActivity;
 
     public array $translatable = ['title'];
     protected $guarded = ['id'];
@@ -101,6 +104,15 @@ class Seat extends Model {
 
     public function isAvailablePeriod($date, $period) {
         return $this->getAvailablePeriodsOnDate($date)->contains($period);
+
+    }
+
+    public function getActivitylogOptions(): LogOptions {
+        return LogOptions::defaults()
+            ->dontSubmitEmptyLogs()
+            ->dontLogIfAttributesChangedOnly(['price'])
+            ->logOnly(['provider.name', 'title', 'services->*->title', 'status']);
+        // Chain fluent methods for configuration options
 
     }
 }

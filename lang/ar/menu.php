@@ -1,5 +1,7 @@
 <?php
 return [
+    "join_requests" => "طلبات الانضمام",
+    "join_request" => "طلب انضمام",
     "sliders"=>"السلايدر",
     "slider"=>"سلايدر",
     "providers_reservations_dues"=>'مستحقات المشاغل',

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}"/>
     <!-- Main Css File Template -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}"/>
+    @livewireStyles
 </head>
 <body>
 <div class="sidebar_pagebody">
@@ -28,60 +29,10 @@
     </main>
 
 </div>
-<div id="joinServiceModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <form id="joinServiceForm" class="container mt-5" autocomplete="on">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="firstName" class="form-label">الاسم الأول:</label>
-                    <input type="text" id="firstName" name="firstName" class="form-control"
-                           autocomplete="given-name"
-                           required>
-                </div>
-                <div class="col-md-4">
-                    <label for="lastName" class="form-label">الاسم الأخير:</label>
-                    <input type="text" id="lastName" name="lastName" class="form-control" autocomplete="family-name"
-                           required>
-                </div>
-                <div class="col-md-4">
-                    <label for="email" class="form-label">البريد الإلكتروني:</label>
-                    <input type="email" id="email" name="email" class="form-control" autocomplete="email" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="phone" class="form-label">رقم الجوال:</label>
-                    <input type="tel" id="phone" name="phone" class="form-control" autocomplete="tel" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="password" class="form-label">كلمة المرور:</label>
-                    <input type="password" id="password" name="password" class="form-control"
-                           autocomplete="new-password" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="confirmPassword" class="form-label">تأكيد كلمة المرور:</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
-                           autocomplete="new-password" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="gender" class="form-label">الجنس:</label>
-                    <select id="gender" name="gender" class="form-select" autocomplete="sex" required>
-                        <option value="male">ذكر</option>
-                        <option value="female">أنثى</option>
-                    </select>
-                </div>
-                <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary w-100">تسجيل</button>
-                </div>
-            </div>
-        </form>
+@livewireScripts
 
-        <div id="successMessage" class="success-message" style="display: none;">
-            <img src="assets/img/done.gif" alt="Success" class="check-icon">
-            <p>تم التسجيل وتقديم طلبك بنجاح سيتم مراجعة الطلب والتواصل معك من خلال الادارة</p>
-        </div>
-    </div>
-</div>
-</body>
+
+@livewire('livewire-ui-modal')
 
 <!-- jQuery 3.6.4 -->
 <script src="{{asset('assets/js/jquery-3.6.4.min.js')}}"></script>
@@ -106,4 +57,9 @@
 
 <!-- Main Plugin JS (optional custom plugin file) -->
 <script src="{{asset('assets/js/plugin.js')}}"></script>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<!-- Focus plugin -->
+<script defer src="https://unpkg.com/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+</body>
 </html>

@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        'accept_request' => 'Request accepted successfully',
         "pay_reservation_totals" => "Pay reservation totals",
         "pay_reservation_fees" => "Pay reservation fees",
         'admin_withdraw_balance_from_wallet_text' => ':AMOUNT has been withdrawn from your wallet',

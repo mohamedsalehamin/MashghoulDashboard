@@ -7,7 +7,9 @@ use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\SeatResource\Pages\CreateSeat;
 use App\CatalogModule\Resources\SeatResource\Pages\EditSeat;
 use App\CatalogModule\Resources\SeatResource\Pages\ListSeats;
+use App\CatalogModule\Resources\SeatResource\Pages\ListSeatsActivities;
 use App\CatalogModule\Resources\SeatResource\Pages\ViewSeat;
+use App\CatalogModule\Resources\ServiceResource\Pages\ListServiceActivities;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
@@ -105,6 +107,10 @@ class SeatResource extends Resource {
         Tables\Filters\TrashedFilter::make()
             ])
             ->actions([
+                Action::make('activities')
+                    ->label(__("forms.actions.activities"))
+                    ->url(fn($record) => static::getUrl('activities', ['record' => $record])),
+
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -156,6 +162,7 @@ class SeatResource extends Resource {
             'create' => CreateSeat::route('/create'),
             'edit' => EditSeat::route('/{record}/edit'),
             'view' => ViewSeat::route('/{record}/view'),
+            'activities' => ListSeatsActivities::route('/{record}/activities'),
         ];
     }
 

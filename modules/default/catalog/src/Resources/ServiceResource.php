@@ -5,6 +5,7 @@ namespace App\CatalogModule\Resources;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
 use App\CatalogModule\Resources\ServiceResource\Pages\EditService;
+use App\CatalogModule\Resources\ServiceResource\Pages\ListServiceActivities;
 use App\CatalogModule\Resources\ServiceResource\Pages\ListServices;
 use App\CatalogModule\Resources\ServiceResource\Pages\ViewService;
 use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
@@ -79,10 +80,10 @@ class ServiceResource extends Resource {
                         ->label('')
                         ->schema([
                             TextInput::make('title.ar')
-                                ->formatStateUsing(fn($record) => $record->title['ar']??'')
+                                ->formatStateUsing(fn($record) => $record->title['ar'] ?? '')
                                 ->label(__("forms.fields.title_ar"))->required(),
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
-                                ->formatStateUsing(fn($record) => $record->title['en']??'')
+                                ->formatStateUsing(fn($record) => $record->title['en'] ?? '')
                                 ->required(),
                             TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
                         ])
@@ -100,9 +101,9 @@ class ServiceResource extends Resource {
                     ->searchable(),
                 TextColumn::make('provider.name')
                     ->label(__('forms.fields.provider_name'))
-                    ->searchable(true,fn($query,$search) => $query->whereHas('provider',fn($q) => $q
-                        ->where('name->ar','like',"%$search%")
-                        ->orWhere('name->en','like',"%$search%")
+                    ->searchable(true, fn($query, $search) => $query->whereHas('provider', fn($q) => $q
+                        ->where('name->ar', 'like', "%$search%")
+                        ->orWhere('name->en', 'like', "%$search%")
                     )),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('price')->searchable(),
@@ -126,6 +127,10 @@ class ServiceResource extends Resource {
                 Tables\Filters\TrashedFilter::make()
             ])
             ->actions([
+                Action::make('activities')
+                    ->label(__("forms.actions.activities"))
+                    ->url(fn($record) => static::getUrl('activities', ['record' => $record])),
+
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -133,10 +138,10 @@ class ServiceResource extends Resource {
 
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make(),
@@ -171,6 +176,8 @@ class ServiceResource extends Resource {
             'create' => CreateService::route('/create'),
             'edit' => EditService::route('/{record}/edit'),
             'view' => ViewService::route('/{record}/view'),
+            'activities' => ListServiceActivities::route('/{record}/activities'),
+
         ];
     }
 

@@ -2,6 +2,7 @@
 return [
     'fields' => [
         "text_when_order_completed" => "Text when order completed",
+        "pros"=>"Feature",
         "total_gross_profit"=>'Profit',
         "reservations_fess"=>'Reservations fees',
         "enabled_free_fees_in_first_reservation"=>"Enable free fess in the first reservation",
@@ -355,6 +356,9 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "accept"=>'Accept',
+        "reject"=>'Reject',
+        'activities'=>'Activities',
         "transfer"=>"Transfer",
         "reduction"=>'reduction',
         'add' => 'Add',

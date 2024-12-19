@@ -22,7 +22,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use App\Filament\Resources\Shield\RoleResource\Pages;
+use App\ContentModule\Resources\Shield\RoleResource\Pages;
 
 class RoleResource extends Resource implements HasShieldPermissions {
     use HasTranslationLabel;

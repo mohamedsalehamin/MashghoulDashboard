@@ -10,13 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 
 class Service extends Model implements HasMedia {
 
-    use HasFactory, Publishable, HasTranslations, InteractsWithMedia,SoftDeletes;
+    use HasFactory, Publishable, HasTranslations, InteractsWithMedia, SoftDeletes;
+    use LogsActivity;
 
     public array $translatable = ['title', 'description'];
     protected $guarded = ['id'];
@@ -39,5 +42,15 @@ class Service extends Model implements HasMedia {
 
     public function provider() {
         return $this->belongsTo(Provider::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions {
+        return LogOptions::defaults()
+
+            ->dontSubmitEmptyLogs()
+            ->dontLogIfAttributesChangedOnly(['price'])
+            ->logOnly(['title', 'description', 'duration', 'status']);
+        // Chain fluent methods for configuration options
+
     }
 }

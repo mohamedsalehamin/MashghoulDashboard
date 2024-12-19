@@ -31,16 +31,17 @@
         </div>
         <div class="copyWrite">
             <p>© 2024 تطبيق مشغول. جميع الحقوق محفوظة</p>
-            <p>
-                تم بواسطة
-                <a href="https://targetlines.com">
-                    <img src="assets/img/targetlines-logo.png" alt="Targetlines">
-                </a>
-            </p>
+            {{--            <p>--}}
+            {{--                تم بواسطة--}}
+            {{--                <a href="https://targetlines.com">--}}
+            {{--                    <img src="assets/img/targetlines-logo.png" alt="Targetlines">--}}
+            {{--                </a>--}}
+            {{--            </p>--}}
         </div>
         <div class="foot-menu">
             <ul class="list-styled">
                 @foreach($pages as $page)
+
                     <li><a href="{{route('site.page',$page->slug)}}">{{$page->title}}</a></li>
                 @endforeach
                 @foreach(\App\ContentModule\Models\Page::whereNotIn("id",collect($pages)->pluck('id')->toArray()) as $page)
