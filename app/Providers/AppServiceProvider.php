@@ -77,7 +77,7 @@ class AppServiceProvider extends ServiceProvider {
         });
         $settings = new DeveloperSetting();
         view()->share('settings', new GeneralSettings());
-        config()->set("app.debug", $settings->debug_mode);
+//        config()->set("app.debug", $settings->debug_mode);
 
 
 
