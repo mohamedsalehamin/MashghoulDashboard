@@ -9,7 +9,7 @@ class ProductsResource extends JsonResource {
     public function toArray($request) {
         return [
             'id' => $this->id,
-            'title' => $this->title,
+            'title' => $this->title[app()->getLocale()]??'',
             'price' => $this->price->format(),
 
         ];

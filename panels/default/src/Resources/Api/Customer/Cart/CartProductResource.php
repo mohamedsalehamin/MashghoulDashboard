@@ -17,7 +17,7 @@ class CartProductResource extends JsonResource {
     public function toArray($request) {
         return [
             'id' => $this->id,
-            'name' => $this->title,
+            'name' => $this->title[app()->getLocale()]??'',
             'price' => $this->price->format(),
 
         ];
