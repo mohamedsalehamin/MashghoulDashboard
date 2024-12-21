@@ -45,7 +45,7 @@ class ReservationServices {
         $counts = $this->stats();
         return Api::isOk(__("Statistics"), [
             'reservations_total' =>Money::parse( provider()->reservations()->sum('price'))->format(),
-            'profits' => Money::parse(Commission::whereHas('reservation', fn($query) => $query->where('reservable_id', provider()->id))->where('transferred', 0)->sum('amount'))->format(),
+            'profits' => Money::parse(provider()->balance)->format(),
             'customers' => Customer::whereHas('reservations', fn($query) => $query->where('reservable_id', provider()->id))->count(),
             'seats_count' => provider()->seats()->count(),
             'reservations_count' => provider()->reservations()->count(),
