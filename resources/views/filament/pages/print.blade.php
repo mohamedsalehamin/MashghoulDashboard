@@ -3,7 +3,7 @@
         <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <title>تمونوا - فواتير - {{$order->order_number}}</title>
+    <title>مشغول - فواتير - {{$order->order_number}}</title>
     <link
             href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&display=swap"
             rel="stylesheet"
