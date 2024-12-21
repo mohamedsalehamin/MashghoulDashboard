@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Rules;
 
+use App\CatalogModule\Models\Service;
 use App\UsersModule\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
@@ -26,8 +27,9 @@ class IsValidPeriodFormatRule implements Rule {
             ->seats()
             ->where('id', request()->get('seat_id'))
             ->first();
+        $interval=Service::findMany(request()->collect('services')->pluck('id'))->sum('duration');
 
-        return collect($seat->getAvailablePeriodsOnDate(request()->date('date')))
+        return collect($seat->getAvailablePeriodsOnDate(request()->date('date'),true,$interval))
             ->where('from', request()->get('from'))
             ->where('to', request()->get('to'))
             ->where('reserved', false)

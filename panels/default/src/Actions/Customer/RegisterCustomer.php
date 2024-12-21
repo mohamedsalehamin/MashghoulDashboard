@@ -15,7 +15,7 @@ class RegisterCustomer {
     /**
      * @throws Exception
      */
-    public function handle($first_name, $last_name, $phone, $email, $city_id, $gender, $dob=null,$device_token = null, $voip_token = null) {
+    public function handle($first_name, $last_name, $phone, $city_id, $gender, $email = null, $dob = null, $device_token = null, $voip_token = null) {
         $customer = Customer::create([
             'name' => $first_name . ' ' . $last_name,
             'email' => $email,

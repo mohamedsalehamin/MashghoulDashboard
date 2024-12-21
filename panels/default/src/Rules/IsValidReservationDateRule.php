@@ -2,6 +2,8 @@
 
 namespace App\DefaultPanel\Rules;
 
+use App\CatalogModule\Models\Product;
+use App\CatalogModule\Models\Service;
 use App\UsersModule\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Rule;
@@ -26,6 +28,7 @@ class IsValidReservationDateRule implements Rule {
             ->seats()
             ->where('id', request()->get('seat_id'))
             ->first();
+
         return $seat->canBookOnDate(Carbon::parse($value));
 
     }

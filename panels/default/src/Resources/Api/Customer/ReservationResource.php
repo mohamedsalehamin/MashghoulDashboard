@@ -17,6 +17,7 @@ class ReservationResource extends JsonResource {
             'status' => $this->status->getLabel(),
             'duration' => $this->as_cart->getContent()->sum(fn($service) => $service->associatedModel->duration),
             'services' => ReservationServiceResource::collection($this->as_cart->getContent()),
+            'coupon'=>ReservationConditionsResource::make($this->as_cart->getConditions()->values()->filter(fn($condition)=>$condition?->getType()=='coupon')?->first()),
             'date' => $this->date->format('Y-m-d'),
             'from' => Carbon::parse($this->from)->format('H:i'),
             'to' => Carbon::parse($this->to)->format('H:i'),

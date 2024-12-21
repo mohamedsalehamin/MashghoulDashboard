@@ -173,11 +173,13 @@ class ReservationResource extends Resource {
                                 TextEntry::make('meta_data.points')->label(__('forms.fields.wining_points')),
                                 Group::make()->schema(function ($record) {
                                     $totals = $record->as_cart->formattedTotals();
+
                                     return [
                                         TextEntry::make('services_total')->state(fn() => $totals['services_total']),
                                         TextEntry::make('products_total')->state(fn() => $totals['products_total']),
                                         TextEntry::make('discount')->state(fn() => $totals['discount']),
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
+                                        TextEntry::make('wallet_discount')->state(fn() => $totals['wallet_discount']),
                                         TextEntry::make('total')->state(fn() => $totals['total']),
                                     ];
                                 })

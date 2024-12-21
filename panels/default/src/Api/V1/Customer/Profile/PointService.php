@@ -16,7 +16,7 @@ class PointService {
 
     public function index() {
 
-        return Api::isOk(__("Points"), MyPointResource::collection(auth()->user()->points()->latest()->get()))
+        return Api::isOk(__("Points"), MyPointResource::collection(auth()->user()->points()->latest()->paginate()))
             ->addAttribute('points', auth()->user()->getTotalPoints());
     }
 

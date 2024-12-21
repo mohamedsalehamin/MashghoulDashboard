@@ -10,9 +10,9 @@ use App\UsersModule\Models\Manager;
 class UpdateUserToken {
     use AsAction;
 
-    public function handle(User|Manager $user): bool {
+    public function handle($user): bool {
         $user->tokens()->delete();
-        $user->update(['api_token'=>$user->createToken("Tasawk:Token")->plainTextToken,'phone_verified_at' => now()]);
+        $user->update(['api_token' => $user->createToken("Tasawk:Token")->plainTextToken, 'phone_verified_at' => now()]);
         return true;
     }
 

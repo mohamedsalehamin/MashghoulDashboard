@@ -93,16 +93,26 @@ class ManageGeneral extends SettingsPage {
 
                 Forms\Components\Section::make("applications_links")->schema([
 
-                    TextInput::make('applications_links.google_play_link')
+                Forms\Components\Fieldset::make()->label(__("forms.fields.client_app"))->schema([
+                    TextInput::make('applications_links.client.google_play_link')
                         ->label(__('forms.fields.google_play_link'))
                         ->url()
-                        ->required()
-                    ,
-                    TextInput::make('applications_links.apple_store_link')
+                        ->required(),
+                    TextInput::make('applications_links.client.apple_store_link')
                         ->label(__('forms.fields.apple_store_link'))
                         ->url()
-                        ->required()
-                    ,
+                        ->required(),
+                ]),
+                Forms\Components\Fieldset::make()->label(__("forms.fields.provider_app"))->schema([
+                    TextInput::make('applications_links.provider.google_play_link')
+                        ->label(__('forms.fields.google_play_link'))
+                        ->url()
+                        ->required(),
+                    TextInput::make('applications_links.provider.apple_store_link')
+                        ->label(__('forms.fields.apple_store_link'))
+                        ->url()
+                        ->required(),
+                ])
                 ])->columns(1),
                 Forms\Components\Section::make("app_pages")->schema([
                     Forms\Components\Fieldset::make(__("sections.app_pages"))

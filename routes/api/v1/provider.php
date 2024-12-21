@@ -8,6 +8,7 @@ use App\DefaultPanel\Api\V1\Provider\ReservationServices;
 Route::prefix('v1/providers')->group(function () {
 
     Route::post('auth/login', [AuthServices::class, 'login']);
+    Route::post('auth/register', [AuthServices::class, 'register']);
 
     Route::post('auth/password/forget', [AuthServices::class, 'forgetPassword']);
     Route::post('auth/password/reset', [AuthServices::class, 'resetPassword']);

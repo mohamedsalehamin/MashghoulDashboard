@@ -30,7 +30,7 @@ class RegisterCustomerRequest extends FormRequest {
         return [
             'first_name' => ['required', 'string', 'min:3', 'max:40'],
             'last_name' => ['required', 'string', 'min:3', 'max:40'],
-            'email' => ['required', 'email', 'unique:users'],
+            'email' => ['nullable', 'email', 'unique:users'],
             'dob' => ['nullable', 'date',],
 
             'phone' => [

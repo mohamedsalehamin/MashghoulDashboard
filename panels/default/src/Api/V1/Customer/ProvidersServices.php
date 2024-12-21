@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer;
 
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\Service;
 use App\DefaultPanel\Requests\Api\Customer\ClosestBranchesBasedOnCoordinateRequest;
 use App\DefaultPanel\Resources\Api\Customer\LightProviderResource;
 use App\DefaultPanel\Resources\Api\Customer\ProviderResource;
@@ -59,7 +60,9 @@ class ProvidersServices {
     }
 
     public function availableTimes(Provider $provider, Seat $seat) {
-        return Api::isOk(__("provider information"), $seat->availableTimes(request()->date('date')));
+        $interval = Service::findMany(request()->get('services'))->sum('duration');
+
+        return Api::isOk(__("provider information"), $seat->availableTimes(request()->date('date'),$interval));
     }
 
 
