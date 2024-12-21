@@ -43,23 +43,23 @@ class Seat extends Model {
         return $this->hasMany(Reservation::class);
     }
 
-    public function availableTimes(Carbon $date) {
-        return $this->getAvailablePeriodsOnDate($date);
+    public function availableTimes(Carbon $date, $interval = 60) {
+
+        return $this->getAvailablePeriodsOnDate($date, true, $interval);
 
     }
 
-    public function canBookOnDate($date): bool {
-        return $this->getAvailablePeriodsOnDate($date, false)->count();
+    public function canBookOnDate($date, $interval = 60): bool {
+        return $this->getAvailablePeriodsOnDate($date, false, $interval)->count();
 
     }
 
-    public function getAvailablePeriodsOnDate($date, $skip = true) {
+    public function getAvailablePeriodsOnDate($date, $skip = true, $interval = 60) {
         $day = strtolower($date->format('l'));
-        if ($skip && !$this->canBookOnDate($date)) {
+        if ($skip && !$this->canBookOnDate($date, $interval)) {
 
             return collect([]);
         }
-
 
         $current_day = collect(array_values($this->meta_data['days_list'] ?? []))
             ->where('day_name', $day)
@@ -68,8 +68,9 @@ class Seat extends Model {
         if (empty($current_day)) {
             return collect([]);
         }
-        $slots = GeneralSettings::getDayTimesSlot($current_day['from'] ?? '00:00', $current_day['to'] ?? '23:59');
 
+
+        $slots = GeneralSettings::getDayTimesSlot($current_day['from'] ?? '00:00', $current_day['to'] ?? '23:59', $interval);
 
         if ($date->isToday()) {
             $slots = collect($slots)->filter(function ($period) {

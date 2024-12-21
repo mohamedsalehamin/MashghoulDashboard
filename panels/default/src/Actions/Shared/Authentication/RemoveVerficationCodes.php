@@ -8,7 +8,7 @@ use App\Models\User;
 class RemoveVerficationCodes {
     use AsAction;
 
-    public function handle(User $user) {
+    public function handle($user) {
         return $user->verificationCodes()->delete();
     }
 

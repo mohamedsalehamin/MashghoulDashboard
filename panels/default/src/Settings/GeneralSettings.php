@@ -38,10 +38,10 @@ class GeneralSettings extends Settings {
         return 'general';
     }
 
-    public static function getDayTimesSlot($from = '00:00', $to = '23:59') {
+    public static function getDayTimesSlot($from = '00:00', $to = '23:59',$interval=60) {
         $startPeriod = Carbon::parse($from);
         $endPeriod = Carbon::parse($to);
-        $interval = "60 minutes";
+        $interval = "$interval minutes";
         $period = CarbonPeriod::create($startPeriod, $interval, $endPeriod);
         $hours = [];
 

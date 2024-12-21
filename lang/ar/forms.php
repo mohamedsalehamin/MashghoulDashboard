@@ -1,6 +1,9 @@
 <?php
 return [
     'fields' => [
+        "provider_app" => "تطبيق المشغل",
+        'client_app' => 'تطبيق العميل',
+        "wallet_discount"=>'خصم المحفظة',
         "pros"=>"ميزات فرعية",
         "text_when_order_completed" => "نص الرسالة عند انتهاء الطلب",
         'expire_after' => 'تنتهي بعد',

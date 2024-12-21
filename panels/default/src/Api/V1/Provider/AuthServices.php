@@ -4,10 +4,12 @@ namespace App\DefaultPanel\Api\V1\Provider;
 
 
 use Api;
+use App\ContentModule\Models\JoinRequest;
 use App\DefaultPanel\Actions\Provider\ProviderHasRightsToLogin;
 use App\DefaultPanel\Actions\Shared\Authentication\ForgetPassword;
 use App\DefaultPanel\Actions\Shared\Authentication\UpdateUserPassword;
 use App\DefaultPanel\Actions\Shared\Authentication\UpdateUserToken;
+use App\DefaultPanel\Requests\Api\Provider\Authentication\RegisterRequest;
 use App\DefaultPanel\Resources\Api\Provider\ProviderAccountResources;
 use App\DefaultPanel\Resources\Api\Provider\ProviderResources;
 use Auth;
@@ -49,6 +51,9 @@ class AuthServices {
 
     }
 
-
+    public function register(RegisterRequest $request) {
+        JoinRequest::create($request->validated());
+        return Api::isOk(__("done"));
+    }
 
 }
