@@ -220,7 +220,7 @@ class RoleResource extends Resource implements HasShieldPermissions {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->whereNotIn('name', ['super_admin', 'panel_user', 'customer','patient','doctor','lab']))
+            ->modifyQueryUsing(fn($query) => $query->whereNotIn('name', ['super_admin','provider', 'panel_user', 'customer','patient','doctor','lab']))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->badge()

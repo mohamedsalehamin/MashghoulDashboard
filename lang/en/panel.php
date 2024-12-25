@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        "you_have_gain_points_due_to_register"=>"You have gain :points points due to registration",
         'accept_request' => 'Request accepted successfully',
         "pay_reservation_totals" => "Pay reservation totals",
         "pay_reservation_fees" => "Pay reservation fees",
@@ -62,6 +63,8 @@ return [
         'delete' => 'Delete'
     ],
     'enums' => [
+        'transferred'=>'Transferred',
+        "REJECTED"=>'Rejected',
         "minutes" => ":minutes minutes",
         "30_minutes" => "30 minutes",
         "90_minutes" => "90 minutes",

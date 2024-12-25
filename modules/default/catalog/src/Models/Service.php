@@ -46,9 +46,7 @@ class Service extends Model implements HasMedia {
 
     public function getActivitylogOptions(): LogOptions {
         return LogOptions::defaults()
-
             ->dontSubmitEmptyLogs()
-            ->dontLogIfAttributesChangedOnly(['price'])
             ->logOnly(['title', 'description', 'duration', 'status']);
         // Chain fluent methods for configuration options
 

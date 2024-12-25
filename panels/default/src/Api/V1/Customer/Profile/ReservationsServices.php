@@ -18,7 +18,7 @@ class ReservationsServices {
                 ->when(request()->has('status'), fn($query) => $query->whereIn('status', $status))
                 ->when(request()->filled('id'), fn($query) => $query->where('id', request('id')))
                 ->when(request()->filled('direction'), fn($query) => $query->orderBy('date', request('direction')))
-                ->latest()->get()
+                ->get()
         ));
 
     }

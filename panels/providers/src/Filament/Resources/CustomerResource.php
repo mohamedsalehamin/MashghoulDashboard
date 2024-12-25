@@ -7,8 +7,8 @@ use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\CustomerResource\Pages\ListCustomers;
 use App\ProviderPanel\Filament\Resources\CustomerResource\Pages\ViewCustomer;
+use App\ProviderPanel\Filament\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use App\UsersModule\Models\Users\Customer;
-use App\UsersModule\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
@@ -37,7 +37,7 @@ class CustomerResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-//            ->modifyQueryUsing(fn($query) => $query->whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id)))
+            ->modifyQueryUsing(fn($query) => $query->whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id)))
             ->columns([
                 TextColumn::make('id')->searchable(),
 

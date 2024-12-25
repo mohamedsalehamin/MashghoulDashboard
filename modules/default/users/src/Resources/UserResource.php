@@ -73,7 +73,7 @@ class UserResource extends Resource {
                     ->autocomplete("off"),
 
                 Select::make("role")
-                    ->relationship("roles", "name", fn(Builder $query) => $query->whereNotIn('name', ['customer', 'manager','lab','doctor','patient', 'operator', 'panel_user', 'super_admin']))
+                    ->relationship("roles", "name", fn(Builder $query) => $query->whereNotIn('name', ['customer','provider', 'manager','lab','doctor','patient', 'operator', 'panel_user', 'super_admin']))
                     ->required()
                     ->columnSpan(2)
                     ->preload(),
@@ -89,7 +89,7 @@ class UserResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'patient', 'panel_user', 'super_admin'])))
+            ->modifyQueryUsing(fn(Builder $query) => $query->whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider','patient', 'panel_user', 'super_admin'])))
             ->columns([
                 TextColumn::make('id')->searchable(),
 
@@ -100,6 +100,7 @@ class UserResource extends Resource {
                     ->copyMessageDuration(1500)
                     ->searchable(),
                 TextColumn::make('roles.name')
+                    ->formatStateUsing(fn($record)=>$record->roles->where('name','!=','panel_user')->pluck('name')->implode(","))
                     ->default("N/A")
                     ->searchable(),
                 TextColumn::make('phone')

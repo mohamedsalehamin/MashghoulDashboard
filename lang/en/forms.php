@@ -28,6 +28,10 @@ return [
         "provider" => "Provider",
         "provider_app" => "Provider app",
         "wallet_discount"=>"Wallet discount",
+        "coupon_discount"=>"Coupon discount",
+        "first_reservation"=>"First Reservation",
+        'admin_withdraw_balance_from_wallet_text' => ':AMOUNT has been withdrawn from your wallet',
+
         'client_app' => 'Client app',
         'object_type' => 'Type',
         "wining_points"=>"Wining points",

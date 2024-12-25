@@ -52,7 +52,28 @@ class SliderResource extends Resource {
                 ->label(__('forms.fields.image_ar'))
                 ->collection('ar')
                 ->required(),
+            Select::make("object_type")
+                ->live()
+                ->options([
+                    'link' => __("forms.fields.external_link"),
+                    'category' => __("forms.fields.category"),
+                    'provider' => __("forms.fields.provider"),
+                ]),
 
+            Select::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'category')
+                ->label(__('forms.fields.category'))
+                ->options(Category::pluck('name', 'id'))
+                ->required(),
+            Select::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'provider')
+                ->label(__('forms.fields.provider'))
+                ->options(Provider::pluck('name', 'id'))
+                ->required(),
+            TextInput::make('object_id')
+                ->visible(fn($get) => $get('object_type') == 'link')
+                ->label(__('forms.fields.link'))
+                ->url(),
             Toggle::make('status')->default(1)
                 ->onColor('success')
                 ->offColor('danger')
@@ -70,10 +91,10 @@ class SliderResource extends Resource {
                     ->boolean()
                     ->action(
                         \Filament\Tables\Actions\Action::make('Active')
-                            ->label(fn(Banner $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
+                            ->label(fn(Slider $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
                             ->disabled(fn(Model $record): bool => !filament()->auth()->user()->can('update', $record))
                             ->requiresConfirmation()
-                            ->action(fn(Banner $record) => $record->toggleStatus())
+                            ->action(fn(Slider $record) => $record->toggleStatus())
 
 
                     )

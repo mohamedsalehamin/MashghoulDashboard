@@ -38,7 +38,7 @@ class ReservationCommissionResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->where('amount',">",0))
+            ->modifyQueryUsing(fn($query) => $query->whereHas('reservation',fn($builder)=>$builder->paid())->where('amount',">",0))
             ->columns([
 
 
@@ -54,7 +54,7 @@ class ReservationCommissionResource extends Resource {
 
                 TextColumn::make('reservation.reservable.name')
                     ->label(__('forms.fields.provider_name'))
-                    ->searchable(),
+                ,
 
 
                 TextColumn::make('reservation.price')
@@ -79,10 +79,10 @@ class ReservationCommissionResource extends Resource {
                     ->label(__('forms.fields.total_gross_profit'))
                     ->state(fn($record)=>$record->profit() )
 //                    ->money()
-                    ->searchable(),
+                    ->searchable(false),
                 TextColumn::make('status')
                     ->badge()
-                    ->searchable(),
+                    ->searchable(false),
                 TextColumn::make('created_at')
                     ->date()
                     ->searchable(),

@@ -112,7 +112,7 @@ class Seat extends Model {
         return LogOptions::defaults()
             ->dontSubmitEmptyLogs()
             ->dontLogIfAttributesChangedOnly(['price'])
-            ->logOnly(['provider.name', 'title', 'services->*->title', 'status']);
+            ->logOnly(['provider.name', 'title', 'status',]);
         // Chain fluent methods for configuration options
 
     }

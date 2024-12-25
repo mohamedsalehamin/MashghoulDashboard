@@ -23,7 +23,8 @@ class ChangeReservationStatusAction {
             ])
             ->visible(fn(Reservation $record) => auth()->user()->can('update', $record))
             ->action(function (array $data, Reservation $record, $action): void {
-                if ($data['status'] == ReservationStatus::COMPLETED->value) {
+                if ($data['status'] == ReservationStatus::COMPLETED->value && $record->commission?->amount->formatByDecimal()>0) {
+
                     if (!$record->commission->transferred) {
                         $record->reservable?->user?->notify(new AdminSendEntitlementsNotification());
                         $record->reservable?->deposit(

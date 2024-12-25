@@ -84,11 +84,11 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
         'active' => UserStatus::class
     ];
 
-//    public function setPasswordAttribute($value): void {
-////        if ($value) {
-////            $this->attributes['password'] = bcrypt($value);
-////        }
-//    }
+    public function setPasswordAttribute($value): void {
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
+    }
 
 
     public function getMorphClass(): string {

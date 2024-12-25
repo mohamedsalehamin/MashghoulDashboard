@@ -60,7 +60,6 @@ class ReservationResource extends Resource {
     public static function table(Table $table): Table {
 
         return $table
-
             ->modifyQueryUsing(fn($query) => $query->paid()->latest())
             ->columns([
                 TextColumn::make('id')->searchable(),
@@ -70,7 +69,7 @@ class ReservationResource extends Resource {
                 TextColumn::make('seat.title')->label(__('forms.fields.seat_name'))->searchable(),
                 TextColumn::make('duration')
                     ->formatStateUsing(fn($record) => $record->duration)
-                    ->label(__('forms.fields.duration'))->searchable(),
+                    ->label(__('forms.fields.duration'))->searchable(false),
 
 
                 TextColumn::make('from')->searchable(),
@@ -138,7 +137,6 @@ class ReservationResource extends Resource {
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
             ])
-
             ->striped();
     }
 
@@ -151,7 +149,10 @@ class ReservationResource extends Resource {
                         Section::make("basic_information")
                             ->schema([
                                 TextEntry::make('id'),
-                                TextEntry::make('reservable.name')->label(__("forms.fields.provider_name")),
+                                TextEntry::make('reservable.name')->label(__("forms.fields.provider_name"))
+                                ->hint(fn($record)=>Reservation::where('user_id',$record->user_id)->first()->id == $record->id?__("forms.fields.first_reservation"):'')
+                                ->hintColor('primary'),
+
                                 TextEntry::make('customer.name'),
                                 TextEntry::make('customer.phone'),
                                 TextEntry::make('seat.title')->label(__("forms.fields.seat_name")),
@@ -177,7 +178,15 @@ class ReservationResource extends Resource {
                                     return [
                                         TextEntry::make('services_total')->state(fn() => $totals['services_total']),
                                         TextEntry::make('products_total')->state(fn() => $totals['products_total']),
-                                        TextEntry::make('discount')->state(fn() => $totals['discount']),
+                                        TextEntry::make('coupon_discount')->state(function ($record) use ($totals) {
+                                            $name = $record->as_cart->getConditions()->filter(fn($condition) => $condition->getType() == 'coupon')->first()?->getName();
+                                            $code = $totals['discount'];
+                                            if ($name) {
+                                                return $name . "($code)";
+                                            }
+
+                                            return $code;
+                                        }),
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
                                         TextEntry::make('wallet_discount')->state(fn() => $totals['wallet_discount']),
                                         TextEntry::make('total')->state(fn() => $totals['total']),
@@ -265,8 +274,5 @@ class ReservationResource extends Resource {
         return __('menu.reservations');
     }
 
-    public static function can(string $action, ?Model $record = null): bool {
-        return true;
-    }
 
 }

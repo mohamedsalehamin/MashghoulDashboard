@@ -11,7 +11,7 @@ class CategoryWithChildrenResource extends JsonResource {
             'id' => $this->id,
             'name' => $this->name,
             'image' => $this->getFirstMediaUrl(),
-            'children'=>CategoryResource::collection($this->children),
+            'children'=>CategoryResource::collection($this->children()->enabled()->get()),
 
 
         ];

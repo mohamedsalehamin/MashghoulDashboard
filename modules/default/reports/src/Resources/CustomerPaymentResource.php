@@ -49,7 +49,7 @@ class CustomerPaymentResource extends Resource {
 
                 TextColumn::make('transactionable.reservable.name')
                     ->label(__("forms.fields.provider_name"))
-                    ->searchable(),
+                    ->searchable(false),
 
                 TextColumn::make('user.phone')
                     ->label(__('forms.fields.phone'))

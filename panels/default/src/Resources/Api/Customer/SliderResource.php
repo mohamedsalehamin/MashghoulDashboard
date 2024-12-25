@@ -11,6 +11,8 @@ class SliderResource extends JsonResource {
         return [
             'id' => $this->id,
             'image' => $this->getFirstMediaUrl(app()->getLocale()),
+            'object_type' => $this->object_type,
+            'object_id' => $this->object_id,
         ];
     }
 
