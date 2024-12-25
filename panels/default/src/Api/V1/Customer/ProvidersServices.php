@@ -21,9 +21,9 @@ class ProvidersServices {
             'lng' => request()->get('longitude', 0),
         ];
         $providers = Provider::enabled()
-            ->when(request()->filled('term'), fn($query) => $query
+            ->when(request()->has('term'), fn($query) => $query
                 ->where('name->ar', 'like', '%' . request('term') . '%')
-                ->where('name->en', 'like', '%' . request('term') . '%')
+                ->orWhere('name->en', 'like', '%' . request('term') . '%')
             )
             ->when(request()->filled('city_id'), fn($query) => $query->where('city_id', request('city_id')))
             ->when(request()->filled('category_id'), fn($query) => $query->where('category_id', request('category_id')))
