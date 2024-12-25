@@ -18,6 +18,7 @@ class AddReservationCommissionAction {
         $percentage = 100 - $settings->app_percentage;
 
         $amount = ($reservation->as_cart->getNetProfitTotal() / 100) * $percentage;
+
         $reservation->commission()->create([
             'percentage' => $percentage,
             'amount' => $amount

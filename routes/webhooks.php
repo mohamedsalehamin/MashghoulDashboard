@@ -3,6 +3,7 @@
 use App\CatalogModule\Models\Transaction;
 use App\ContentModule\Models\Category;
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
+use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\PayTransactionViaWallet;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -12,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
 Route::get('testo', function () {
+    $reservation = \App\CatalogModule\Models\Reservation::latest()->first();
+    AddReservationCommissionAction::run($reservation);
+    dd('as');
     $customer = \App\Models\User::find(13);
     $customer->notify(new \App\Notifications\WiningGiftSuccessfullyNotification([
         'ar' => __("panel.messages.your_are_gain_points_for_register", ['points' => GeneralSettings::getPointsOnAction('register')], 'ar'),
