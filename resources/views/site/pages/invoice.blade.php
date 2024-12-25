@@ -1,5 +1,6 @@
+@php use App\DefaultPanel\Lib\Utils;use Cknow\Money\Money; @endphp
 @php(app()->setLocale('ar'))
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <title>تمونوا-فاتورة رقم {{$reservation->id}}</title>
@@ -247,7 +248,15 @@
                     <td>{{\Cknow\Money\Money::parse($service->price)->format()}}</td>
                     <td colspan="2" style="text-align: left; direction: ltr">
                         {{$service->name}}
-{{--                        ({{$reservation->service_type->getLabel()}})--}}
+                        <ul>
+                            @foreach ($service['attributes']['products']??[] as $index => $option)
+                                    <?php
+                                    $option_name = Utils::getTranslatedField($option['title']);
+                                    $price = Money::parse($option['price']['amount'])->format();
+                                    echo "<li>{$option_name} ({$price}) </li>";
+                                    ?>
+                            @endforeach
+                        </ul>
                     </td>
                 </tr>
             @endforeach
