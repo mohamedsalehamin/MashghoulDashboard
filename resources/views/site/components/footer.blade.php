@@ -25,7 +25,7 @@
             @foreach($social_links as $link)
 
                 <a href="{{data_get($link,'link')}}">
-                    <i class="fa-brands fa-{{data_get($link,'icon')}}"></i>
+                    <i class="fa-brands fa-{{Str::replace(" ","",data_get($link,'icon'))}}"></i>
                 </a>
             @endforeach
 
