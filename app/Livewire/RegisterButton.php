@@ -11,6 +11,6 @@ class RegisterButton extends Component {
 
     public function openModal() {
 
-        $this->dispatch('openModal', 'register-model');
+        return redirect()->route('site.pages.register');
     }
 }

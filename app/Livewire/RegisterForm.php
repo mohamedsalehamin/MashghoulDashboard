@@ -29,10 +29,11 @@ class RegisterForm extends ModalComponent {
     }
 
     public function submit() {
-        app()->setLocale('ar');
+
         $this->validate();
         JoinRequest::create($this->except(''));
-        session()->flash('message', 'تم تقديم طلب الانضمام بنجاح');
+        session()->flash('message', __("site.heading.register_successfully"));
+
         return redirect()->route('site.pages.register');
     }
 }

@@ -151,7 +151,10 @@ return [
 
     ],
     'heading' => [
-
+        'register_successfully'=>'تم تقديم طلب الانضمام بنجاح',
+        'register_as_provider' => 'التسجيل كمقدم خدمة',
+        'join_us_as_a_provider' => 'انضم كمقدم خدمة',
+        'mashghoul_features' => 'مميزات مشغول',
         'added_to_favorite_list' => 'تم الاضافة للمفضله بنجاح',
         "no_doctors_in_city" => "لايوجد اطباء فى المدينه المحدده",
         "no_labs_in_city" => "لايوجد مختبرات فى المدينه المحدده",
@@ -285,6 +288,7 @@ return [
         'latest_products' => 'آخر المنتجات',
         'contact_us' => 'تواصل معنا',
         'faqs' => 'الأسئلة الشائعة',
+        "copyright" => '© 2024 تطبيق مشغول. جميع الحقوق محفوظة',
         'contact_information' => 'معلومات التواصل',
         'app' => 'جـــرأة للديكـــور',
         'discount' => "خصم :DISCOUNT% ",

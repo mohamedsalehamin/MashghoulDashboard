@@ -1,6 +1,8 @@
 <?php
 return [
     'fields' => [
+        "logo_in_english"=>"صوره الشعار بالانجليزية",
+        "logo_in_arabic"=>"صوره الشعار بالعربية",
         'admin_withdraw_balance_from_wallet_text' => '  تم سحب مبلغ :AMOUNT من المحفظة',
         "provider_app" => "تطبيق المشغل",
         'client_app' => 'تطبيق العميل',
