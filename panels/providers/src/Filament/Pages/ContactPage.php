@@ -42,7 +42,7 @@ class ContactPage extends Page {
             TextInput::make('phone')
                 ->required(),
             Select::make('contact_type_id')
-                ->options(ContactType::pluck('name', 'id'))
+                ->options(ContactType::enabled()->pluck('name', 'id'))
                 ->label(__("forms.fields.message_type")),
             TextInput::make('subject')
                 ->required(),
