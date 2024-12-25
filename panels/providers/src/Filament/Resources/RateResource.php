@@ -34,7 +34,7 @@ class RateResource extends Resource {
 
                 TextColumn::make('reservation.customer.name')->searchable(),
                 TextColumn::make('reservation.customer.phone')->searchable(),
-                TextColumn::make('type')->formatStateUsing(fn($record) => __("forms.fields.".$record->type."_rate")),
+                TextColumn::make('type')->formatStateUsing(fn($record) => __("forms.fields." . $record->type . "_rate")),
                 TextColumn::make('rate')->searchable(),
                 TextColumn::make('comment')->searchable(),
                 TextColumn::make('created_at')->searchable()->date(),
@@ -46,8 +46,9 @@ class RateResource extends Resource {
                     ->label(__("forms.fields.reservation_id")),
 
             ])
-            ->defaultGroup('reservation_id')
-            ;
+            ->groupingDirectionSettingHidden(true)
+            ->filters([])
+            ->defaultGroup('reservation_id');
     }
 
     public static function getPages(): array {

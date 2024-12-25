@@ -88,6 +88,7 @@ class SeatResource extends Resource {
                     ->searchable(true,fn(Builder $query, $search) => $query->whereHas('provider', fn($q) => $q->where('name->ar', 'like', "%$search%")->orWhere('name->en', 'like', "%$search%"))),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('services_count')->counts("services")->searchable(false),
+                TextColumn::make('created_at')->date(),
 
 
                 IconColumn::make('status')

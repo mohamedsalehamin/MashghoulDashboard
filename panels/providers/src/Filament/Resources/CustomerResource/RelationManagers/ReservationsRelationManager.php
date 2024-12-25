@@ -2,6 +2,7 @@
 
 namespace App\ProviderPanel\Filament\Resources\CustomerResource\RelationManagers;
 
+use App\CatalogModule\Resources\ReservationResource;
 use App\DefaultPanel\Enum\ServicesTypeEnum;
 use App\UsersModule\Models\Doctor;
 use Cknow\Money\Money;
@@ -35,38 +36,38 @@ class ReservationsRelationManager extends RelationManager {
 
     public function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->where('reservable_type', Doctor::class))
+            ->modifyQueryUsing(fn($query) => $query->where('reservable_id', provider()->id))
             ->heading(__('sections.reservations'))
+            ->emptyStateHeading('')
             ->columns([
                 TextColumn::make('id')->searchable(),
-
+                TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->searchable(),
                 TextColumn::make('date')
                     ->date()
                     ->searchable(),
-                TextColumn::make('period')->searchable(),
+                TextColumn::make('from')->searchable(),
+                TextColumn::make('to')->searchable(),
                 TextColumn::make('price')
                     ->searchable(),
-                TextColumn::make('reserve_type')
-                    ->color(fn($record) => $record->reserve_type->getColor())
-                    ->badge(),
-
-                TextColumn::make('service_type')
-                    ->color(fn($record) => $record->service_type->getColor())
-                    ->badge(),
                 TextColumn::make('status')
                     ->label(__('forms.fields.status'))
                     ->color(fn($record) => $record?->status?->getColor())
                     ->badge(),
                 TextColumn::make('transaction.status')
+                    ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                     ->label(__('forms.fields.payment_status'))
-                    ->color(fn($record) => $record?->transaction?->status?->getColor())
+                    ->color(fn($record) => $record?->getPaymentStatus()?->getColor())
                     ->badge(),
 
                 TextColumn::make('price'),
+                TextColumn::make('meta_data.points')->label(__('forms.fields.points'))->searchable(),
 
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->url(fn(Model $record) => route('filament.doctor-panel.resources.reservations.view', $record->id)),
+                Tables\Actions\ViewAction::make()->url(fn(Model $record) => ReservationResource::getUrl('view', [$record->id])),
             ]);
     }
 

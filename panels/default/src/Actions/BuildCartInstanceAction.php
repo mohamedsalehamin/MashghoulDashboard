@@ -45,14 +45,17 @@ class BuildCartInstanceAction {
         $cart->applyProducts(!$pay_fees_mode ? $productPrice : 0);
         $cart->applyCoupon($request->get('coupon_code'));
 
-        if (auth()->user()->reservations()->count() != 0 && !$settings->enabled_free_fees_in_first_reservation) {
-            $cart->applyReservationsFees($settings->reservations_fess);
+        if ($settings->enabled_free_fees_in_first_reservation && auth()->user()->reservations()->count() == 0) {
 
+
+        } else {
+            $cart->applyReservationsFees($settings->reservations_fess);
         }
 
         if ($request->filled('wallet') && $cart->getTotal() < $request->get('wallet')) {
             throw new APIException(__("validation.api.overdue_wallet_balance"));
         }
+
         if ($request->filled('wallet') && auth()->user()->getTotalPointsBalance() < $request->get('wallet')) {
             throw new APIException(__("validation.api.insufficient_wallet_balance"));
         }

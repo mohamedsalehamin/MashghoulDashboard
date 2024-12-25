@@ -73,7 +73,6 @@ class Reservation extends Model {
         static::created(function (Reservation $reservation) {
 
 
-
         });
         static::updating(function (Reservation $reservation) {
             if ($reservation->getOriginal('status') != $reservation->status) {
@@ -81,23 +80,6 @@ class Reservation extends Model {
                 $reservation->customer->notify(new ReservationStatusChangedNotification($reservation));
                 $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
             }
-//            if ($reservation->status == ReservationStatus::COMPLETED) {
-//                if ($reservation->commission()->exists() && !$reservation->commission->transferred) {
-//                    $reservation->reservable->user->notify(new AdminSendEntitlementsNotification());
-//                    $amount = $reservation?->commission?->amount->formatByDecimal();
-//                    $reservation->reservable->deposit(
-//                        amount: $amount,
-//                        meta: [
-//                            'description' => [
-//                                'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $amount, 'ID' => $reservation->id], 'ar'),
-//                                'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $amount, 'ID' => $reservation->id], 'en'),
-//                            ],
-//                        ]
-//                    );
-//                    $reservation?->commission->update(['transferred' => true, 'confirmed' => true]);
-//                }
-//
-//            }
 
             $reservation->addTimeline([
                 'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
@@ -243,7 +225,6 @@ class Reservation extends Model {
     public function canRate(): bool {
         return !$this->rate()->exists() && $this->status == ReservationStatus::COMPLETED;
     }
-
 
 
     public function reservable(): MorphTo {

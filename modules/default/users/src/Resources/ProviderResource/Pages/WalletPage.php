@@ -130,7 +130,7 @@ class WalletPage extends Page implements HasTable {
 
     protected function getTableQuery(): ?Builder {
 
-        return Transaction::whereHas('wallet', fn($query) => $query->where('holder_id', $this->record->provider->id));
+        return Transaction::whereHas('wallet', fn($query) => $query->where('holder_id', $this->record?->provider?->id));
     }
 
     public function getHeading(): string|Htmlable {

@@ -20,18 +20,19 @@ class ProvidersServices {
             'lat' => request()->get('latitude', 0),
             'lng' => request()->get('longitude', 0),
         ];
-        $providers = Provider::when(request()->filled('term'), fn($query) => $query
-            ->where('name->ar', 'like', '%' . request('term') . '%')
-            ->where('name->en', 'like', '%' . request('term') . '%')
-        )
+        $providers = Provider::enabled()
+            ->when(request()->filled('term'), fn($query) => $query
+                ->where('name->ar', 'like', '%' . request('term') . '%')
+                ->where('name->en', 'like', '%' . request('term') . '%')
+            )
             ->when(request()->filled('city_id'), fn($query) => $query->where('city_id', request('city_id')))
             ->when(request()->filled('category_id'), fn($query) => $query->where('category_id', request('category_id')))
             ->when(request()->get('order_by') == 'nearest', fn($query) => $query->orderBy('distance', 'asc'))
             ->when(request()->get('order_by') == 'farthest', fn($query) => $query->orderBy('distance', 'desc'))
             ->when(request()->get('order_by') == 'rating', fn($query) => $query->withAvg('rate', 'rate')->orderBy('rate_avg_rate', request()->get('order_dir', 'desc')))
             ->when(request()->get('order_by') == 'date', fn($query) => $query->orderBy('created_at', request()->get('order_dir', 'desc')))
-            ->when(request()->get('distance') , fn($query) => $query
-                ->whereDistanceSphere('location',new Point($user_location['lat'], $user_location['lng'],), '<=', request()->get('distance')*1000)
+            ->when(request()->get('distance'), fn($query) => $query
+                ->whereDistanceSphere('location', new Point($user_location['lat'], $user_location['lng'],), '<=', request()->get('distance') * 1000)
 
             )
             ->withDistanceSphere('location', new Point($user_location['lat'], $user_location['lng']))
@@ -51,7 +52,7 @@ class ProvidersServices {
     }
 
     public function seats(Provider $provider) {
-        return Api::isOk(__("provider information"), SeatResource::collection($provider->seats));
+        return Api::isOk(__("provider information"), SeatResource::collection($provider->seats()->enabled()->paginate()));
     }
 
     public function toggleFavorite(Provider $provider) {
@@ -62,9 +63,8 @@ class ProvidersServices {
     public function availableTimes(Provider $provider, Seat $seat) {
         $interval = Service::findMany(request()->get('services'))->sum('duration');
 
-        return Api::isOk(__("provider information"), $seat->availableTimes(request()->date('date'),$interval));
+        return Api::isOk(__("provider information"), $seat->availableTimes(request()->date('date'), $interval));
     }
-
 
 
 }

@@ -35,6 +35,10 @@ class Provider extends Model implements HasMedia {
 //        'bio'=>'array',
     ];
 
+    public function scopeEnabled($builder) {
+        return $builder->whereHas("user", fn($q) => $q->where('active', 1));
+    }
+
     public function city() {
         return $this->belongsTo(City::class);
     }

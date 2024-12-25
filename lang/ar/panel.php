@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        "you_have_gain_points_due_to_register"=>" لقد حصلت علي :points مكافئة لتسجيلك في التطبيق",
         'accept_request' => 'تم قبول الطلب بنجاح',
         'make_sure_that_bank_account_info_is_right' => ' يرجي التاكد من صحة بيانات الحساب البنكي قبل تاكيد الطلب , وقد تستغرق عملية التحويل ٤٨ ساعه',
         'gift_for_register' => 'مكافأة لتسجيل الحساب',
@@ -81,6 +82,7 @@ return [
 
     ],
     'enums' => [
+        "REJECTED"=>'مرفوض',
         "withdraw_request" => "طلب سحب",
         "refunded" => "مستردة",
         'ACCEPTED' => 'مقبول',

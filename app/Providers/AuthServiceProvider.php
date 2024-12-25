@@ -6,6 +6,7 @@ use App\CatalogModule\Models\Branch;
 use App\CatalogModule\Models\Commission\DoctorCommission;
 use App\CatalogModule\Models\Commission\LabCommission;
 use App\CatalogModule\Models\Reservation;
+use App\ContentModule\Models\JoinRequest;
 use App\DoctorPanel\Filament\Resources\Option;
 use App\DoctorPanel\Filament\Resources\Product;
 use App\ContentModule\Models\Banner;
@@ -31,6 +32,7 @@ use App\Policies\CouponPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\CustomerReviewPolicy;
 use App\Policies\DoctorCommissionPolicy;
+use App\Policies\JoinRequestPolicy;
 use App\Policies\LabCommissionPolicy;
 use App\Policies\OptionPolicy;
 use App\Policies\OrderPolicy;
@@ -59,8 +61,8 @@ class AuthServiceProvider extends ServiceProvider {
 
         CustomerReview::class => CustomerReviewPolicy::class,
         Reservation::class=>ReservationPolicy::class,
-        LabCommission::class=>LabCommissionPolicy::class,
-        DoctorCommission::class=>DoctorCommissionPolicy::class,
+        JoinRequest::class=>JoinRequestPolicy::class
+
 
 
 

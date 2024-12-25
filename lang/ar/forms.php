@@ -1,9 +1,12 @@
 <?php
 return [
     'fields' => [
+        'admin_withdraw_balance_from_wallet_text' => '  تم سحب مبلغ :AMOUNT من المحفظة',
         "provider_app" => "تطبيق المشغل",
         'client_app' => 'تطبيق العميل',
         "wallet_discount"=>'خصم المحفظة',
+        "coupon_discount"=>'خصم الكوبون',
+        "first_reservation"=>"اول جلسة",
         "pros"=>"ميزات فرعية",
         "text_when_order_completed" => "نص الرسالة عند انتهاء الطلب",
         'expire_after' => 'تنتهي بعد',

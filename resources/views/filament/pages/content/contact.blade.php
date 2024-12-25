@@ -14,7 +14,7 @@
             <h3>@lang("sections.social_links")</h3>
             <ul class="flex gap-4">
                 @foreach($settings->social_links as $social)
-                    <li> <a href="{{$social['link']}}" target="_blank"><i class="fab fa-{{$social['icon']}}"></i></a> </li>
+                    <li> <a href="{{$social['link']}}" target="_blank"><i class="fab fa-{{Str::replace(" ","",$social['icon'])}}"></i></a> </li>
                 @endforeach
 
             </ul>

@@ -26,7 +26,7 @@ class ProductsRelationManager extends RelationManager {
 
     public function table(Table $table): Table {
         return $table
-            ->heading(__('sections.services'))
+            ->heading(__('sections.products'))
             ->recordTitleAttribute('name')
             ->columns([
 
@@ -40,9 +40,9 @@ class ProductsRelationManager extends RelationManager {
             ->filters([
                 //
             ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
+//            ->headerActions([
+//                Tables\Actions\CreateAction::make(),
+//            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

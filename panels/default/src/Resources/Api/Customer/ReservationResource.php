@@ -31,6 +31,7 @@ class ReservationResource extends JsonResource {
             'enums' => [
                 'status' => $this->status,
             ],
+            'points'=>$this->meta_data['points']??'',
             'invoice_url' => route('reservations.invoice', $this),
             'transactions' => ReservationTransactionResource::collection($this->transactions),
             'totals' => $this->as_cart->formattedTotals()

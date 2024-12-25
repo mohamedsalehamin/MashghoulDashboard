@@ -6,7 +6,7 @@ class FontawesomeIcons {
     static public function get(): array {
         return [
             'fab fa-facebook' => 'facebook',
-            'fab fa-x' => 'twitter',
+            'fab fa-x' => 'x',
             'fab fa-instagram' => 'instagram',
             'fab fa-youtube' => 'youtube',
             'fab fa-telegram' => 'telegram',
@@ -20,7 +20,7 @@ class FontawesomeIcons {
     static public function toSelect(): array {
         return collect(static::get())->mapWithKeys(fn($item, $key) => [$item =>
             <<<HTML
-<i class="$key"> $item</i>
+<i class="$key"> </i>
 HTML
 
         ])->toArray();

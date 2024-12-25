@@ -11,7 +11,7 @@ class CategoryResource extends JsonResource {
             'id' => $this->id,
             'image' => $this->getFirstMediaUrl(app()->getLocale()),
             'name' => $this->name,
-            'has_children' => $this->children->count() > 0,
+            'has_children' => $this->children()->enabled()->count() > 0,
 
 
         ];
