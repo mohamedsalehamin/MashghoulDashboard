@@ -80,22 +80,30 @@ class Seat extends Model {
         }
 
         $reservations = $this->reservations()
-            ->paid()
-            ->whereDate('date', $date)
+//            ->paid()
+            ->whereDate('date', $date->format("Y-m-d"))
             ->pluck('from', 'to')
-            ->map(function ($from, $to) {
-                return Carbon::parse($from)->format("H:i") . " - " . Carbon::parse($to)->format("H:i");
-            })
+            ->map(fn($from, $to) => ['from' => Carbon::parse($from)->format("H:i"), 'to' => Carbon::parse($to)->format('H:i')])
+            ->values()
             ->toArray();
 
         return collect($slots)
-            ->map(function ($slot) use ($reservations) {
+            ->map(function ($slot) {
+
                 return [
                     'from' => \Str::before($slot, " -"),
                     'to' => \Str::after($slot, " - "),
-                    'reserved' => in_array($slot, $reservations)
+                    'reserved' => false
                 ];
+            })->map(function ($slot) use ($reservations) {
+
+                $slot['reserved'] = collect($reservations)
+                    ->where('from', ">=", $slot['from'])
+                    ->where('to', "<=", $slot['to'])
+                    ->count();
+                return $slot;
             })
+
 //            ->sortBy(function ($time) {
 //                return \Str::before($time, " -");
 //            })

@@ -443,7 +443,7 @@ class Cart extends CoreCart {
 
     public
     function walletDiscount() {
-        return $this->getConditionsByType('wallet')?->first()?->getValue() * 100;
+        return $this->getConditionsByType('wallet')?->first()?->getValue() ;
     }
 
     public
@@ -457,7 +457,6 @@ class Cart extends CoreCart {
     }
 
     public function getNetProfitTotal() {
-//        dd($this->totals()['subtotal']);
         return $this->totals()['subtotal'] - $this->totals()['wallet_discount'];
     }
 
