@@ -1,8 +1,6 @@
 @extends('site.layouts.app')
 @section("title",__('site.heading.home'))
 @section('content')
-
-    @php($locale='ar')
     <div class="mainBackground">
         <header class="header-home">
             @include('site.components.navbar')
