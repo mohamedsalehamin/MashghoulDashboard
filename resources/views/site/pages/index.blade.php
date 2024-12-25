@@ -2,35 +2,10 @@
 @section("title",__('site.heading.home'))
 @section('content')
 
+    @php($locale='ar')
     <div class="mainBackground">
         <header class="header-home">
-            <div class="container">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="menu-logo text-center">
-                        <a href="{{route('site.home')}}">
-                            <img
-                                src="assets/img/logo.png"
-                                alt="الشعار"
-                                class="img-fluid logo"
-                            />
-                        </a>
-                    </div>
-                    <nav>
-                        <ul class="nav-list d-flex align-items-center">
-                            <li class="linkMenu">
-                                <a href="#about"> من نحن </a>
-                            </li>
-                            <li class="linkMenu">
-                                <a href="#features">مميزات مشغول</a>
-                            </li>
-                            <li class="linkMenu">
-                                <a href="#faq">الأسئلة الشائعة</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    @livewire('register-button')
-                </div>
-            </div>
+            @include('site.components.navbar')
         </header>
         <section class="slider">
             <div class="main-slider">
@@ -39,19 +14,16 @@
                         <div class="row align-items-center">
                             <div class="col-xl-4 col-lg-6 col-sm-12">
                                 <div class="slid-body">
-                                    <h3 class="slid-tit">جمالك يبدأ معنا!</h3>
+                                    <h3 class="slid-tit">{{data_get($landing_settings,"content.header.$locale.title")}}</h3>
                                     <div class="slid-desc">
-                                        <p>
-                                            تطبيق التجميل الأول في السعودية. خدمات متكاملة، ولاء يكافئك، وحجوزات
-                                            تفاعلية سهلة
-                                        </p>
+                                        <p>{{data_get($landing_settings,"content.header.$locale.description")}}</p>
                                     </div>
                                     <div class="btns-url">
                                         <a href="#" class="button-wrapper">
                                             <div class="button">
                                                 <img src="assets/img/play.png" alt="Google Play">
                                             </div>
-                                            <div class="popover">حمل التطبيق الآن</div>
+                                            <div class="popover">@lang("site.fields.download_apps_now")</div>
                                         </a>
                                         <a href="#">
                                             <div class="button">
@@ -63,7 +35,9 @@
                             </div>
                             <div class="col-xl-6 col-lg-6 col-sm-12">
                                 <div class="image-slider">
-                                    <img src="assets/img/slider.png" alt="slider-img">
+                                    @php($image =data_get($landing_settings,"content.header.$locale.image"))
+                                    @php($image =is_array($image)?array_values($image)[0]:$image)
+                                    <img src="{{asset('storage/'.$image)}}" alt="slider-img">
                                 </div>
                             </div>
                         </div>
@@ -78,14 +52,15 @@
                 <img src="assets/img/about-logo.png" alt="">
             </div>
             <div class="about-content">
-                {{data_get($landing_settings,'content.about')}}
+                {{data_get($landing_settings,"content.about.$locale.about")}}
             </div>
         </div>
     </section>
 
     <section id="features" class="block features">
         <div class="container">
-            @foreach(data_get($landing_settings,'content.features') as $feature)
+            @foreach(data_get($landing_settings,"content.features.$locale")??[] as $feature)
+
                 @php($imagePath = isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]:data_get($feature,'image'))
                 @php($title=data_get($feature,'title'))
                 @php($description=data_get($feature,'description'))
@@ -107,19 +82,13 @@
 
                                         <div class="col-6">
                                             <ul class="list-unstyled">
-                                                @foreach(collect($feature['pros'])->pluck('en.title') as $pros)
+                                                @foreach(collect($feature['pros'])->pluck('title') as $pros)
                                                     <li>{{$pros}}</li>
                                                 @endforeach
 
                                             </ul>
                                         </div>
-                                        <div class="col-6">
-                                            <ul class="list-unstyled">
-                                                @foreach(collect($feature['pros'])->pluck('ar.title') as $pros)
-                                                    <li>{{$pros}}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+
                                     </div>
                                 @endisset
                             </div>
@@ -132,7 +101,7 @@
     </section>
     <section id="faq" class="block faq faq-container">
         <div class="container">
-            <h4 class="sec-tit">الأسئلة الشائعة</h4>
+            <h4 class="sec-tit">@lang('site.heading.faqs')</h4>
             @foreach(\App\ContentModule\Models\Faq::get() as  $index =>$faq)
                 @php($delay =$loop->iteration *0.2)
                 <div class="faq-item wow animate__animated animate__bounceInRight" data-wow-delay="{{$delay}}s">

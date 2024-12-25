@@ -10,25 +10,25 @@
             <div class="shopping-step shopping-step-active">
                 <div class="row mb-3">
                     <div class="col-lg-6">
-                        <label for="full_name">الاسم الاول <span
+                        <label for="full_name">@lang("site.fields.first_name") <span
                                 style="color: red;">*</span></label>
                         <input type="text" id="full_name" name="full_name"
-                               placeholder="الاسم الاول"
+                               placeholder="@lang("site.fields.first_name")"
                                wire:model="first_name"
                         >
                         @error('first_name')<p class="text-danger my-0">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="last_name">الاسم الاخير <span
+                        <label for="last_name">@lang("site.fields.last_name") <span
                                 style="color: red;">*</span></label>
                         <input type="text" id="last_name" name="last_name"
-                               placeholder="الاسم الاخير"
+                               placeholder="@lang("site.fields.first_name") "
                                wire:model="last_name"
                         >
                         @error('last_name')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="email">البريد الإلكتروني</label>
+                        <label for="email">@lang("site.fields.email")</label>
                         <input type="email" id="email" name="email"
                                placeholder="example@example.com"
                                wire:model="email"
@@ -36,7 +36,7 @@
                         @error('email')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="phone">رقم الجوال <span style="color: red;">*</span></label>
+                        <label for="phone">@lang("site.fields.phone") <span style="color: red;">*</span></label>
                         <input type="tel" id="phone" name="phone"
                                placeholder="+9665xxxxxxxx"
                                wire:model="phone"
@@ -44,28 +44,28 @@
                         @error('phone')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="gender">الجنس</label>
+                        <label for="gender">@lang("site.fields.gender")</label>
                         <select id="gender" name="gender"
                                 wire:model="gender"
                         >
-                            <option value="">اختر الجنس</option>
-                            <option value="male">ذكر</option>
-                            <option value="female">أنثى</option>
+                            <option value="">@lang("site.fields.choose")</option>
+                            <option value="male">@lang("site.enum.male")</option>
+                            <option value="female">@lang("site.enum.female")</option>
                         </select>
                         @error('gender')<p class="text-danger">{{$message}}</p>@enderror
 
                     </div>
                     <div class="col-lg-6">
-                        <label for="password">رقم المرور</label>
+                        <label for="password">@lang("site.fields.password")</label>
                         <input type="password" id="password" name="password"
                                wire:model="password"
-                               placeholder="أدخل رقم المرور" >
+                               placeholder="@lang("site.fields.password")" >
                         @error('password')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="confirm_password">تأكيد رقم المرور</label>
+                        <label for="confirm_password">@lang("site.fields.password_confirmation")</label>
                         <input type="password" id="confirm_password" name="password_confirmation"
-                               placeholder="أدخل تأكيد رقم المرور"
+                               placeholder="@lang("site.fields.password_confirmation")"
                                wire:model="password_confirmation"
                         >
                         @error('password_confirmation')<p class="text-danger">{{$message}}</p>@enderror
@@ -73,12 +73,12 @@
                 </div>
                 <label>
                     <input id="terms" type="checkbox" name="terms"  wire:model="terms">
-                    أوافق على
+                    @lang("site.heading.accept_terms")
                     @php($page=\App\ContentModule\Models\Page::find($settings->app_pages['terms_and_conditions']))
                     @if($page)
-                    <a href="{{route('site.page',$page->slug)}}" target="_blank">الشروط والأحكام</a>
+                    <a href="{{route('site.page',$page->slug)}}" target="_blank">@lang("site.heading.terms_and_conditions")</a>
                     @else
-                        الشروط والأحكام
+                        @lang("site.heading.terms_and_conditions")
                     @endif
                 </label>
                 @error('terms')<p class="text-danger">{{$message}}</p>@enderror
@@ -87,8 +87,8 @@
                         <div class="spinner-border spinner-border-sm" role="status" wire:loading>
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        تسجبل
 
+                        @lang("site.buttons.register")
                     </button>
                 </div>
             </div>

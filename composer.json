@@ -38,7 +38,7 @@
         "livewire/livewire": "^3.4",
         "lorisleiva/laravel-actions": "^2.7",
         "matanyadaev/laravel-eloquent-spatial": "^3.2",
-        "mcamara/laravel-localization": "^1.8",
+        "mcamara/laravel-localization": "^2.2",
         "mpdf/mpdf": "^8.2",
         "myfatoorah/laravel-package": "2.1",
         "pxlrbt/filament-activity-log": "^1.1",

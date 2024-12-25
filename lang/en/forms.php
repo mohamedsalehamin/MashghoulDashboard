@@ -1,6 +1,8 @@
 <?php
 return [
     'fields' => [
+        "logo_in_english"=>"English logo",
+        "logo_in_arabic"=>"Arabic logo",
         "text_when_order_completed" => "Text when order completed",
         "pros"=>"Feature",
         "total_gross_profit"=>'Profit',

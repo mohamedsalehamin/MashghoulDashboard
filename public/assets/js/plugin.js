@@ -33,6 +33,27 @@ jQuery(function () {
     //     });
 
 
+    // ************************ for language ************************
+    let currentLanguage = 'ar';
+    //
+    // jQuery('#language-switcher').click(function (e) {
+    //     e.preventDefault();
+    //
+    //     const currentPage = window.location.pathname;
+    //     const isArabic = currentPage.includes('_en');
+    //
+    //     if (isArabic) {
+    //         const arabicPage = currentPage.replace('_en', '');
+    //         window.location.href = arabicPage;
+    //     } else {
+    //         const parts = currentPage.split('/');
+    //         const pageName = parts.pop();
+    //         const englishPage = pageName.includes('.html') ? pageName.replace('.html', '_en.html') : `${pageName}_en.html`;
+    //         window.location.href = `${parts.join('/')}/${englishPage}`;
+    //     }
+    // });
+
+
     // ************************ fixed menu ************************
     jQuery(window).scroll(function () {
 
@@ -57,24 +78,29 @@ jQuery(function () {
     jQuery('.link a').on('click', function (event) {
         event.preventDefault();
 
-        const target = jQuery(jQuery(this).attr('href'));
+        const href = jQuery(this).attr('href');
+        const isEnglish = href.includes('_en');
+        const targetSelector = href.split('#')[1];
+        const target = targetSelector ? jQuery(`#${targetSelector}`) : null;
 
-        if (target.length) {
+        if (target && target.length) {
             const stickHeight = jQuery("header").length ? jQuery("header").height() : 0;
             const paddingTop = parseFloat(jQuery("header").css('padding-top')) || 0;
             const paddingBottom = parseFloat(jQuery("header").css('padding-bottom')) || 0;
 
-
             const offset = jQuery(window).scrollTop() < 1
-                ? -(stickHeight + paddingTop + paddingBottom)*2
+                ? -(stickHeight + paddingTop + paddingBottom) * 2
                 : -(3 + stickHeight + paddingTop + paddingBottom);
-
 
             const newScrollPosition = target.offset().top + offset;
 
-            jQuery(window).scrollTop(newScrollPosition);
+            jQuery('html, body').animate({ scrollTop: newScrollPosition }, 600); // Smooth scroll
+        } else {
+            window.location.href = href; // Navigate to external or different page
         }
     });
+
+
 
 // Scroll Event to Change Navbar Style and Active Class
     jQuery(window).on('scroll', function () {
@@ -97,8 +123,14 @@ jQuery(function () {
                 var blockId = jQuery(this).attr("id");
 
 
-                jQuery(".link a[href='#" + blockId + "']").addClass("active")
-                    .parent().siblings().children().removeClass("active");
+                jQuery(function () {
+                    const dir = jQuery('html').attr('dir'); // Detect the direction (rtl or ltr)
+                    const pagePrefix = dir === 'rtl' ? 'index.html' : 'index_en.html';
+
+                    jQuery(".link a[href='" + pagePrefix + "#" + blockId + "']").addClass("active")
+                        .parent().siblings().children().removeClass("active");
+                });
+
             }
         });
         if (wst === 0) {
@@ -384,7 +416,7 @@ jQuery(function () {
         duration: 1000,
         easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
         interval: 150,
-        reset: true,
+        reset: false,
     });
 
     // Apply animation to elements revealing from the top

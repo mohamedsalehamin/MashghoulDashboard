@@ -2,20 +2,21 @@
     <div class="container">
         <div class="ready">
             <h5 class="ready-tit">
-                {{data_get($landing_settings,'content.footer.title')}}
+                {{data_get($landing_settings,"content.footer.$locale.title")}}
             </h5>
             <p class="ready-para">
-                {{data_get($landing_settings,'content.footer.description')}}
+                {{data_get($landing_settings,"content.footer.$locale.description")}}
+
             </p>
             <div class="btns-url">
                 <a href="{{data_get($settings,'applications_links.google_play_link')}}">
                     <div class="button">
-                        <img src="assets/img/play.png" alt="Google Play">
+                        <img src="/assets/img/play.png" alt="Google Play">
                     </div>
                 </a>
                 <a href="{{data_get($settings,'applications_links.apple_store_link')}}">
                     <div class="button">
-                        <img src="assets/img/store.png" alt="App Store">
+                        <img src="/assets/img/store.png" alt="App Store">
                     </div>
                 </a>
             </div>
@@ -30,7 +31,7 @@
 
         </div>
         <div class="copyWrite">
-            <p>© 2024 تطبيق مشغول. جميع الحقوق محفوظة</p>
+            <p>@lang('site.heading.copyright')</p>
             {{--            <p>--}}
             {{--                تم بواسطة--}}
             {{--                <a href="https://targetlines.com">--}}

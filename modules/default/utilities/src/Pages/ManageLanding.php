@@ -27,57 +27,121 @@ class ManageLanding extends SettingsPage {
     public function form(Form $form): Form {
         return $form
             ->schema([
+                FileUpload::make('logos.ar')
+                    ->label(__('forms.fields.logo_in_arabic'))
+                    ->required(),
+                FileUpload::make('logos.en')
+                    ->label(__('forms.fields.logo_in_english'))
+                    ->required(),
                 Forms\Components\Section::make("header")
                     ->label(__("sections.header"))
                     ->schema([
-                        TextInput::make('header.title')
-                            ->label(__('forms.fields.title'))
-                            ->required(),
-                        Textarea::make('header.description')
-                            ->label(__('forms.fields.description'))
-                            ->required(),
-                        FileUpload::make('header.image')->label(__("forms.fields.image")),
+                        Tabs::make()->schema([
+                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                TextInput::make('title')
+                                    ->label(__('forms.fields.title'))
+                                    ->required(),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required(),
+                                FileUpload::make('image')->label(__("forms.fields.image")),
+                            ])->statePath("header.ar"),
+
+                            Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                TextInput::make('title')
+                                    ->label(__('forms.fields.title'))
+                                    ->required(),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required(),
+                                FileUpload::make('image')->label(__("forms.fields.image")),
+                            ])->statePath("header.en"),
+                        ])
+
                     ])->statePath('content'),
                 Forms\Components\Section::make("about_us")
                     ->label(__("sections.about_us"))
                     ->schema([
-                        Textarea::make('about')
-                            ->label(__('forms.fields.description'))
-                            ->required(),
+                        Tabs::make()->schema([
+                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                Textarea::make('about')
+                                    ->label(__('forms.fields.description'))
+                                    ->required()
+                            ])->statePath("about.ar"),
+
+                            Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                Textarea::make('about')
+                                    ->label(__('forms.fields.description'))
+                                    ->required()
+                            ])->statePath("about.en")
+                        ])
+                        ,
+
                     ])->statePath('content'),
                 Forms\Components\Section::make("our_features")
                     ->label(__("sections.our_features"))
                     ->schema([
-                        Repeater::make('features')->schema([
-                            TextInput::make('title')
-                                ->label(__('forms.fields.title'))
-                                ->required(),
-                            Textarea::make('description')
-                                ->label(__('forms.fields.description'))
-                                ->required(),
-                            FileUpload::make('image')->label(__("forms.fields.image")),
-                            Repeater::make('pros')->schema([
-                                Tabs::make('tabs')->schema([
-                                    Tabs\Tab::make(__("panel.languages.arabic"))->schema([
-                                            TextInput::make('title')
-                                        ])->statePath("ar"),
-                                    Tabs\Tab::make(__("panel.languages.english"))->schema([
-                                            TextInput::make('title')
-                                        ])->statePath("en")
-                                ])
-                            ])
+                        Tabs::make()->schema([
 
-                        ])
+                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                Repeater::make('features')->schema([
+                                    TextInput::make('title')
+                                        ->label(__('forms.fields.title'))
+                                        ->required(),
+                                    Textarea::make('description')
+                                        ->label(__('forms.fields.description'))
+                                        ->required(),
+                                    FileUpload::make('image')->label(__("forms.fields.image")),
+
+
+                                    Repeater::make('pros')->schema([
+                                        TextInput::make('title')
+                                    ])
+                                ])
+                                    ->statePath("features.ar"),
+                            ]),
+                            Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                TextInput::make('title')
+                                    ->label(__('forms.fields.title'))
+                                    ->required(),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required(),
+                                FileUpload::make('image')->label(__("forms.fields.image")),
+
+
+                                Repeater::make('pros')->schema([
+                                    TextInput::make('title')
+                                ])
+                            ])->statePath("features.en"),
+
+
+                        ]),
                     ])->statePath('content'),
                 Forms\Components\Section::make("footer")
                     ->label(__("sections.footer"))
                     ->schema([
-                        TextInput::make('footer.title')
-                            ->label(__('forms.fields.title'))
-                            ->required(),
-                        Textarea::make('footer.description')
-                            ->label(__('forms.fields.description'))
-                            ->required(),
+                        Tabs::make()->schema([
+                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                TextInput::make('title')
+                                    ->label(__('forms.fields.title'))
+                                    ->required(),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required(),
+                            ])->statePath("footer.ar"),
+
+                            Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                TextInput::make('title')
+                                    ->label(__('forms.fields.title'))
+                                    ->required(),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required(),
+                            ])->statePath("footer.en"),
+                        ])
+
+
                     ])->statePath('content'),
 
             ]);

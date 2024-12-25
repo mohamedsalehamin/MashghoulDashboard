@@ -9,6 +9,7 @@ class LandingSettings extends Settings
 {
 
     public array $content = [];
+    public array $logos = [];
 
 
 
