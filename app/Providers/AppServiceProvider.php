@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider {
                 ->with('landing_settings', $landingSettings)
                 ->with('settings', $settings)
                 ->with('social_links', $settings->social_links)
-                ->with('locale', 'ar')
+                ->with('locale', $this->app->getLocale())
                 ->with('pages', $pages);
         });
 
