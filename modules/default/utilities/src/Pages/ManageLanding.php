@@ -101,19 +101,23 @@ class ManageLanding extends SettingsPage {
                                     ->statePath("features.ar"),
                             ]),
                             Tabs\Tab::make(__("panel.languages.english"))->schema([
-                                TextInput::make('title')
-                                    ->label(__('forms.fields.title'))
-                                    ->required(),
-                                Textarea::make('description')
-                                    ->label(__('forms.fields.description'))
-                                    ->required(),
-                                FileUpload::make('image')->label(__("forms.fields.image")),
-
-
-                                Repeater::make('pros')->schema([
+                                Repeater::make('features')->schema([
                                     TextInput::make('title')
+                                        ->label(__('forms.fields.title'))
+                                        ->required(),
+                                    Textarea::make('description')
+                                        ->label(__('forms.fields.description'))
+                                        ->required(),
+                                    FileUpload::make('image')->label(__("forms.fields.image")),
+
+
+                                    Repeater::make('pros')->schema([
+                                        TextInput::make('title')
+                                    ])
                                 ])
-                            ])->statePath("features.en"),
+                                    ->statePath("features.en")
+
+                            ]),
 
 
                         ]),
