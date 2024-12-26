@@ -82,7 +82,7 @@
                                 @if(isset($feature['pros'])&& count($feature['pros']))
                                     <div class="row itemsPro">
 
-                                        <div class="col-6">
+                                        <div class="col-12">
                                             <ul class="list-unstyled">
                                                 @foreach(collect($feature['pros'])->pluck('title') as $pros)
                                                     <li>{{$pros}}</li>
