@@ -29,7 +29,7 @@ class CartCheckoutRequest extends FormRequest {
             'services' => ['required', 'array'],
             'services.*.id' => ['required', Rule::exists('seat_service', 'service_id')->where('seat_id', $this->get('seat_id')),],
             'coupon_code' => ['nullable', 'exists:coupons,code', new IsValidCoupon($this->cart()->getServicesTotalIncludeProducts())],
-            'date' => ['required', 'date', ],
+            'date' => ['required', 'date', new IsValidReservationDateRule(), new IsValidPeriodFormatRule()],
             'from' => ['required', 'date_format:H:i'],
             'to' => ['required', 'date_format:H:i'],
 
