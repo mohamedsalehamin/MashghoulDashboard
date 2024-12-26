@@ -22,6 +22,7 @@ class ReservationServices {
     public function index() {
 
         $reservations = Reservation::query()
+            ->paid()
             ->where('reservable_id', provider()->id)
             ->when(request()->has('status'), fn($query) => $query->where('status', request('status')))
             ->when(request()->filled('date_from'), fn($query) => $query->whereDate('date', '>=', request('date_from')))
