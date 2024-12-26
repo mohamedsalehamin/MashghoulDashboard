@@ -39,16 +39,14 @@ class AppServiceProvider extends ServiceProvider {
     public function register(): void {
 
         $this->cart();
-        view()->composer('*', function ($view,) {
+        view()->composer('*', function ($view) {
             $settings = new GeneralSettings();
             $landingSettings = new LandingSettings();
 
-            $pages = Cache::remember('pages', 60 * 60, function () use ($settings) {
-                return collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
+            $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
 
-                    return [$pageName => Page::find($page)];
+                return [$pageName => Page::find($page)];
 
-                });
             });
             return $view
                 ->with('landing_settings', $landingSettings)
@@ -79,7 +77,6 @@ class AppServiceProvider extends ServiceProvider {
         $settings = new DeveloperSetting();
         view()->share('settings', new GeneralSettings());
         config()->set("app.debug", $settings->debug_mode);
-
 
 
         FilamentView::registerRenderHook(
@@ -133,9 +130,9 @@ class AppServiceProvider extends ServiceProvider {
         Table::configureUsing(function (Table $table): void {
             $table->modifyQueryUsing(function (Builder $query): void {
 
-                if ($query->getColumns()->getModel()->getCreatedAtColumn() && get_class($query->getColumns()->getModel()) !=Reservation::class) {
+                if ($query->getColumns()->getModel()->getCreatedAtColumn() && get_class($query->getColumns()->getModel()) != Reservation::class) {
 
-                    $query->latest($query->getColumns()->getModel()->getTable().".created_at");
+                    $query->latest($query->getColumns()->getModel()->getTable() . ".created_at");
                 }
 
             });

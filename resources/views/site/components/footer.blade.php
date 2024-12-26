@@ -9,12 +9,12 @@
 
             </p>
             <div class="btns-url">
-                <a href="{{data_get($settings,'applications_links.google_play_link')}}">
+                <a href="{{data_get($settings,'applications_links.client.google_play_link')}}">
                     <div class="button">
                         <img src="/assets/img/play.png" alt="Google Play">
                     </div>
                 </a>
-                <a href="{{data_get($settings,'applications_links.apple_store_link')}}">
+                <a href="{{data_get($settings,'applications_links.client.apple_store_link')}}">
                     <div class="button">
                         <img src="/assets/img/store.png" alt="App Store">
                     </div>
@@ -45,9 +45,9 @@
 
                     <li><a href="{{route('site.page',$page->slug)}}">{{$page->title}}</a></li>
                 @endforeach
-                @foreach(\App\ContentModule\Models\Page::whereNotIn("id",collect($pages)->pluck('id')->toArray()) as $page)
-                    <li><a href="{{route('site.page',$page->slug)}}">{{$page->title}}</a></li>
-                @endforeach
+{{--                @foreach(\App\ContentModule\Models\Page::whereNotIn("id",collect($pages)->pluck('id')->toArray()) as $page)--}}
+{{--                    <li><a href="{{route('site.page',$page->slug)}}">{{$page->title}}</a></li>--}}
+{{--                @endforeach--}}
             </ul>
         </div>
         <a id="to_top" href="#top">

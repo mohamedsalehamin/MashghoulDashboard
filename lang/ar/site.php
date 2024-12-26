@@ -10,7 +10,7 @@ return [
         'date_from' => 'من تاريخ',
         'date_to' => 'إلى تاريخ',
         'doctor_manager_name' => 'اسم الطبيب المسئول',
-        'download_apps_now' => 'حمل تطبيق تمونوا الآن',
+        'download_apps_now' => 'حمل تطبيق مشغول الآن',
         'license_number' => 'رقم الترخيص',
         'clinic_image' => 'صورة العيادة',
         'lab_images' => 'صور المختبر',
