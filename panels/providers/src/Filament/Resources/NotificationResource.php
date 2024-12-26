@@ -39,6 +39,7 @@ class NotificationResource extends Resource {
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
+                    ->visible(fn(Model $record) => $record->url !== null)
                     ->url(fn(Model $record) => $record->url),
                 Tables\Actions\DeleteAction::make(),
             ])

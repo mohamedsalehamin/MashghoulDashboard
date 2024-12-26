@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\ProviderPanel\Filament\Resources\ReservationResource;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Notifications\DatabaseNotification;
 
@@ -25,9 +26,8 @@ class Notification extends DatabaseNotification {
 
                 $data = json_decode($attributes['data'], true)['viewData'];
                 return match ($data['entity_type']) {
-                    'branch' => route('filament.admin.resources.reservation.view', $data['entity_id']),
-                    'order' => route('filament.admin.resources.catalog.branches.edit', $data['entity_id']),
-                    default => 'javascript:void(0)',
+                    'reservation' =>provider()->id?ReservationResource::getUrl('view',[$data['entity_id']]):\App\CatalogModule\Resources\ReservationResource::getUrl('view',[$data['entity_id']]),
+                    default => null,
                 };
 
             }

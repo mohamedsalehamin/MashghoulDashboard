@@ -52,6 +52,7 @@ class ReservationResource extends Resource {
         return $table
             ->modifyQueryUsing(fn($query) => $query
                 ->where('reservable_id', provider()->id)
+                ->latest("id")
             )
             ->columns([
                 TextColumn::make('id')->searchable(),
@@ -144,7 +145,8 @@ class ReservationResource extends Resource {
                         Section::make("basic_information")
                             ->schema([
                                 TextEntry::make('id'),
-//                                TextEntry::make('reservable.name')->label(__("forms.fields.provider_name")),
+
+
                                 TextEntry::make('customer.name'),
                                 TextEntry::make('customer.phone'),
                                 TextEntry::make('seat.title')->label(__("forms.fields.seat_name")),
@@ -166,11 +168,21 @@ class ReservationResource extends Resource {
                                 TextEntry::make('meta_data.points')->label(__('forms.fields.wining_points')),
                                 Group::make()->schema(function ($record) {
                                     $totals = $record->as_cart->formattedTotals();
+
                                     return [
                                         TextEntry::make('services_total')->state(fn() => $totals['services_total']),
                                         TextEntry::make('products_total')->state(fn() => $totals['products_total']),
-                                        TextEntry::make('discount')->state(fn() => $totals['discount']),
+                                        TextEntry::make('coupon_discount')->state(function ($record) use ($totals) {
+                                            $name = $record->as_cart->getConditions()->filter(fn($condition) => $condition->getType() == 'coupon')->first()?->getName();
+                                            $code = $totals['discount'];
+                                            if ($name) {
+                                                return $name . "($code)";
+                                            }
+
+                                            return $code;
+                                        }),
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
+                                        TextEntry::make('wallet_discount')->state(fn() => $totals['wallet_discount']),
                                         TextEntry::make('total')->state(fn() => $totals['total']),
                                     ];
                                 })

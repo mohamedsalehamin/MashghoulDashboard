@@ -60,7 +60,7 @@ class ReservationResource extends Resource {
     public static function table(Table $table): Table {
 
         return $table
-            ->modifyQueryUsing(fn($query) => $query->paid()->latest())
+            ->modifyQueryUsing(fn($query) => $query->latest())
             ->columns([
                 TextColumn::make('id')->searchable(),
                 TextColumn::make('reservable.name')->label(__('forms.fields.provider_name'))->searchable(),

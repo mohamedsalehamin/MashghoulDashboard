@@ -9,6 +9,7 @@ use App\UsersModule\Resources\LabResource;
 use App\UsersModule\Resources\ProviderResource;
 use App\UsersModule\Resources\ProviderResource\Widgets\WalletStats;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Concerns\HasTabs;
@@ -25,6 +26,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 use Theamostafa\Wallet\Models\Transaction;
+use Theamostafa\Wallet\Models\Wallet;
 
 class WalletPage extends Page implements HasTable {
     use InteractsWithRecord;
@@ -73,27 +75,27 @@ class WalletPage extends Page implements HasTable {
                 Action::make('pay')
                     ->visible(fn() => $this->record->provider?->wallet?->balance > 0)
                     ->label(__('forms.actions.reduction'))
+                    ->model($this->record->provider?->wallet)
+                    ->record($this->record->provider)
                     ->form([
                         TextInput::make('amount')
                             ->rules(['lte:' . $this->record->provider?->wallet?->balance])
                             ->label(__('forms.fields.amount'))
                             ->required(),
                         SpatieMediaLibraryFileUpload::make('receipt')
+                            ->afterStateUpdated(fn($get, $set) => $set('image', $get('receipt')))
                             ->columnSpan(2),
+                        Hidden::make('image')
                     ])
-                    ->before(function ($record, $data) {
-//                        dd($data);
-                    })
                     ->action(function ($data) {
-//dd('as');
-                        $this->record->provider->withdraw(amount: $data['amount'], meta: [
+                        $operation = $this->record->provider->withdraw(amount: $data['amount'], meta: [
 
                             'description' => [
-                                'ar' => __('panel.messages.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']]),
-                                'en' => __('forms.fields.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']])
+                                'ar' => __('panel.messages.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']], 'ar'),
+                                'en' => __('forms.fields.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']], 'en')
                             ]
                         ]);
-
+                        $operation->addMedia(array_values($data['image'])[0])->toMediaCollection();
                     })
             ])
             ->columns([
@@ -109,7 +111,14 @@ class WalletPage extends Page implements HasTable {
                     ->formatStateUsing(fn($record) => $record->meta['description'][app()->getLocale()])
                     ->searchable(false),
                 TextColumn::make('created_at')
-                    ->date()->searchable(false)
+                    ->date()
+                    ->searchable(false)
+            ])
+            ->actions([
+                Action::make('receipt')
+                    ->label(__("forms.actions.show_receipt"))
+                    ->visible(fn($record) => $record->getFirstMediaUrl())
+                    ->url(fn($record) => $record->getFirstMediaUrl(), true)
             ])
             ->striped();
 
