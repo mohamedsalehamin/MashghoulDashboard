@@ -143,7 +143,7 @@ class WalletPage extends Page implements HasTable {
     public function getBreadcrumbs(): array {
         return [
             __('menu.dashboard'),
-            $this->record->provider->title,
+            $this->record?->provider?->title,
             __('menu.wallet')
         ];
     }

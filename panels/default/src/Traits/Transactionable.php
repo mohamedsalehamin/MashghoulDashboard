@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait Transactionable {
     public function scopePaid($query) {
-//        return $query->whereHas('transactions', fn($q) => $q->where('status', 'paid')->orWhere('status', 'refunded'));
+        return $query->whereHas('transactions', fn($q) => $q->where('status', 'paid')->orWhere('status', 'refunded'));
     }
 
 

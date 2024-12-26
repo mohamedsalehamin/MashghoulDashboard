@@ -16,14 +16,16 @@
                                     <div class="slid-desc">
                                         <p>{{data_get($landing_settings,"content.header.$locale.description")}}</p>
                                     </div>
+
                                     <div class="btns-url">
-                                        <a href="#" class="button-wrapper">
+                                        <a href="{{data_get($settings->applications_links,'client.google_play_link')}}"
+                                           class="button-wrapper">
                                             <div class="button">
                                                 <img src="assets/img/play.png" alt="Google Play">
                                             </div>
                                             <div class="popover">@lang("site.fields.download_apps_now")</div>
                                         </a>
-                                        <a href="#">
+                                        <a href="{{data_get($settings->applications_links,'client.apple_store_link')}}">
                                             <div class="button">
                                                 <img src="assets/img/store.png" alt="App Store">
                                             </div>
@@ -34,7 +36,8 @@
                             <div class="col-xl-6 col-lg-6 col-sm-12">
                                 <div class="image-slider">
                                     @php($image =data_get($landing_settings,"content.header.$locale.image"))
-                                    @php($image =is_array($image)?array_values($image)[0]:$image)
+
+                                    @php($image =is_array($image)?array_values($image)[0]??'':$image)
                                     <img src="{{asset('storage/'.$image)}}" alt="slider-img">
                                 </div>
                             </div>
@@ -58,8 +61,9 @@
     <section id="features" class="block features">
         <div class="container">
             @foreach(data_get($landing_settings,"content.features.$locale")??[] as $feature)
+                @continue(empty(data_get($feature,'image')))
+                @php($imagePath = is_array(data_get($feature,'image')) && isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]??'':data_get($feature,'image'))
 
-                @php($imagePath = isset(array_values(data_get($feature,'image'))[0])?array_values(data_get($feature,'image'))[0]:data_get($feature,'image'))
                 @php($title=data_get($feature,'title'))
                 @php($description=data_get($feature,'description'))
                 <div class="features_item">

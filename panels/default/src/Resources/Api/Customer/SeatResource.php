@@ -10,7 +10,7 @@ class SeatResource extends JsonResource {
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'services' => ServiceResource::collection($this->services),
+            'services' => ServiceResource::collection($this->services()->enabled()->get()),
             'working_days'=>WorkingTimesResource::collection(collect( $this->meta_data['days_list'])->where('status',1))
         ];
     }

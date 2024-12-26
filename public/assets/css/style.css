@@ -974,8 +974,8 @@ html[dir='ltr'] .join_Us {
 }
 
 .itemsPro [class*='col-']:last-child {
-    border-inline-end: 2px solid var(--sec);
-    padding-inline-end: 20px;
+    /*border-inline-end: 2px solid var(--sec);*/
+    /*padding-inline-end: 20px;*/
 }
 
 .itemsPro [class*='col-']:first-child ul {

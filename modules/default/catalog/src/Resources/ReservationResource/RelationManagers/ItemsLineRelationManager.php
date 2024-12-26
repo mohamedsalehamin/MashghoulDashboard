@@ -30,15 +30,15 @@ class ItemsLineRelationManager extends RelationManager {
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('model.id')
-                    ->formatStateUsing(fn( ItemsLine $record) => Service::find($record->model['id'])->title)
+                    ->formatStateUsing(fn(ItemsLine $record) => Service::find($record->model['id'])->title)
                     ->label(__('forms.fields.name')),
 
                 Tables\Columns\TextColumn::make('products')
-                    ->state(function ($record){
+                    ->state(function ($record) {
                         $text = [];
-                        foreach ($record['attributes']['products']??[] as $index => $option) {
+                        foreach ($record['attributes']['products'] ?? [] as $index => $option) {
                             $option_name = Utils::getTranslatedField($option['title']);
-                            $price =Money::parse($option['price']['amount'])->format();
+                            $price = Money::parse($option['price']['amount'])->format();
                             $text[] = "{$option_name} ({$price}) ";
                         }
                         return $text;
@@ -50,7 +50,9 @@ class ItemsLineRelationManager extends RelationManager {
                 Tables\Columns\TextColumn::make('total')
                     ->label(__("forms.fields.service_price"))
                     ->state(function (ItemsLine $record) {
-                        return Money::parse(($record->quantity * $record->price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
+                        $price = Money::parse($record->model['price']['amount'] ?? 0)->formatByDecimal();
+
+                        return Money::parse(($record->quantity * $price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
                     }),
 
             ])
