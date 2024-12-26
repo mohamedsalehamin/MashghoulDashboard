@@ -10,6 +10,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -66,7 +67,14 @@ class WalletResource extends Resource {
                     ->formatStateUsing(fn($record) => $record->meta['description'][app()->getLocale()]),
                 TextColumn::make('created_at')
                     ->date()
-            ])->striped();
+            ])
+            ->actions([
+                Action::make('receipt')
+                    ->label(__("forms.actions.show_receipt"))
+                    ->visible(fn($record) => $record->getFirstMediaUrl())
+                    ->url(fn($record) => $record->getFirstMediaUrl(), true)
+            ])
+            ->striped();
     }
 
 

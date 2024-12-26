@@ -377,6 +377,7 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "show_receipt"=>'عرض الفاتورة',
         "accept"=>'قبول',
         "reject"=>'رفض',
         'activities'=>'سجل التغيرات',

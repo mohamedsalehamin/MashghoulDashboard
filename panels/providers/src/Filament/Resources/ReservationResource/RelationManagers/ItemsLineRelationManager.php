@@ -49,7 +49,9 @@ class ItemsLineRelationManager extends RelationManager {
                 Tables\Columns\TextColumn::make('total')
                     ->label(__("forms.fields.service_price"))
                     ->state(function (ItemsLine $record) {
-                        return Money::parse(($record->quantity * $record->price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
+                        $price = Money::parse($record->model['price']['amount'] ?? 0)->formatByDecimal();
+
+                        return Money::parse(($record->quantity * $price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
                     }),
 
             ])

@@ -365,6 +365,7 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "show_receipt"=>'Show receipt',
         "accept"=>'Accept',
         "reject"=>'Reject',
         'activities'=>'Activities',
