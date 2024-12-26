@@ -978,13 +978,13 @@ html[dir='ltr'] .join_Us {
     /*padding-inline-end: 20px;*/
 }
 
-.itemsPro [class*='col-']:first-child ul {
-    direction: ltr;
-}
+/*.itemsPro [class*='col-']:first-child ul {*/
+/*    direction: ltr;*/
+/*}*/
 
-.itemsPro [class*='col-']:last-child ul {
-    direction: rtl;
-}
+/*.itemsPro [class*='col-']:last-child ul {*/
+/*    direction: rtl;*/
+/*}*/
 
 .features_item [class*='col-']:not(.itemsPro [class*='col-']) {
     margin-bottom: 50px;
