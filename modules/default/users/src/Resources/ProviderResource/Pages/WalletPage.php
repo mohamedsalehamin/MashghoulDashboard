@@ -117,8 +117,8 @@ class WalletPage extends Page implements HasTable {
             ->actions([
                 Action::make('receipt')
                     ->label(__("forms.actions.show_receipt"))
-                    ->visible(fn($record) => $record->getFirstMediaUrl())
-                    ->url(fn($record) => $record->getFirstMediaUrl(), true)
+                    ->visible(fn($record) => $record?->getFirstMediaUrl())
+                    ->url(fn($record) => $record?->getFirstMediaUrl(), true)
             ])
             ->striped();
 

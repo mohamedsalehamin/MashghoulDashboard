@@ -97,9 +97,9 @@ class Seat extends Model {
                 ];
             })->map(function ($slot) use ($reservations) {
 
-                $slot['reserved'] = collect($reservations)
-                    ->where('from', ">=", $slot['from'])
-                    ->where('to', "<=", $slot['to'])
+                $slot['reserved'] = (bool)collect($reservations)
+                    ->where('from', "<=", $slot['to'])
+                    ->where('to', ">", $slot['from'])
                     ->count();
                 return $slot;
             })
