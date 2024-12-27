@@ -45,11 +45,11 @@ class ReservationServices {
     public function statistics() {
         $counts = $this->stats();
         return Api::isOk(__("Statistics"), [
-            'reservations_total' =>Money::parse( provider()->reservations()->sum('price'))->format(),
+            'reservations_total' =>Money::parse( provider()->reservations()->paid()->sum('price'))->format(),
             'profits' => Money::parse(provider()->balance)->format(),
-            'customers' => Customer::whereHas('reservations', fn($query) => $query->where('reservable_id', provider()->id))->count(),
+            'customers' => Customer::whereHas('reservations', fn($query) => $query->where('reservable_id', provider()->id)->paid())->count(),
             'seats_count' => provider()->seats()->count(),
-            'reservations_count' => provider()->reservations()->count(),
+            'reservations_count' => provider()->reservations()->paid()->count(),
             'stats' => [
                 'new' =>(int) $counts->pending,
                 'in_processing' =>(int) $counts->in_processing,
@@ -61,7 +61,7 @@ class ReservationServices {
     }
 
     public function stats() {
-        return DB::table('reservations')
+        return Reservation::paid()
             ->where('reservable_id', provider()?->id)
             ->select(DB::raw("count(id) AS 'all', sum( CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS 'pending', sum( CASE WHEN status in( 'processing') THEN 1 ELSE 0 END) AS 'in_processing', sum( CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS 'completed', sum( CASE WHEN status in( 'canceled') THEN 1 ELSE 0 END) AS 'canceled' "))->first();
     }
