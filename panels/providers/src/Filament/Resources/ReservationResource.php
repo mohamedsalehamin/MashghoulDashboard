@@ -52,6 +52,7 @@ class ReservationResource extends Resource {
         return $table
             ->modifyQueryUsing(fn($query) => $query
                 ->where('reservable_id', provider()->id)
+                ->paid()
                 ->latest("id")
             )
             ->columns([

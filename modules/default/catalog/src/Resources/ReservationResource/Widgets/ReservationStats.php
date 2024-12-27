@@ -3,6 +3,7 @@
 namespace App\CatalogModule\Resources\ReservationResource\Widgets;
 
 use App\CatalogModule\Models\Commission;
+use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Seat;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\UsersModule\Models\Doctor;
@@ -20,7 +21,7 @@ class ReservationStats extends BaseWidget {
     protected static ?int $sort = 1;
 
     protected function getStats(): array {
-        $totalsStats = DB::table('reservations')
+        $totalsStats = Reservation::paid()
             ->where('reservable_id', provider()?->id)
             ->select(
                 DB::raw("
@@ -56,7 +57,7 @@ class ReservationStats extends BaseWidget {
         END) AS 'canceled'
 "))->first();
 
-        $sumStats = DB::table('reservations')
+        $sumStats = Reservation::paid()
             ->where('reservable_id', provider()?->id)
             ->select(
                 DB::raw("
@@ -91,12 +92,10 @@ class ReservationStats extends BaseWidget {
         END) AS 'canceled'
 
 "))->first();
-        $balance =Commission::whereHas('reservation', fn($q) => $q->where("reservable_id", provider()->id))
-            ->where('transferred', 0)
-            ->sum('amount');
+        $balance =provider()->balance;
         return [
 
-            Stat::make(__('panel.stats.customers'), Customer::whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id))->count()),
+            Stat::make(__('panel.stats.customers'), Customer::whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id)->paid())->count()),
             Stat::make(__('panel.stats.reserved_balance'), Money::parse($balance)),
             Stat::make(__('panel.stats.reservations_total'), Money::parse($totalsStats->all)->format()),
             Stat::make(__('panel.stats.new_reservations_total'), Money::parse($totalsStats->pending)->format()),
