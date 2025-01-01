@@ -21,7 +21,7 @@ return [
         "points_count_when_customer_dob" => "عدد النقاط المكتسبة عندما يكون تاريح اليوم هوعيد  ميلاد العميل",
         "reservation_flow" => "طريقة الدفع",
         "reservations_fess" => "رسوم الحجز",
-        "enabled_free_fees_in_first_reservation" => "تفعيل الحجز المجاني لأول أول حجز",
+        "enabled_free_fees_in_first_reservation" => "تفعيل الحجز المجاني لأول جلسة",
         "title_ar" => "الاسم بالعربية",
         "title_en" => "الاسم بالانجليزية",
         "commercial_register" => "السجل التجاري",
