@@ -29,7 +29,7 @@ return [
     'schedule_reservation' => 'جدولة الحجز',
     'patient_not_attend_reservation' => 'عدم حضور المريض',
     'reservations' => 'الحجوزات',
-    'labs_pages' => 'صفحات المختبر',
+    'labs_pages' => 'صفحات مقدمي الخدمة',
     'doctors_pages' => 'صفحات الأطباء',
     'contact'=> 'تواصل معنا',
     'cancellation_data' => 'بيانات الإلغاء',
