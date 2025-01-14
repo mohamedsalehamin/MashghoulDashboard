@@ -42,7 +42,7 @@
         <div class="foot-menu">
             <ul class="list-styled">
                 @foreach($pages as $page)
-
+                    @continue(!$page)
                     <li><a href="{{route('site.page',$page->slug)}}">{{$page->title}}</a></li>
                 @endforeach
 {{--                @foreach(\App\ContentModule\Models\Page::whereNotIn("id",collect($pages)->pluck('id')->toArray()) as $page)--}}
