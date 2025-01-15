@@ -5,6 +5,7 @@ namespace App\ContentModule\Resources;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Resources\BannerResource\Pages\ListBanners;
 use App\UsersModule\Models\Provider;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
@@ -24,8 +25,9 @@ use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ContentModule\Resources\BannerResource\Pages\CreateBanner;
 use App\ContentModule\Resources\BannerResource\Pages\EditBanner;
+use Spatie\Color\Hsb;
 
-class BannerResource extends Resource {
+class BannerResource extends Resource implements HasShieldPermissions {
     use HasTranslationLabel;
     use Translatable;
 
@@ -84,6 +86,8 @@ class BannerResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query)=>$query->orderBy("sort"))
+            ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('name'),
@@ -134,5 +138,19 @@ class BannerResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.content');
+    }
+    public static function getPermissionPrefixes(): array {
+        return [
+            'view_any',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'reorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+        ];
     }
 }

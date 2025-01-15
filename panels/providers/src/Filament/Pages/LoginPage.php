@@ -74,11 +74,17 @@ class LoginPage extends SimplePage {
             $this->throwFailureValidationException();
         }
 
-        if (!Filament::auth()->user()?->hasRole(Provider::ROLE) || !Filament::auth()->user()->active) {
+
+        if (!Filament::auth()->user()->active->value) {
+            auth()->logout();
+            $this->throwInactiveException();
+
+        }
+
+        if (!Filament::auth()->user()?->hasRole(Provider::ROLE)) {
             auth()->logout();
             $this->throwFailureValidationException();
         }
-
         $user = Filament::auth()->user();
 
         if (
@@ -98,6 +104,12 @@ class LoginPage extends SimplePage {
     protected function throwFailureValidationException(): never {
         throw ValidationException::withMessages([
             'data.password' => __('filament-panels::pages/auth/login.messages.failed'),
+        ]);
+    }
+
+    protected function throwInactiveException(): never {
+        throw ValidationException::withMessages([
+            'data.password' => __('panel.messages.your_account_not_activated'),
         ]);
     }
 

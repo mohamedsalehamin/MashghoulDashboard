@@ -22,7 +22,7 @@ class FaqsPage extends Page {
         return __('menu.faqs');
     }
     public static function getNavigationGroup(): ?string {
-        return __('menu.pages');
+        return __('menu.mashghoul_pages');
     }
     public static function getNavigationLabel(): string {
         return __('menu.faqs');

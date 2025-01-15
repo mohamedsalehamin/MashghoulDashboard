@@ -13,6 +13,7 @@ class CategoryServices {
         //Todo:Fetch categories where has products in current selected branch
         $categories = Category::parent()
             ->enabled()
+            ->orderBy('sort')
             ->get();
         return Api::isOk(__("List of categories"), CategoryResource::collection($categories));
     }

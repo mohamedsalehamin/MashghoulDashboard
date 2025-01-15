@@ -3,8 +3,11 @@
 namespace App\ReportsModule\Resources;
 
 use App\DefaultPanel\Enum\ReservationStatus;
+use App\ReportsModule\Filters\CustomerPaymentsLocationFilter;
+use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -40,7 +43,7 @@ class CustomerPaymentResource extends Resource {
 
                 TextColumn::make('transactionable_id')
                     ->label(__('forms.fields.reservation_id'))
-                    ->url(fn($record) => route('filament.admin.resources.reservations.view', $record->transactionable_id),true)
+                    ->url(fn($record) => route('filament.admin.resources.reservations.view', $record->transactionable_id), true)
                     ->searchable(['id']),
 
                 TextColumn::make('user.name')
@@ -56,7 +59,6 @@ class CustomerPaymentResource extends Resource {
                     ->searchable(),
 
 
-
                 TextColumn::make('meta_data.gateway')
                     ->label(__('forms.fields.payment_data_method'))
                     ->searchable(false)
@@ -67,7 +69,6 @@ class CustomerPaymentResource extends Resource {
                     }),
                 TextColumn::make('meta_data.paid_at')
                     ->label(__('forms.fields.payment_data_paid_at'))
-
                     ->state(function ($record) {
                         return Carbon::parse($record->meta_data['paid_at'] ?? $record->date)->timezone("africa/cairo")->translatedFormat("Y-m-d h:i a");
                     }),
@@ -76,7 +77,7 @@ class CustomerPaymentResource extends Resource {
 
                 TextColumn::make('invoice_url')
                     ->state(fn($record) => isset($record->meta_data['invoiceURL']) ? __('forms.fields.show_invoice') : __('forms.fields.no_invoice'))
-                    ->url(fn($record) => isset($record->meta_data['invoiceURL'] )?$record->meta_data['invoiceURL']: '', true)
+                    ->url(fn($record) => isset($record->meta_data['invoiceURL']) ? $record->meta_data['invoiceURL'] : '', true)
                     ->searchable(false),
 
                 TextColumn::make('price')
@@ -89,16 +90,20 @@ class CustomerPaymentResource extends Resource {
             ->filters([
 
 
-
-
-
+                CustomerPaymentsLocationFilter::make(),
                 Filter::make('created_at')
                     ->form([
+                        Select::make('provider_id')
+                            ->options(Provider::pluck('name', 'id'))
+                            ->label(__('forms.fields.provider'))
+                            ->nullable()
+                            ->searchable(),
                         DatePicker::make('date_from'),
                         DatePicker::make('date_until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
+                            ->when($data['provider_id'] ?? '', fn(Builder $query, $provider_id): Builder => $query->whereHas('transactionable.reservable', fn($builder) => $builder->where('id', $provider_id)))
                             ->when(
                                 $data['date_from'] ?? '',
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),

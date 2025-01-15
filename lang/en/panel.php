@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        "your_account_not_activated" => "Your account is not activated please contact the administrator",
         "you_have_gain_points_due_to_register"=>"You have gain :points points due to registration",
         'accept_request' => 'Request accepted successfully',
         "pay_reservation_totals" => "Pay reservation totals",

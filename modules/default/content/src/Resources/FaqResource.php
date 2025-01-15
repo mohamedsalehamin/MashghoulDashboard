@@ -3,6 +3,7 @@
 namespace App\ContentModule\Resources;
 
 use App\DefaultPanel\Enum\FaqLocationEnum;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -22,7 +23,7 @@ use App\ContentModule\Models\Faq;
 use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 
-class FaqResource extends Resource {
+class FaqResource extends Resource implements HasShieldPermissions {
     use Translatable;
     use HasTranslationLabel;
 
@@ -54,6 +55,8 @@ class FaqResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query)=>$query->orderBy("sort"))
+            ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('question'),
@@ -99,5 +102,16 @@ class FaqResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.content');
+    }
+
+    public static function getPermissionPrefixes(): array {
+        return [
+            'view_any',
+            'create',
+            'update',
+            'reorder',
+            'delete',
+            'delete_any',
+        ];
     }
 }

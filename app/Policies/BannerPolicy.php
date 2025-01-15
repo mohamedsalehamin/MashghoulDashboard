@@ -30,7 +30,7 @@ class BannerPolicy
      */
     public function view(User $user, Banner $banner): bool
     {
-        return $user->can('view_banner');
+        return $user->can('{{ View }}');
     }
 
     /**
@@ -145,7 +145,7 @@ class BannerPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_banner');
     }
 
 }

@@ -1,5 +1,6 @@
 <?php
 return [
+    "mashghoul_pages" => "Mashghoul pages",
     "join_requests" => "Join requests",
     "join_request" => "Join request",
     'seats' => 'Seats',

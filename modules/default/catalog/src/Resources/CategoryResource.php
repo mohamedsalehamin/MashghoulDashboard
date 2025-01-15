@@ -31,7 +31,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class CategoryResource extends Resource  {
+class CategoryResource extends Resource implements HasShieldPermissions {
     use Translatable;
     use HasTranslationLabel;
 
@@ -67,9 +67,12 @@ class CategoryResource extends Resource  {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query)=>$query->orderBy("sort"))
+            ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('name'),
+
                 IconColumn::make('status')
                     ->boolean()
                     ->action(
@@ -135,4 +138,19 @@ class CategoryResource extends Resource  {
     }
 
 
+    public static function getPermissionPrefixes(): array {
+        return [
+            'view_any',
+            'view',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'reorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+        ];
+    }
 }

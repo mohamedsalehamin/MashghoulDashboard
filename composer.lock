@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9bb177425b0d7d4fbb2cc9346c1f8ec",
+    "content-hash": "d7774e620021e119f9a8b74b993ae727",
     "packages": [
         {
             "name": "alexpechkarev/geometry-library",
@@ -8574,16 +8574,16 @@
         },
         {
             "name": "pxlrbt/filament-excel",
-            "version": "v2.3.4",
+            "version": "v2.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pxlrbt/filament-excel.git",
-                "reference": "da3db3b77b5c06dd3ea8f02e3a5c690db2cfcfc7"
+                "reference": "7b66ba4e8f1d1efffc1993c413ae2729ec0ad3e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pxlrbt/filament-excel/zipball/da3db3b77b5c06dd3ea8f02e3a5c690db2cfcfc7",
-                "reference": "da3db3b77b5c06dd3ea8f02e3a5c690db2cfcfc7",
+                "url": "https://api.github.com/repos/pxlrbt/filament-excel/zipball/7b66ba4e8f1d1efffc1993c413ae2729ec0ad3e0",
+                "reference": "7b66ba4e8f1d1efffc1993c413ae2729ec0ad3e0",
                 "shasum": ""
             },
             "require": {
@@ -8629,7 +8629,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pxlrbt/filament-excel/issues",
-                "source": "https://github.com/pxlrbt/filament-excel/tree/v2.3.4"
+                "source": "https://github.com/pxlrbt/filament-excel/tree/v2.3.6"
             },
             "funding": [
                 {
@@ -8637,7 +8637,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-08-19T09:16:15+00:00"
+            "time": "2025-01-12T13:40:28+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -16528,13 +16528,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1",
         "ext-intl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

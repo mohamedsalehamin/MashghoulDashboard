@@ -42,7 +42,7 @@
         "mpdf/mpdf": "^8.2",
         "myfatoorah/laravel-package": "2.1",
         "pxlrbt/filament-activity-log": "^1.1",
-        "pxlrbt/filament-excel": "^2.1",
+        "pxlrbt/filament-excel": "^2.3",
         "saade/filament-fullcalendar": "^3.0",
         "salla/zatca": "^2.0",
         "spatie/laravel-activitylog": "^4.9",

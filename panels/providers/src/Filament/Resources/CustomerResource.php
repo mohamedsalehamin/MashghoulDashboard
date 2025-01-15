@@ -21,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CustomerResource extends Resource {
     use HasTranslationLabel;
@@ -53,6 +54,9 @@ class CustomerResource extends Resource {
             ])
             ->actions([
                 ViewAction::make()
+            ])
+            ->bulkActions([
+                ExportBulkAction::make(),
             ])
             ->filters([
                 Filter::make('ID')

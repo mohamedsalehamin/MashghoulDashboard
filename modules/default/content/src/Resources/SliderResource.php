@@ -9,6 +9,7 @@ use App\ContentModule\Resources\SliderResource\Pages\CreateSlier;
 use App\ContentModule\Resources\SliderResource\Pages\EditSlider;
 use App\ContentModule\Resources\SliderResource\Pages\ListSliders;
 use App\UsersModule\Models\Provider;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
@@ -29,7 +30,7 @@ use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ContentModule\Resources\BannerResource\Pages\CreateBanner;
 use App\ContentModule\Resources\BannerResource\Pages\EditBanner;
 
-class SliderResource extends Resource {
+class SliderResource extends Resource implements HasShieldPermissions {
     use HasTranslationLabel;
     use Translatable;
 
@@ -84,6 +85,8 @@ class SliderResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query)=>$query->orderBy("sort"))
+            ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
                 SpatieMediaLibraryImageColumn::make('image')->collection(app()->getLocale()),
@@ -134,5 +137,19 @@ class SliderResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.content');
+    }
+    public static function getPermissionPrefixes(): array {
+        return [
+            'view_any',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'reorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+        ];
     }
 }
