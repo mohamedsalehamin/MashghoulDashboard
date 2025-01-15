@@ -9,6 +9,7 @@ use App\ContentModule\Models\Faq;
 use App\ContentModule\Models\Page;
 use App\ContentModule\Models\Slider;
 use App\DefaultPanel\Settings\LandingSettings;
+use App\UsersModule\Models\Users\Customer;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Cache;
 use Filament\Forms\Components\Field;
@@ -134,7 +135,7 @@ class AppServiceProvider extends ServiceProvider {
         Table::configureUsing(function (Table $table): void {
             $table->modifyQueryUsing(function (Builder $query): void {
 
-                if ($query->getColumns()->getModel()->getCreatedAtColumn() && !in_array(get_class($query->getColumns()->getModel()),[Reservation::class,Category::class,Banner::class,Slider::class,Faq::class]) ) {
+                if ($query->getColumns()->getModel()->getCreatedAtColumn() && !in_array(get_class($query->getColumns()->getModel()),[Reservation::class,Category::class,Banner::class,Slider::class,Faq::class,Customer::class]) ) {
 
                     $query->latest($query->getColumns()->getModel()->getTable() . ".created_at");
                 }

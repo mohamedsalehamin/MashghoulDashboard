@@ -25,6 +25,8 @@ class SettingServices {
             'social_media' => $this->socialMedia($settings->social_links),
             'applications_links' => $settings->applications_links,
             'reservation_fee' => $settings->reservations_fess,
+            'commercial_register_number' => $settings->commercial_register,
+            'tax_number' => $settings->tax_number,
             'actions_text' => [
                 'complete_order' => $settings->texts[app()->getLocale()]['text_when_order_completed'] ?? ''
             ]

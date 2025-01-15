@@ -57,13 +57,15 @@ class SeatResource extends Resource {
                     ->label(__('forms.fields.title'))
                     ->required(),
                 Select::make('services')
-
+                    ->label(__('forms.fields.services'))
                     ->required()
                     ->multiple()
-                    ->relationship('services','title')
+                    ->searchable(false)
+                    ->preload()
+                    ->relationship('services', 'title', fn($query, $get) => $query->where("provider_id", $get("provider_id")))
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->getTranslation('title','en')} - {$record->getTranslation('title','ar')}")
-                    ->label(__('forms.fields.services'))
-                    ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id')),
+
+                ,
                 Section::make("working_times")->schema([...GeneralSettings::daysListSchema(),
 
                 ]),
@@ -83,9 +85,8 @@ class SeatResource extends Resource {
                     ->searchable(),
 
                 TextColumn::make('provider.name')
-
                     ->label(__('forms.fields.provider_name'))
-                    ->searchable(true,fn(Builder $query, $search) => $query->whereHas('provider', fn($q) => $q->where('name->ar', 'like', "%$search%")->orWhere('name->en', 'like', "%$search%"))),
+                    ->searchable(true, fn(Builder $query, $search) => $query->whereHas('provider', fn($q) => $q->where('name->ar', 'like', "%$search%")->orWhere('name->en', 'like', "%$search%"))),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('services_count')->counts("services")->searchable(false),
                 TextColumn::make('created_at')->date(),
@@ -105,7 +106,7 @@ class SeatResource extends Resource {
 
             ])
             ->filters([
-        Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make()
             ])
             ->actions([
                 Action::make('activities')
@@ -136,13 +137,13 @@ class SeatResource extends Resource {
                 TextEntry::make('id'),
                 TextEntry::make('provider.name'),
                 TextEntry::make('title'),
-                TextEntry::make('services_count')->state(fn($record)=>$record->services()->count()),
+                TextEntry::make('services_count')->state(fn($record) => $record->services()->count()),
                 RepeatableEntry::make('meta_data.days_list')
                     ->label(__("sections.working_days"))
-                    ->state(fn($record) => collect($record->meta_data['days_list'])->where('status',true))
+                    ->state(fn($record) => collect($record->meta_data['days_list'])->where('status', true))
                     ->schema([
                         TextEntry::make('day_name')
-                            ->formatStateUsing(fn($record,$state) => __("forms.fields.weekdays." . $state))
+                            ->formatStateUsing(fn($record, $state) => __("forms.fields.weekdays." . $state))
                             ->label(__("forms.fields.day_name")),
                         TextEntry::make('from'),
                         TextEntry::make('to'),
@@ -175,7 +176,6 @@ class SeatResource extends Resource {
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
     }
-
 
 
 }
