@@ -16,6 +16,7 @@ class ManageThirdParty extends SettingsPage {
     protected static string $settings = ThirdPartySettings::class;
     protected static ?string $slug = 'settings/third-party';
     protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation=false;
     public function form(Form $form): Form {
         return $form
             ->schema([

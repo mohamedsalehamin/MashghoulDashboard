@@ -104,7 +104,7 @@
     <section id="faq" class="block faq faq-container">
         <div class="container">
             <h4 class="sec-tit">@lang('site.heading.faqs')</h4>
-            @foreach(\App\ContentModule\Models\Faq::get() as  $index =>$faq)
+            @foreach(\App\ContentModule\Models\Faq::orderBy("sort")->get() as  $index =>$faq)
                 @php($delay =$loop->iteration *0.2)
                 <div class="faq-item wow animate__animated animate__bounceInRight" data-wow-delay="{{$delay}}s">
                     <div class="question">

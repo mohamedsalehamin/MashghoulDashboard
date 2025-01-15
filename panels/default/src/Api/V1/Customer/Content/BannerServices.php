@@ -8,7 +8,9 @@ use Tasawk\Api\Facade\Api;
 
 class BannerServices  {
     public function list() {
-        $banners = Banner::enabled()->latest()->get();
+        $banners = Banner::enabled()
+            ->orderBy('sort')
+            ->get();
         return Api::isOk(__("List of banners"), BannerResource::collection($banners));
     }
 

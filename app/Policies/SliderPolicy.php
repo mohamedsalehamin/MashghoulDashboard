@@ -30,7 +30,7 @@ class SliderPolicy
      */
     public function view(User $user, Slider $slider): bool
     {
-        return $user->can('view_slider');
+        return $user->can('{{ View }}');
     }
 
     /**
@@ -145,7 +145,7 @@ class SliderPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_slider');
     }
 
 }

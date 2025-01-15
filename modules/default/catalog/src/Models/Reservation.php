@@ -110,14 +110,6 @@ class Reservation extends Model {
         return $builder->whereBetween('date', [now()->startOfDay(), now()->endOfDay()])->orderBy('from', 'asc');
     }
 
-    public function scopeConsultations($builder) {
-        return $builder->where('reservable_type', Doctor::class);
-    }
-
-    public function scopeTests($builder) {
-        return $builder->where('reservable_type', Lab::class);
-    }
-
     public function customer(): BelongsTo {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -163,6 +155,10 @@ class Reservation extends Model {
 
     public function completed() {
         return $this->status == ReservationStatus::COMPLETED;
+    }
+
+    public function scopeCompleted($builder) {
+        return $builder->where('status', ReservationStatus::COMPLETED);
     }
 
     public function getReservationNumberAttribute(): string {

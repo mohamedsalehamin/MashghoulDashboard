@@ -3,7 +3,9 @@
 namespace App\ContentModule\Resources;
 
 
+use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Enum\ContactSourceEnum;
+use App\DefaultPanel\Filters\DateFilter;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -101,7 +103,11 @@ class ContactResource extends Resource implements HasShieldPermissions {
 
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('contact_type_id')
+                    ->label(__('forms.fields.message_type'))
+                    ->searchable()
+                    ->options(ContactType::pluck('name', 'id')),
+                DateFilter::make()
             ])
             ->actions([
                 Action::make('seen')

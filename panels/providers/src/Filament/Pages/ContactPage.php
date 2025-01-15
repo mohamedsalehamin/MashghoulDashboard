@@ -72,7 +72,7 @@ class ContactPage extends Page {
     }
 
     public static function getNavigationGroup(): ?string {
-        return __('menu.pages');
+        return __('menu.mashghoul_pages');
     }
 
     public static function getNavigationLabel(): string {

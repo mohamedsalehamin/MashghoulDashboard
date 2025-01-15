@@ -19,7 +19,7 @@ class TermsAndConditionsPage extends Page {
         return __('menu.terms_and_conditions');
     }
     public static function getNavigationGroup(): ?string {
-        return __('menu.pages');
+        return __('menu.mashghoul_pages');
     }
     public static function getNavigationLabel(): string {
         return __('menu.terms_and_conditions');

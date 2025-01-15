@@ -1,11 +1,12 @@
 <?php
 return [
+    "mashghoul_pages" => "صفحات مشغول",
     "join_requests" => "طلبات الانضمام",
     "join_request" => "طلب انضمام",
     "sliders"=>"السلايدر",
     "slider"=>"سلايدر",
-    "providers_reservations_dues"=>'مستحقات المشاغل',
-    "providersreservationsdues"=>'مستحقات المشاغل',
+    "providers_reservations_dues"=>'مستحقات مقدمى الخدمات',
+    "providersreservationsdues"=>'مستحقات مقدمى الخدمات',
     'landing_page' => 'صفحة الهبوط',
     "rates"=>'التقييمات',
     "rate"=>'تقييم',

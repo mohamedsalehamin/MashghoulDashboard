@@ -16,7 +16,7 @@ class Category extends Model implements HasMedia {
     use HasTranslations, Publishable, InteractsWithMedia;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'status', 'parent_id'];
+    protected $fillable = ['name', 'status', 'parent_id','sort'];
     public $translatable = ['name'];
     use HasFactory;
 

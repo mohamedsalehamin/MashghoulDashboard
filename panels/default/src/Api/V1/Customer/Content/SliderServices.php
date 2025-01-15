@@ -10,7 +10,9 @@ use Tasawk\Api\Facade\Api;
 
 class SliderServices  {
     public function list() {
-        $sliders = Slider::enabled()->latest()->get();
+        $sliders = Slider::enabled()
+            ->orderBy('sort')
+            ->get();
         return Api::isOk(__("List of banners"), SliderResource::collection($sliders));
     }
 

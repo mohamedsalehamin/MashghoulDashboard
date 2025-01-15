@@ -8,6 +8,9 @@ use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\ModelStatus;
+use App\DefaultPanel\Filters\DateFilter;
+use App\DefaultPanel\Filters\LocationFilter;
+use App\DefaultPanel\Filters\ProviderLocationFilter;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Users\Provider;
@@ -37,6 +40,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use libphonenumber\PhoneNumberType;
 use MatanYadaev\EloquentSpatial\Objects\Point;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
@@ -192,10 +196,10 @@ class ProviderResource extends Resource {
                 ]),
                 Tabs\Tab::make(__("sections.bank_account_information"))->schema([
                     Group::make()->schema([
-                        TextInput::make('bank_name')->required(),
-                        TextInput::make('account_name')->required(),
-                        TextInput::make('account_number')->required(),
-                        TextInput::make('iban')->required(),
+                        TextInput::make('bank_name'),
+                        TextInput::make('account_name'),
+                        TextInput::make('account_number'),
+                        TextInput::make('iban'),
                     ])->relationship('bankAccount'),
 
                 ]),
@@ -252,16 +256,14 @@ class ProviderResource extends Resource {
 
                         return __('forms.fields.id') . " " . $data['id'];
                     }),
-                SelectFilter::make('city_id')
-                    ->searchable()
-                    ->query(fn(Builder $query, $data) => $query->when($data['value'], fn($query) => $query->whereHas('provider', fn($query) => $query->where('city_id', $data['value']))))
-                    ->options(fn(HasTable $livewire) => City::pluck('name', 'id')),
+                ProviderLocationFilter::make(),
                 SelectFilter::make('gender')
                     ->searchable()
                     ->options(GenderEnum::class),
 
                 SelectFilter::make('active')
-                    ->options(ModelStatus::class)
+                    ->options(ModelStatus::class),
+                DateFilter::make()
             ])
             ->actions([
                 Action::make("wallet")
@@ -275,6 +277,7 @@ class ProviderResource extends Resource {
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }

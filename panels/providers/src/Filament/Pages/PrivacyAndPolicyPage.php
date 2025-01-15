@@ -20,7 +20,7 @@ class PrivacyAndPolicyPage extends Page {
         return __('menu.privacy_policy');
     }
     public static function getNavigationGroup(): ?string {
-        return __('menu.pages');
+        return __('menu.mashghoul_pages');
     }
     public static function getNavigationLabel(): string {
         return __('menu.privacy_policy');

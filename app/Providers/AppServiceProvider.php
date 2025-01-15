@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use App\CatalogModule\Models\Reservation;
+use App\ContentModule\Models\Banner;
+use App\ContentModule\Models\Category;
+use App\ContentModule\Models\Faq;
 use App\ContentModule\Models\Page;
+use App\ContentModule\Models\Slider;
 use App\DefaultPanel\Settings\LandingSettings;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Cache;
@@ -130,7 +134,7 @@ class AppServiceProvider extends ServiceProvider {
         Table::configureUsing(function (Table $table): void {
             $table->modifyQueryUsing(function (Builder $query): void {
 
-                if ($query->getColumns()->getModel()->getCreatedAtColumn() && get_class($query->getColumns()->getModel()) != Reservation::class) {
+                if ($query->getColumns()->getModel()->getCreatedAtColumn() && !in_array(get_class($query->getColumns()->getModel()),[Reservation::class,Category::class,Banner::class,Slider::class,Faq::class]) ) {
 
                     $query->latest($query->getColumns()->getModel()->getTable() . ".created_at");
                 }

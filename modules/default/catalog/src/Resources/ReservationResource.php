@@ -5,6 +5,8 @@ namespace App\CatalogModule\Resources;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
 use App\CatalogModule\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
+use App\ContentModule\Models\City;
+use App\ContentModule\Models\State;
 use App\DefaultPanel\Actions\GetRefundTransactionStatusAction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -16,6 +18,7 @@ use App\CatalogModule\Resources\ReservationResource\Pages\ViewReservation;
 use App\CatalogModule\Resources\ReservationResource\Widgets\CalendarWidget;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Lab;
+use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -43,6 +46,7 @@ use JaOcero\ActivityTimeline\Components\ActivityDate;
 use JaOcero\ActivityTimeline\Components\ActivityIcon;
 use JaOcero\ActivityTimeline\Components\ActivitySection;
 use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ReservationResource extends Resource {
     use HasTranslationLabel, Translatable;
@@ -100,15 +104,41 @@ class ReservationResource extends Resource {
                 Filter::make('today_orders')
                     ->query(fn(Builder $query): Builder => $query->today())
                     ->default(),
-                SelectFilter::make('status')
-                    ->options(ReservationStatus::class),
                 Filter::make('created_at')
                     ->form([
+                        Select::make('state_id')
+                            ->live()
+                            ->searchable()
+                            ->afterStateUpdated(fn($set)=>$set('city_id', null))
+                            ->options(State::pluck('name', 'id'))
+                            ->label(__('forms.fields.state_name')),
+                        Select::make('city_id')
+                            ->searchable()
+                            ->options(fn($get) => City::where('state_id', $get('state_id'))->pluck('name', 'id'))
+                            ->label(__('forms.fields.city_name')),
+
+                        Select::make('provider_id')
+                            ->searchable()
+                            ->options(Provider::pluck('name', 'id'))
+                            ->label(__('forms.fields.provider_name')),
+
                         DatePicker::make('date_from'),
                         DatePicker::make('date_to'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
+                            ->when(
+                                $data['state_id'],
+                                fn(Builder $query, $state_id): Builder => $query->whereHas('reservable.city.state', fn($q) => $q->where('id', $state_id)),
+                            )
+                            ->when(
+                                $data['city_id'],
+                                fn(Builder $query, $city_id): Builder => $query->whereHas('reservable.city', fn($q) => $q->where('id', $city_id)),
+                            )
+                            ->when(
+                                $data['provider_id'],
+                                fn(Builder $query, $provider_id): Builder => $query->whereHas('reservable', fn($q) => $q->where('reservable_id', $provider_id)),
+                            )
                             ->when(
                                 $data['date_from'],
                                 fn(Builder $query, $date): Builder => $query->whereDate('date', '>=', $date),
@@ -119,11 +149,14 @@ class ReservationResource extends Resource {
                             );
                     }),
 
+                SelectFilter::make('status')
+                    ->options(ReservationStatus::class),
                 SelectFilter::make('payment_status')
                     ->query(fn(Builder $query, $data) => $query->when($data['value'], fn($query) => $query->whereHas('transaction', fn(Builder $query) => $query->where('status', $data['value']))))
                     ->options(ReservationPaymentStatus::class),
 
             ])
+
             ->actions([
                 ChangeReservationStatusAction::make(),
                 Tables\Actions\ViewAction::make(),
@@ -131,6 +164,7 @@ class ReservationResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
@@ -150,8 +184,8 @@ class ReservationResource extends Resource {
                             ->schema([
                                 TextEntry::make('id'),
                                 TextEntry::make('reservable.name')->label(__("forms.fields.provider_name"))
-                                ->hint(fn($record)=>Reservation::where('user_id',$record->user_id)->first()->id == $record->id?__("forms.fields.first_reservation"):'')
-                                ->hintColor('primary'),
+                                    ->hint(fn($record) => Reservation::where('user_id', $record->user_id)->first()->id == $record->id ? __("forms.fields.first_reservation") : '')
+                                    ->hintColor('primary'),
 
                                 TextEntry::make('customer.name'),
                                 TextEntry::make('customer.phone'),

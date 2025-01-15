@@ -2,11 +2,14 @@
 
 namespace App\UsersModule\Resources;
 
+use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\ModelStatus;
+use App\DefaultPanel\Filters\DateFilter;
+use App\DefaultPanel\Filters\LocationFilter;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Users\Customer;
 use App\UsersModule\Resources\CustomerResource\Pages\CreateCustomer;
@@ -35,6 +38,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use libphonenumber\PhoneNumberType;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
@@ -139,6 +143,10 @@ class CustomerResource extends Resource {
                     ->searchable(true, fn(Builder $query, $search) => $query->where('data->last_name', 'like', '%' . $search . '%')),
                 TextColumn::make('phone')
                     ->searchable(),
+                TextColumn::make('reservations_count')
+                    ->label(__('forms.fields.reservations_count'))
+                    ->state(fn($record) => $record->reservations()->completed()->count())
+                    ->searchable(),
                 TextColumn::make('city.state.country.name')
                     ->label(__('forms.fields.country_id'))
                     ->searchable(),
@@ -179,16 +187,14 @@ class CustomerResource extends Resource {
 
                         return __('forms.fields.id') . " " . $data['id'];
                     }),
-                SelectFilter::make('city_id')
-                    ->searchable()
-                    ->query(fn(Builder $query, $data) => $query->when($data['value'], fn($query) => $query->where('city_id', $data['value'])))
-                    ->options(fn(HasTable $livewire) => City::pluck('name', 'id')),
+                LocationFilter::make(),
                 SelectFilter::make('gender')
                     ->searchable()
                     ->options(GenderEnum::class),
 
                 SelectFilter::make('active')
-                    ->options(ModelStatus::class)
+                    ->options(ModelStatus::class),
+                DateFilter::make(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -197,7 +203,9 @@ class CustomerResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
+
                 ]),
             ]);
     }
