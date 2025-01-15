@@ -98,6 +98,7 @@ return [
         'university_name' => 'اسم الجامعة',
         'times_type' => 'نوع الحجوزات',
         'reservations_count' => 'عدد الحجوزات',
+        "reservations_totals" => "اجمالي الحجوزات",
         'session_duration' => 'مدة الجلسة',
         'rest_duration' => 'مدة الاستراحة',
         'country_name' => 'الدولة',

@@ -34,10 +34,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use libphonenumber\PhoneNumberType;
+use Money\Money;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
@@ -134,6 +136,7 @@ class CustomerResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('id')->searchable(),
 
@@ -143,10 +146,7 @@ class CustomerResource extends Resource {
                     ->searchable(true, fn(Builder $query, $search) => $query->where('data->last_name', 'like', '%' . $search . '%')),
                 TextColumn::make('phone')
                     ->searchable(),
-                TextColumn::make('reservations_count')
-                    ->label(__('forms.fields.reservations_count'))
-                    ->state(fn($record) => $record->reservations()->completed()->count())
-                    ->searchable(),
+
                 TextColumn::make('city.state.country.name')
                     ->label(__('forms.fields.country_id'))
                     ->searchable(),
@@ -155,6 +155,17 @@ class CustomerResource extends Resource {
                     ->searchable(),
                 TextColumn::make('city.name')
                     ->label(__("forms.fields.city_name"))
+                    ->searchable(),
+                TextColumn::make('completed_reservations_count')
+                    ->counts('completedReservations')
+                    ->sortable()
+                    ->label(__('forms.fields.reservations_count'))
+                    ->searchable(),
+                TextColumn::make('completed_reservations_sum_price')
+                    ->formatStateUsing(fn($state) => \Cknow\Money\Money::parse($state ?? 0, 'SAR')->format())
+                    ->sum('completedReservations', 'price')
+                    ->sortable()
+                    ->label(__('forms.fields.reservations_totals'))
                     ->searchable(),
                 TextColumn::make('created_at')->searchable()->date(),
                 TextColumn::make('active')

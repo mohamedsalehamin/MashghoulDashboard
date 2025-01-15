@@ -48,6 +48,7 @@ class SeatResource extends Resource {
                 Select::make('services')
                     ->required()
                     ->multiple()
+                    ->searchable(false)
                     ->relationship('services')
                     ->label(__('forms.fields.services'))
                     ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id')),

@@ -18,6 +18,8 @@ class GeneralSettings extends Settings {
     public string $app_name;
     public string $app_email;
     public string $app_phone;
+    public string $tax_number;
+    public string $commercial_register;
     public string $reservations_fess;
     public string $app_percentage;
     public string $reservation_flow;
@@ -53,10 +55,20 @@ class GeneralSettings extends Settings {
 
     public static function getDurations() {
         return [
+            '15' => __("panel.enums.minutes",[ 'minutes' => 15]),
             '30' => __("panel.enums.30_minutes"),
+            '45' => __("panel.enums.minutes", ["minutes" => 45]),
             '60' => __("panel.enums.60_minutes"),
+            '75' => __("panel.enums.minutes", ["minutes" => 75]),
             '90' => __("panel.enums.90_minutes"),
+            '100' => __("panel.enums.minutes", ["minutes" => 100]),
             '120' => __("panel.enums.120_minutes"),
+            130 => __("panel.enums.minutes", ["minutes" => 130]),
+            140 => __("panel.enums.minutes", ["minutes" => 140]),
+            150 => __("panel.enums.minutes", ["minutes" => 150]),
+            160 => __("panel.enums.minutes", ["minutes" => 160]),
+            180 => __("panel.enums.minutes", ["minutes" => 180]),
+            200 => __("panel.enums.minutes", ["minutes" => 200]),
         ];
     }
 

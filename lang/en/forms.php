@@ -1,6 +1,7 @@
 <?php
 return [
     'fields' => [
+        'reservations_totals' => 'Reservations totals',
         "logo_in_english"=>"English logo",
         "logo_in_arabic"=>"Arabic logo",
         "text_when_order_completed" => "Text when order completed",

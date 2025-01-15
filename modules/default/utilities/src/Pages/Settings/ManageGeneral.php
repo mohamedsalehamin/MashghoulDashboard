@@ -48,6 +48,14 @@ class ManageGeneral extends SettingsPage {
                         ->type('number')
                         ->numeric()
                         ->required(),
+                    TextInput::make('commercial_register')
+                        ->type('number')
+                        ->numeric()
+                        ->required(),
+                    TextInput::make('tax_number')
+                        ->type('number')
+                        ->numeric()
+                        ->required(),
 //                    TextInput::make('app_whatsapp')
 //                        ->type('number')
 //                        ->numeric()

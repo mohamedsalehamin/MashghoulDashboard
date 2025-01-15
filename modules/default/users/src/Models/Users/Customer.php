@@ -4,6 +4,7 @@ namespace App\UsersModule\Models\Users;
 
 
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
+use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 
@@ -28,5 +29,7 @@ class Customer extends User {
         });
     }
 
-
+    public function completedReservations(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->reservations()->where('status', ReservationStatus::COMPLETED);
+}
 }
