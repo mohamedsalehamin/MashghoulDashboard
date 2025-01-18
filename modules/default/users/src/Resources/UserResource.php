@@ -89,7 +89,8 @@ class UserResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider','patient', 'panel_user', 'super_admin'])))
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider','patient', 'panel_user', 'super_admin'])))
             ->columns([
                 TextColumn::make('id')->searchable(),
 
@@ -161,7 +162,7 @@ class UserResource extends Resource {
 
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'manager', 'operator', 'panel_user', 'super_admin']))->count();
+        return static::getModel()::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider','patient', 'panel_user', 'super_admin']))->count();
     }
     public static function getNavigationGroup(): ?string {
         return __('menu.crew');
