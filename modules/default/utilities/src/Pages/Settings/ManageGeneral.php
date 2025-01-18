@@ -56,21 +56,11 @@ class ManageGeneral extends SettingsPage {
                         ->type('number')
                         ->numeric()
                         ->required(),
-//                    TextInput::make('app_whatsapp')
-//                        ->type('number')
-//                        ->numeric()
-//                        ->required(),
-//
-//                    Textarea::make('app_address')
-//                        ->minLength(3)
-//                        ->required(),
-//                    TextInput::make('taxes')
-//                        ->label(__("forms.fields.taxes"))
-//                        ->type('number')
-//                        ->suffix("%")
-//                        ->rules(['numeric','min:1','max:100'])
-//                        ->required(),
+                    TextInput::make('reservations_fees')
 
+                        ->type('number')
+                        ->suffix(__("forms.suffixes.sar"))
+                        ->required(),
 
                     TextInput::make('app_percentage')
                         ->suffix(__("forms.suffixes.percentage"))

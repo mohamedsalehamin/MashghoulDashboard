@@ -8,11 +8,14 @@ use App\DefaultPanel\Actions\PayTransactionViaWallet;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
+use App\Mail\SendEmailNotification;
 use App\Notifications\ReservationCreatedSuccessfullyNotification;
 use Illuminate\Support\Facades\Route;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
-Route::get('testo', function () {
+Route::get('testoo', function () {
+    Mail::to("ahmed.mostafa.dev.eg@gmail.com")->send( new SendEmailNotification("As", "ASd"));
+    dd('');
     $reservation = \App\CatalogModule\Models\Reservation::latest()->first();
     AddReservationCommissionAction::run($reservation);
     dd('as');
@@ -48,10 +51,10 @@ Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoo
                 AddPointToCustomerAction::run($reservation->customer, GeneralSettings::getPointsOnAction('reserve'), ['description' => $description]);
 //                $reservation->patient->notify(new ReservationCreatedSuccessfullyNotification($reservation));
 
-                Notification::send([...\App\DefaultPanel\Lib\Utils::getAdministrationUsers(),$reservation->reservable->user],new ReservationCreatedSuccessfullyNotification($reservation));
-                $reservation->customer->notify(new \App\Notifications\WiningGiftSuccessfullyNotification( [
-                    'ar' => __("panel.messages.you_are_gain_points_for_reservation", ['points' => GeneralSettings::getPointsOnAction('reserve'),'id'=>$reservation->id], 'ar'),
-                    'en' => __("panel.messages.you_are_gain_points_for_reservation", ['points' => GeneralSettings::getPointsOnAction('reserve'),'id'=>$reservation->id], 'en'),
+                Notification::send([...\App\DefaultPanel\Lib\Utils::getAdministrationUsers(), $reservation->reservable->user], new ReservationCreatedSuccessfullyNotification($reservation));
+                $reservation->customer->notify(new \App\Notifications\WiningGiftSuccessfullyNotification([
+                    'ar' => __("panel.messages.you_are_gain_points_for_reservation", ['points' => GeneralSettings::getPointsOnAction('reserve'), 'id' => $reservation->id], 'ar'),
+                    'en' => __("panel.messages.you_are_gain_points_for_reservation", ['points' => GeneralSettings::getPointsOnAction('reserve'), 'id' => $reservation->id], 'en'),
                 ]));
             }
 

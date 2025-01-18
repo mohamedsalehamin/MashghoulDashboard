@@ -36,8 +36,8 @@ class ProviderHasRightsToLogin {
      * @throws Exception
      */
     public function inBlackList(): static {
-        if (!auth()->user()->active) {
-            throw new APIException(__('validation.api.account_suspend'));
+        if (!auth()->user()->active->value) {
+            throw new APIException(__('panel.messages.your_account_not_activated'));
         }
         return $this;
     }

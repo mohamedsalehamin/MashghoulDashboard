@@ -217,17 +217,12 @@ class ProviderResource extends Resource {
                                 ])
                             ])->statePath('texts'),
 
-                        TextInput::make('reservations_fees')
 
-                            ->type('number')
-                            ->suffix(__("forms.suffixes.sar"))
-                            ->required(),
 
                         Select::make('reservation_flow')->options([
                             'total' => __("panel.messages.pay_reservation_totals"),
                             'fees' => __("panel.messages.pay_reservation_fees")
                         ]),
-                        Toggle::make('enabled_free_fees_in_first_reservation'),
                     ])
                         ->relationship('options')
 
