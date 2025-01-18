@@ -37,7 +37,7 @@ class GlobalOrderStats extends BaseWidget {
         return [
 
             Stat::make(__('panel.stats.reservations_total'), Money::parse($totalsStats->all)->format()),
-            Stat::make(__('panel.stats.providers_wallet_balance_totals'), Money::parse(Wallet::where('holder_type',Provider::class)->whereIn('holder_id', $providers)->sum('balance'))->format()),
+            Stat::make(__('panel.stats.providers_wallet_balance_totals'), Money::parse(Wallet::where('holder_type', Provider::class)->whereIn('holder_id', $providers)->sum('balance'))->format()),
             Stat::make(__('panel.stats.new_reservations_total'), Money::parse($totalsStats->pending)->format()),
             Stat::make(__('panel.stats.in_processing_reservations_total'), Money::parse($totalsStats->in_processing)->format()),
             Stat::make(__('panel.stats.completed_reservations_total'), Money::parse($totalsStats->completed)->format()),
@@ -55,7 +55,7 @@ class GlobalOrderStats extends BaseWidget {
 
             Stat::make(__('panel.stats.customers_count'), Customer::count()),
             Stat::make(__('panel.stats.providers_count'), Provider::count()),
-            Stat::make(__('panel.stats.administrators_count'), User::whereHas('roles', fn($q) => $q->whereNotIn('name', ['panel_user', 'customer', 'super_admin']))->count()),
+            Stat::make(__('panel.stats.administrators_count'), User::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider', 'patient', 'panel_user', 'super_admin']))->count()),
             Stat::make(__('panel.stats.contact_us_messages'), Contact::count()),
 
         ];
