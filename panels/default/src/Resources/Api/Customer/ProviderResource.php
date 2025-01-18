@@ -28,7 +28,7 @@ class ProviderResource extends JsonResource {
             'distance' => 20,
             'working_days' =>WorkingTimesResource::collection(collect( $this->meta_data['days_list'])->where('status',1)),
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
-
+            'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]['text_when_order_completed']??'',
         ];
     }
 }

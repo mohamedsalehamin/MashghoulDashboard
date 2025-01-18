@@ -36,6 +36,9 @@ class CountryResource extends Resource {
                     ->schema([
                         TextInput::make('name')->required(),
                         TextInput::make('phone_code')->numeric()->required(),
+                        TextInput::make('taxes')->numeric()
+                            ->suffix('%')
+                            ->required(),
 
                         Toggle::make('status')->default(1)
                             ->onColor('success')

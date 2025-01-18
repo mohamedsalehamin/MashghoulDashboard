@@ -71,56 +71,37 @@ class ManageGeneral extends SettingsPage {
 //                        ->rules(['numeric','min:1','max:100'])
 //                        ->required(),
 
-                    Tabs::make('tabs')
-                        ->schema([
-                            Tabs\Tab::make(__("panel.languages.arabic"))->schema([
-                                Textarea::make('ar.text_when_order_completed')
-                            ]),
-                            Tabs\Tab::make(__("panel.languages.english"))->schema([
-                                Textarea::make('en.text_when_order_completed')
-                            ])
-                        ])->statePath('texts'),
 
-                    TextInput::make('reservations_fess')
-                        ->type('number')
-                        ->suffix(__("forms.suffixes.sar"))
-                        ->required(),
                     TextInput::make('app_percentage')
                         ->suffix(__("forms.suffixes.percentage"))
                         ->type('number')
                         ->required(),
 
-                    Select::make('reservation_flow')
-                        ->options([
-                            'total' => __("panel.messages.pay_reservation_totals"),
-                            'fees' => __("panel.messages.pay_reservation_fees")
-                        ]),
-                    Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
 
                 ]),
 
                 Forms\Components\Section::make("applications_links")->schema([
 
-                Forms\Components\Fieldset::make()->label(__("forms.fields.client_app"))->schema([
-                    TextInput::make('applications_links.client.google_play_link')
-                        ->label(__('forms.fields.google_play_link'))
-                        ->url()
-                        ->required(),
-                    TextInput::make('applications_links.client.apple_store_link')
-                        ->label(__('forms.fields.apple_store_link'))
-                        ->url()
-                        ->required(),
-                ]),
-                Forms\Components\Fieldset::make()->label(__("forms.fields.provider_app"))->schema([
-                    TextInput::make('applications_links.provider.google_play_link')
-                        ->label(__('forms.fields.google_play_link'))
-                        ->url()
-                        ->required(),
-                    TextInput::make('applications_links.provider.apple_store_link')
-                        ->label(__('forms.fields.apple_store_link'))
-                        ->url()
-                        ->required(),
-                ])
+                    Forms\Components\Fieldset::make()->label(__("forms.fields.client_app"))->schema([
+                        TextInput::make('applications_links.client.google_play_link')
+                            ->label(__('forms.fields.google_play_link'))
+                            ->url()
+                            ->required(),
+                        TextInput::make('applications_links.client.apple_store_link')
+                            ->label(__('forms.fields.apple_store_link'))
+                            ->url()
+                            ->required(),
+                    ]),
+                    Forms\Components\Fieldset::make()->label(__("forms.fields.provider_app"))->schema([
+                        TextInput::make('applications_links.provider.google_play_link')
+                            ->label(__('forms.fields.google_play_link'))
+                            ->url()
+                            ->required(),
+                        TextInput::make('applications_links.provider.apple_store_link')
+                            ->label(__('forms.fields.apple_store_link'))
+                            ->url()
+                            ->required(),
+                    ])
                 ])->columns(1),
                 Forms\Components\Section::make("app_pages")->schema([
                     Forms\Components\Fieldset::make(__("sections.app_pages"))

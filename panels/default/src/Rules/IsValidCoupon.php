@@ -26,17 +26,33 @@ class IsValidCoupon implements Rule {
      * @return bool
      */
     public function passes($attribute, $value) {
+        $services_ids = request()->collect('services')->pluck('products.*.id', 'id');
+
         $cp = Coupon::where('code', $value)
             ->first();
-
-        $auth_user = request()->user('sanctum');
 
         if (!$cp) {
             $this->message = (__("validation.api.coupon_code_not_found"));
             return false;
         }
-        if ($cp->providers()->count() && !$cp->providers()->pluck("provider_id")->contains(request()->route('provider')?->id)) {
-            $this->message = (__("validation.api.coupon_code_not_found"));
+        $isTotalServicesCountHasRelationWithCoupon = (bool)$cp->services()->whereIn('service_id', $services_ids->keys())->count() == $services_ids->count();
+
+
+        $auth_user = request()->user('sanctum');
+
+
+        if (!$isTotalServicesCountHasRelationWithCoupon) {
+            $this->message = (__("validation.api.coupon_cant_be_used_with_selected_services"));
+            return false;
+        };
+
+        if ($isTotalServicesCountHasRelationWithCoupon && $cp->services()
+                ->with('products')
+                ->whereIn('service_id', $services_ids->keys())
+                ->get()
+                ->pluck('products.*.id')
+                ->flatten()->intersect($services_ids->flatten())->count() != $services_ids->flatten()->count()) {
+            $this->message = (__("validation.api.coupon_cant_be_used_with_selected_services"));
             return false;
         }
 

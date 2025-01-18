@@ -27,9 +27,11 @@ class IsValidPeriodFormatRule implements Rule {
             ->seats()
             ->where('id', request()->get('seat_id'))
             ->first();
+
         $interval=Service::findMany(request()->collect('services')->pluck('id'))->sum('duration');
 
         return collect($seat->getAvailablePeriodsOnDate(request()->date('date'),true,$interval))
+            ->flatten(1)
             ->where('from', request()->get('from'))
             ->where('to', request()->get('to'))
             ->where('reserved', false)

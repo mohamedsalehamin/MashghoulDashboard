@@ -2,7 +2,10 @@
 return [
     'app_name' => 'Tamona',
     'no_data' => 'No Data',
+    'contact_us_success' => 'Your message has been sent successfully',
     'fields' => [
+        'contact_type' => 'Contact Type',
+        "message_title"=> 'Message Title',
         "id_number" => "ID Number",
         'important_links' => 'important links',
         'revisit_date' => 'Revisit Date',

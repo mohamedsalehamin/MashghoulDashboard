@@ -2,7 +2,10 @@
 return [
     'app_name' => 'تمونوا',
     'no_data' => 'لا توجد  بيانات بعد',
+    'contact_us_success' => 'تم إرسال الرسالة بنجاح',
     'fields' => [
+        'contact_type' => 'نوع الرسالة',
+        "message_title" => "عنوان الرسالة",
         'important_links' => 'روابط هامة',
         "id_number" => "رقم الهوية",
         'revisit_date' => 'التاريخ المحدد لجلسة الإعادة',

@@ -73,9 +73,7 @@ class CustomersChart extends ChartWidget {
         ];
     }
 
-    public function getDescription(): ?string {
-        return __('panel.stats.customers_description');
-    }
+
 
     public function getTableHeading(): ?string {
         return __('panel.stats.customers');

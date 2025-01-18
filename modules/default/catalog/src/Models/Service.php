@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Models;
 
+use App\CatalogModule\Models\Reservation\ItemsLine;
 use App\DefaultPanel\Traits\Publishable;
 use App\UsersModule\Models\Provider;
 use Cknow\Money\Money;
@@ -50,5 +51,13 @@ class Service extends Model implements HasMedia {
             ->logOnly(['title', 'description', 'duration', 'status']);
         // Chain fluent methods for configuration options
 
+    }
+
+    public function reservations() {
+        return $this->hasManyThrough(Reservation::class, ItemsLine::class, 'service_id', 'id', 'id', 'reservation_id');
+    }
+
+    public function paidReservations() {
+        return $this->reservations()->paid();
     }
 }

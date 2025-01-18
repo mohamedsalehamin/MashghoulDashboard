@@ -12,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 
 class ProductsRelationManager extends RelationManager {
@@ -30,7 +32,6 @@ class ProductsRelationManager extends RelationManager {
             ->recordTitleAttribute('name')
             ->columns([
 
-                Tables\Columns\TextColumn::make('index')->rowIndex(),
                 Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
                 Tables\Columns\TextColumn::make('price'),
@@ -45,6 +46,11 @@ class ProductsRelationManager extends RelationManager {
 //            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make()->exports([
+                        ExcelExport::make()
+                            ->withFilename(date('Y-m-d') . '-products-export')
+                    ]),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

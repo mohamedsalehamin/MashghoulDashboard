@@ -1,6 +1,9 @@
 <?php
 return [
     'messages' => [
+        'send_sms_description' => 'You can send SMS to your customers',
+        'sms_sent_successfully' => 'SMS sent successfully',
+        'sms_email_successfully' => 'Email sent successfully',
         "your_account_not_activated" => "Your account is not activated please contact the administrator",
         "you_have_gain_points_due_to_register"=>"You have gain :points points due to registration",
         'accept_request' => 'Request accepted successfully',
@@ -289,6 +292,8 @@ return [
         'patients_description' => 'Number of patients during the specified period',
         'reservations_status_title' => 'Reservations status',
         'reservations_status_description' => 'Number of reservations during the specified period',
+        'reservation_according_to_country' => 'Services providers according to country',
+        'reservation_according_to_country_description' => 'Number of reservations according to country during the specified period',
         'labs_reservations_status_title' => 'Labs reservations status',
         'labs_reservations_status_description' => 'Number of labs reservations during the specified period',
         'labs_total_reservations_status_title' => 'Labs total reservations status',

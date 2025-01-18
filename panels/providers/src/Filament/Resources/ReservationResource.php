@@ -251,6 +251,7 @@ class ReservationResource extends Resource {
     public static function getNavigationBadge(): ?string {
         return static::getModel()::where('reservable_id', provider()->id)
             ->where('status', ReservationStatus::PENDING)
+            ->paid()
             ->count();
 
     }

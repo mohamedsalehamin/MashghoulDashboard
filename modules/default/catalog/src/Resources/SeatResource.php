@@ -15,6 +15,7 @@ use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
 use Closure;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -34,6 +35,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tasawk\Models\Catalog\Category;
 
 
@@ -66,7 +68,13 @@ class SeatResource extends Resource {
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->getTranslation('title','en')} - {$record->getTranslation('title','ar')}")
 
                 ,
-                Section::make("working_times")->schema([...GeneralSettings::daysListSchema(),
+                Section::make("working_times")->schema([
+                    Repeater::make('working_times')
+                        ->statePath('meta_data.days_list')
+                        ->label('')
+                        ->minItems(1)
+                        ->maxItems(2)
+                    ->schema(GeneralSettings::daysListSchema())
 
                 ]),
 
@@ -121,6 +129,8 @@ class SeatResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

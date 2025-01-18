@@ -32,6 +32,7 @@ class UsersRelationManager extends RelationManager {
                     ->searchable()
                 ->toggleable(false),
 
+
                 TextColumn::make('created_at')
                     ->label(__("forms.fields.used_at"))
                     ->dateTime()->searchable()->toggleable(false),

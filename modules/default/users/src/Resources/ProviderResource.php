@@ -27,6 +27,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -117,7 +118,6 @@ class ProviderResource extends Resource {
                                 Tabs\Tab::make(__('panel.languages.arabic'))
                                     ->schema([
                                         TextInput::make('name.ar')
-
                                             ->label(__('forms.fields.provider_name'))
                                             ->required(),
                                         Textarea::make('bio.ar')
@@ -188,7 +188,9 @@ class ProviderResource extends Resource {
                             ->defaultLocation([24.7136, 46.6753])
                             ->draggable()
                             ->clickable(),
-                        Section::make("working_times")->schema(GeneralSettings::daysListSchema())
+                        Section::make("working_times")
+                            ->schema(GeneralSettings::daysListSchema())
+                            ->statePath('meta_data.days_list'),
 
                     ])
                         ->relationship('provider')
@@ -203,6 +205,34 @@ class ProviderResource extends Resource {
                     ])->relationship('bankAccount'),
 
                 ]),
+                Tabs\Tab::make(__("sections.settings"))->schema([
+                    Group::make()->schema([
+                        Tabs::make('tabs')
+                            ->schema([
+                                Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                    Textarea::make('ar.text_when_order_completed')
+                                ]),
+                                Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                    Textarea::make('en.text_when_order_completed')
+                                ])
+                            ])->statePath('texts'),
+
+                        TextInput::make('reservations_fees')
+
+                            ->type('number')
+                            ->suffix(__("forms.suffixes.sar"))
+                            ->required(),
+
+                        Select::make('reservation_flow')->options([
+                            'total' => __("panel.messages.pay_reservation_totals"),
+                            'fees' => __("panel.messages.pay_reservation_fees")
+                        ]),
+                        Toggle::make('enabled_free_fees_in_first_reservation'),
+                    ])
+                        ->relationship('options')
+
+
+                ])
             ])
         ])->columns(1);
 
@@ -268,7 +298,7 @@ class ProviderResource extends Resource {
             ->actions([
                 Action::make("wallet")
                     ->icon('heroicon-o-wallet')
-                    ->url(fn($record) => static::getUrl('wallet', ['record'=>$record->id]))
+                    ->url(fn($record) => static::getUrl('wallet', ['record' => $record->id]))
                     ->label(__('menu.wallet')),
 
                 Tables\Actions\EditAction::make(),

@@ -28,6 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use ParagonIE\Sodium\Core\Curve25519\H;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 
 class SeatResource extends Resource {
@@ -99,6 +100,8 @@ class SeatResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

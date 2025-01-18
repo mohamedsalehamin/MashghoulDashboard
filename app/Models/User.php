@@ -99,6 +99,13 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
         return $this->hasOne(\App\UsersModule\Models\Provider::class, "user_id");
     }
 
+    public function supplier() {
+        return $this->provider();
+}
+
+    public function options() {
+        return $this->hasOne(ProviderOption::class, "provider_id");
+}
     public function setPhoneAttribute($value): void {
         $this->attributes['phone'] = \Str::replace(' ', '', $value);
     }

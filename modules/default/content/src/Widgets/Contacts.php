@@ -2,6 +2,8 @@
 
 
 use App\ContentModule\Models\Contact;
+use App\ContentModule\Models\ContactType;
+use App\DefaultPanel\Filters\DateFilter;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -25,6 +27,13 @@ class Contacts extends BaseWidget {
             ->query(
                 Contact::where('seen', 0)->orderBy('created_at', 'desc')->limit(10)
             )
+            ->filters([
+                Tables\Filters\SelectFilter::make('contact_type_id')
+                    ->label(__('forms.fields.message_type'))
+                    ->searchable()
+                    ->options(ContactType::pluck('name', 'id')),
+                DateFilter::make()
+            ])
             ->columns([
                 TextColumn::make('id')->rowIndex()->toggleable(false),
 

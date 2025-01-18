@@ -4,6 +4,8 @@ namespace App\ContentModule\Models;
 
 use App\DefaultPanel\Enum\CouponTypes;
 use App\DefaultPanel\Traits\Publishable;
+use App\Models\CouponProduct;
+use App\Models\CouponService;
 use App\Models\User;
 use App\UsersModule\Models\Provider;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +40,7 @@ class Coupon extends Model {
     public function users(): BelongsToMany {
         return $this->belongsToMany(User::class, 'coupon_user', 'coupon_id', 'user_id');
     }
+
     public function providers(): BelongsToMany {
         return $this->belongsToMany(Provider::class, 'coupon_provider', 'coupon_id', 'provider_id');
     }
@@ -45,4 +48,10 @@ class Coupon extends Model {
     public function applyForUser($user): void {
         $this->users()->attach($user->id);
     }
+
+    public function services(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(CouponService::class);
+    }
+
+
 }

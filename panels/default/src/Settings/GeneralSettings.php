@@ -234,7 +234,7 @@ class GeneralSettings extends Settings {
                     ->seconds(false)
                     ->statePath("$index.to"),
 
-            ])->statePath('meta_data.days_list')
+            ])
                 ->columns(3);
         }
         return $schema;

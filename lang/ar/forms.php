@@ -1,6 +1,13 @@
 <?php
 return [
     'fields' => [
+        'reservations_fees' => 'رسوم الحجز',
+        "user_type" => "نوع المستخدم",
+        "registered_in_last_current_month" => "المسجلين في الشهر الحالي",
+        "notified_users_count" => " أجمالي عدد المستخدمين المستهدفين ",
+        "active_customers" => "العملاء النشطين",
+        "in_specific_period" => "في فترة معينة",
+        "target_type" => "الفئة المستهدفة",
         "logo_in_english"=>"صوره الشعار بالانجليزية",
         "logo_in_arabic"=>"صوره الشعار بالعربية",
         'admin_withdraw_balance_from_wallet_text' => '  تم سحب مبلغ :AMOUNT من المحفظة',

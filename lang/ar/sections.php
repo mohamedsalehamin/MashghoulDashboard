@@ -1,5 +1,7 @@
 <?php
 return [
+    'send_sms' => 'إرسال رسالة نصية',
+    'send_email' => 'إرسال بريد إلكتروني',
     "providers"=>"مقدمي الخدمة",
     "seats"=>"كراسي الخدمة",
     "levels"=>"الشرائج",
@@ -113,10 +115,12 @@ return [
     'orders' => 'الطلبات',
     'latest_orders' => 'أخر الطلبات',
     'top_branches' => 'أفضل الفروع',
-    'best_selling_products' => 'افضل المنتجات مبيعا',
+    'best_selling_products' => 'افضل الخدمات مبيعا',
     'branches_in_maintenance_mode' => 'الفروع في وضع الصيانة',
     'branches_in_heavy_load_mode' => 'الفروع في وضع الذروة',
-    "best_selling_products_description" => "أفضل المنتجات مبيعا وفقا لعدد الطلبات المنجزة",
+    "best_selling_products_description" => "أفضل الخدمات مبيعا وفقا لعدد الحجوزات المدفوعة",
+    "providers_by_city" => "عدد مقدمي الخدمة وفقا للمدينة",
+    "providers_by_state" => "عدد مقدمي الخدمة وفقا للمنطقة",
     "latest_orders_description" => "أخر الطلبات التي بحاجة للموافقة عليها",
     "top_branches_description" => "أفضل الفروع وفقا لعدد الطلبات المنجزة",
     "branches_in_maintenance_mode_description" => "الفروع التي تم تفعيل وضع الصيانة لها",

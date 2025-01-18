@@ -29,7 +29,7 @@ class CartServiceResource extends JsonResource {
             "quantity" => $this->quantity,
             'products' => CartProductResource::collection($products),
             'service_price'=>$this->associatedModel->price->format(),
-            'products_price'=>collect($products)->reduce(fn($carry, $product) => $carry->add($product->price), Money::parse(0))->format(),
+            'products_price'=>Money::parse(collect($products)->reduce(fn($carry, $product) => $carry +($product->price->formatByDecimal() *$product->quantity),0))->format(),
             'total' => Money::parse($this->getPriceSumWithConditions())->format()
         ];
     }

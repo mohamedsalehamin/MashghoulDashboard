@@ -33,6 +33,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 
 class ServiceResource extends Resource {
@@ -83,7 +84,9 @@ class ServiceResource extends Resource {
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
                                 ->formatStateUsing(fn($record) => $record?->title['en'] ?? '')
                                 ->required(),
-                            TextInput::make('price')->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
+                            TextInput::make('price')
+                                ->numeric()
+                                ->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
                         ])->relationship('products'),
                 ])->columnSpan(1),
 
@@ -126,6 +129,8 @@ class ServiceResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

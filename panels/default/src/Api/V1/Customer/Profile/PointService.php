@@ -30,7 +30,6 @@ class PointService {
 
     public function exchange(Level $plan) {
 
-        //get all User points
         $points = auth()->user()->points()->where('transferred', false);
 //get total points
         $userTotalPoints = $points->sum('reset_points');
