@@ -1,6 +1,9 @@
 <?php
 return [
     'messages' => [
+        'sms_sent_successfully' => 'تم إرسال الرسالة النصية بنجاح',
+        'sms_email_successfully' => 'تم إرسال البريد الإلكتروني بنجاح',
+        'send_sms_description' => 'يمكنك إرسال رسالة نصية للعملاء',
         "your_account_not_activated" => "لم يتم تفعيل حسابك بعد برجاء التواصل مع الادارة ",
         "you_have_gain_points_due_to_register" => " لقد حصلت علي :points مكافئة لتسجيلك في التطبيق",
         'accept_request' => 'تم قبول الطلب بنجاح',
@@ -246,6 +249,9 @@ return [
         "customer_registered_body" => "قام :name بتسجيل حساب جديد",
     ],
     'stats' => [
+        'reservation_according_to_country' => 'عدد مقدمي الخدمة حسب الدولة',
+        'reservation_according_to_country_description' => 'عدد الحجوزات حسب الدولة',
+
         'rates_count' => 'عدد التقييمات',
         'avg_rate' => 'متوسط التقييم',
         'seats_count' => 'عدد كراسي الخدمة',
@@ -311,7 +317,7 @@ return [
         'week' => 'الأسبوع الحالي',
         'last_month' => 'الشهر الحالي',
         'year' => 'السنة الحالية',
-        'customers' => 'إحصائيات العملاء',
+        'customers' => 'عدد العملاء',
         'orders_chart_description' => 'عدد الطلبات تم استلامها خلال الفترة المحددة',
         'customers_description' => 'عدد العملاء المسجلين خلال الفترة المحددة',
         'wholesale-requests' => 'عدد طلبات الجملة',

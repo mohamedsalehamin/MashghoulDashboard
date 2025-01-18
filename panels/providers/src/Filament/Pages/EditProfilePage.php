@@ -18,6 +18,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
@@ -106,7 +107,6 @@ class EditProfilePage extends Page {
                                     Tabs\Tab::make(__('panel.languages.arabic'))
                                         ->schema([
                                             TextInput::make('name.ar')
-
                                                 ->label(__('forms.fields.provider_name'))
                                                 ->required(),
                                             Textarea::make('bio.ar')
@@ -176,6 +176,7 @@ class EditProfilePage extends Page {
                                 ->draggable()
                                 ->clickable(),
                             Section::make("working_times")->schema(GeneralSettings::daysListSchema())
+                                ->statePath('meta_data.days_list')
 
                         ])
                             ->relationship('provider')
@@ -190,6 +191,35 @@ class EditProfilePage extends Page {
                         ])->relationship('bankAccount'),
 
                     ]),
+                    Tabs\Tab::make(__("sections.settings"))->schema([
+                        Group::make()->schema([
+                            Tabs::make('tabs')
+                                ->schema([
+                                    Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                        Textarea::make('ar.text_when_order_completed')
+                                    ]),
+                                    Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                        Textarea::make('en.text_when_order_completed')
+                                    ])
+                                ])->statePath('texts'),
+
+                            TextInput::make('reservations_fees')
+                                ->type('number')
+                                ->suffix(__("forms.suffixes.sar"))
+                                ->required(),
+
+                            Select::make('reservation_flow')
+                                ->options([
+                                    'total' => __("panel.messages.pay_reservation_totals"),
+                                    'fees' => __("panel.messages.pay_reservation_fees")
+                                ]),
+                            Toggle::make('enabled_free_fees_in_first_reservation'),
+                        ])->statePath('options')
+
+
+
+                    ])
+                    ,
                 ])
             ])
             ->columns(1);
@@ -207,6 +237,7 @@ class EditProfilePage extends Page {
                 'country_id' => provider()->city->state->country_id,
             ],
             'bankAccount' => $this->record->bankAccount,
+            'options' => $this->record->options,
         ]);
 
 
@@ -222,10 +253,12 @@ class EditProfilePage extends Page {
             'password' => $this->record['password'],
             'data' => $data['data'],
         ]);
-            $this->form->model->provider()->update([
-                ...collect($this->record['provider'])->only(['name', 'bio', 'city_id', 'meta_data'])->toArray(),
-                'location' => (new Point($this->record['provider']['location']['lat'], $this->record['provider']['location']['lng']))->toSqlExpression($this->form->model->getConnection()),
-            ]);
+        $this->form->model->options()->update(collect($data['options'])->only(['texts', 'reservations_fees', 'reservation_flow', 'enabled_free_fees_in_first_reservation'])->toArray());
+        $this->form->model->provider()->update([
+            ...collect($this->record['provider'])->only(['name', 'bio', 'city_id', 'meta_data'])->toArray(),
+            'location' => (new Point($this->record['provider']['location']['lat'], $this->record['provider']['location']['lng']))->toSqlExpression($this->form->model->getConnection()),
+
+        ]);
 //
 
         foreach ($this->record['provider']['image'] ?? [] as $media) {

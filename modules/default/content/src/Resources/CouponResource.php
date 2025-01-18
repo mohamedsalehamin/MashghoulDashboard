@@ -4,6 +4,7 @@ namespace App\ContentModule\Resources;
 
 use App\ContentModule\Models\Coupon;
 use App\ContentModule\Resources;
+use App\ContentModule\Resources\CouponResource\RelationManagers\ServicesRelationManager;
 use App\ContentModule\Resources\CouponResource\RelationManagers\UsersRelationManager;
 use App\DefaultPanel\Enum\CouponTypes;
 use App\DefaultPanel\Enum\ModelStatus;
@@ -19,6 +20,7 @@ use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
+use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -83,12 +85,7 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->numeric()
                         ->required()
                         ->default(1),
-
-                    Select::make('providers')
-                        ->multiple()
-                        ->label(__("forms.fields.provider_name"))
-                        ->relationship('providers')
-                        ->options(Provider::pluck("name", "id")),
+//
                     Toggle::make('status')
                         ->default(1)
                         ->onColor('success')
@@ -185,7 +182,13 @@ class CouponResource extends Resource implements HasShieldPermissions {
 
     public static function getRelations(): array {
         return [
-            UsersRelationManager::class
+            RelationGroup::make(__("sections.usages"),[
+                UsersRelationManager::class,
+            ]),
+            RelationGroup::make(__("sections.providers"),[
+                ServicesRelationManager::class,
+            ]),
+
         ];
     }
 

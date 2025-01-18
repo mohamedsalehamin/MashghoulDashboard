@@ -1,5 +1,7 @@
 <?php
 return [
+    'send_email' => 'Send emails',
+    'send_sms' => 'Send SMS',
     "mashghoul_pages" => "Mashghoul pages",
     "join_requests" => "Join requests",
     "join_request" => "Join request",

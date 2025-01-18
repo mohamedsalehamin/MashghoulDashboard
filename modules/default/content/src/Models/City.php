@@ -3,6 +3,7 @@
 namespace App\ContentModule\Models;
 
 use App\UsersModule\Models\Clinic;
+use App\UsersModule\Models\Provider;
 use App\UsersModule\Models\User\Doctor;
 use App\UsersModule\Models\Lab;
 use App\UsersModule\Models\User\Patient;
@@ -25,4 +26,7 @@ class City extends Model {
         return $this->belongsTo(State::class);
     }
 
+    public function providers() {
+        return $this->hasMany(Provider::class);
+    }
 }

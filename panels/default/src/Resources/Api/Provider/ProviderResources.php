@@ -35,8 +35,8 @@ class ProviderResources extends JsonResource {
                 'latitude' => $this->location?->getCoordinates()[1],
                 'longitude' => $this->location?->getCoordinates()[0],
             ],
-            'working_days' =>WorkingTimesResource::collection(collect( $this->meta_data['days_list'])->where('status',1)),
-
+            'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list'])->where('status', 1)),
+            'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]??'',
         ];
     }
 }

@@ -1,5 +1,9 @@
 <?php
 return [
+    "providers_by_city" => "Providers according to the city",
+    "providers_by_state" => "Providers according to the state",
+    'send_sms' => 'Send SMS',
+    'send_email' => 'Send Email',
     "commissions"=>"Commission",
     "providers"=>"Providers",
     "seats"=>"Seats",
@@ -81,10 +85,10 @@ return [
     'summary' => 'Summary',
     'orders' => 'Orders',
     'top_branches' => 'Top branches',
-    'best_selling_products' => 'Best selling products',
+    'best_selling_products' => 'Best selling reservations',
     'branches_in_maintenance_mode' => 'Branches in maintenance mode',
     'branches_in_heavy_load_mode' => 'Branches in heavy load mode',
-    "best_selling_products_description" => "Best selling products according to the number of orders",
+    "best_selling_products_description" => "Best selling products according to the number of reservations",
     "latest_orders_description" => "Latest orders need action to process",
     "top_branches_description" => "Top branches according to the number of orders",
     "branches_in_maintenance_mode_description" => "Branches that have maintenance mode activated",

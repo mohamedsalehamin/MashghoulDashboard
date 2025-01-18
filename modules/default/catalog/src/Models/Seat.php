@@ -56,26 +56,34 @@ class Seat extends Model {
 
     public function getAvailablePeriodsOnDate($date, $skip = true, $interval = 60) {
         $day = strtolower($date->format('l'));
+        $slots = [];
         if ($skip && !$this->canBookOnDate($date, $interval)) {
 
             return collect([]);
         }
 
-        $current_day = collect(array_values($this->meta_data['days_list'] ?? []))
+        $list = collect(array_values($this->meta_data['days_list'] ?? []))
+            ->flatten(1)
             ->where('day_name', $day)
             ->where('status', true)
-            ->first() ?? [];
-        if (empty($current_day)) {
+            ->values();
+
+        if (empty($list)) {
             return collect([]);
         }
 
+        foreach ($list as $period) {
 
-        $slots = GeneralSettings::getDayTimesSlot($current_day['from'] ?? '00:00', $current_day['to'] ?? '23:59', $interval);
+            $slots[] = GeneralSettings::getDayTimesSlot($period['from'] ?? '00:00', $period['to'] ?? '23:59', $interval);
+        }
+
 
         if ($date->isToday()) {
-            $slots = collect($slots)->filter(function ($period) {
-                $from = \Str::before($period, " -");
-                return Carbon::today()->setTimeFromTimeString($from)->isFuture();
+            $slots = collect($slots)->map(function ($slot) {
+                $slot->filter(function ($period) {
+                    $from = \Str::before($period, " -");
+                    return Carbon::today()->setTimeFromTimeString($from)->isFuture();
+                });
             });
         }
 
@@ -88,26 +96,23 @@ class Seat extends Model {
             ->toArray();
 
         return collect($slots)
-            ->map(function ($slot) {
+            ->map(function ($slot) use ($reservations) {
+                return collect($slot)
+                    ->map(function ($slot) {
+                        return [
+                            'from' => \Str::before($slot, " -"),
+                            'to' => \Str::after($slot, " - "),
+                            'reserved' => false
+                        ];
+                    })->map(function ($slot) use ($reservations) {
+                        $slot['reserved'] = (bool)collect($reservations)
+                            ->where('from', "<=", $slot['to'])
+                            ->where('to', ">", $slot['from'])
+                            ->count();
+                        return $slot;
 
-                return [
-                    'from' => \Str::before($slot, " -"),
-                    'to' => \Str::after($slot, " - "),
-                    'reserved' => false
-                ];
-            })->map(function ($slot) use ($reservations) {
-
-                $slot['reserved'] = (bool)collect($reservations)
-                    ->where('from', "<=", $slot['to'])
-                    ->where('to', ">", $slot['from'])
-                    ->count();
-                return $slot;
-            })
-
-//            ->sortBy(function ($time) {
-//                return \Str::before($time, " -");
-//            })
-            ->values();
+                    })->values();
+            })->values();
 
     }
 

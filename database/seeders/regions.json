@@ -1,0 +1,119 @@
+[
+    {
+        "LKRegionId": "1",
+        "LKRegionCode": "01",
+        "LKRegionAr": "الرياض",
+        "LKRegionEn": "Riyadh",
+        "Latitude": "24.731864",
+        "Longitude": "46.774292",
+        "ID_1": "7"
+    },
+    {
+        "LKRegionId": "2",
+        "LKRegionCode": "02",
+        "LKRegionAr": "مكة المكرمة",
+        "LKRegionEn": "Makkah Al Mukarramah",
+        "Latitude": "21.406328",
+        "Longitude": "39.809088",
+        "ID_1": "11"
+    },
+    {
+        "LKRegionId": "3",
+        "LKRegionCode": "03",
+        "LKRegionAr": "المدينة المنورة",
+        "LKRegionEn": "Al Madinah Al Munawwarah",
+        "Latitude": "24.427145",
+        "Longitude": "39.649658",
+        "ID_1": "5"
+    },
+    {
+        "LKRegionId": "4",
+        "LKRegionCode": "04",
+        "LKRegionAr": "القصيم",
+        "LKRegionEn": "Al Qassim",
+        "Latitude": "26.338499",
+        "Longitude": "43.965396",
+        "ID_1": "6"
+    },
+    {
+        "LKRegionId": "5",
+        "LKRegionCode": "05",
+        "LKRegionAr": "المنطقة الشرقية",
+        "LKRegionEn": "Eastern",
+        "Latitude": "26.372185",
+        "Longitude": "49.993286",
+        "ID_1": "8"
+    },
+    {
+        "LKRegionId": "6",
+        "LKRegionCode": "06",
+        "LKRegionAr": "عسير",
+        "LKRegionEn": "Asir",
+        "Latitude": "18.20848",
+        "Longitude": "42.533569",
+        "ID_1": "1"
+    },
+    {
+        "LKRegionId": "7",
+        "LKRegionCode": "07",
+        "LKRegionAr": "تبوك",
+        "LKRegionEn": "Tabuk",
+        "Latitude": "28.401064",
+        "Longitude": "36.573486",
+        "ID_1": "13"
+    },
+    {
+        "LKRegionId": "8",
+        "LKRegionCode": "08",
+        "LKRegionAr": "حائل",
+        "LKRegionEn": "Hail",
+        "Latitude": "27.527758",
+        "Longitude": "41.698608",
+        "ID_1": "9"
+    },
+    {
+        "LKRegionId": "9",
+        "LKRegionCode": "09",
+        "LKRegionAr": "الحدود الشماليه",
+        "LKRegionEn": "Northern Borders",
+        "Latitude": "30.977609",
+        "Longitude": "41.011962",
+        "ID_1": "3"
+    },
+    {
+        "LKRegionId": "10",
+        "LKRegionCode": "10",
+        "LKRegionAr": "جازان",
+        "LKRegionEn": "Jazan",
+        "Latitude": "16.890959",
+        "Longitude": "42.548375",
+        "ID_1": "10"
+    },
+    {
+        "LKRegionId": "11",
+        "LKRegionCode": "11",
+        "LKRegionAr": "نجران",
+        "LKRegionEn": "Najran",
+        "Latitude": "17.489489",
+        "Longitude": "44.134333",
+        "ID_1": "12"
+    },
+    {
+        "LKRegionId": "12",
+        "LKRegionCode": "12",
+        "LKRegionAr": "الباحة",
+        "LKRegionEn": "Al Bahah",
+        "Latitude": "20.014645",
+        "Longitude": "41.456909",
+        "ID_1": "2"
+    },
+    {
+        "LKRegionId": "13",
+        "LKRegionCode": "13",
+        "LKRegionAr": "الجوف",
+        "LKRegionEn": "Al Jawf",
+        "Latitude": "29.971888",
+        "Longitude": "40.200476",
+        "ID_1": "4"
+    }
+]

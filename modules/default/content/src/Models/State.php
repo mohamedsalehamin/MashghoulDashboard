@@ -4,6 +4,7 @@ namespace App\ContentModule\Models;
 
 use App\UsersModule\Models\Clinic;
 use App\UsersModule\Models\Lab;
+use App\UsersModule\Models\Provider;
 use App\UsersModule\Models\User\Doctor;
 use App\UsersModule\Models\User\Patient;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -32,6 +33,9 @@ class State extends Model {
         return $this->belongsTo(Country::class);
     }
 
+    public function providers(): \Illuminate\Database\Eloquent\Relations\HasManyThrough {
+        return $this->hasManyThrough(Provider::class, City::class, 'state_id', 'city_id', 'id', 'id');
+}
     public function cities(): HasMany {
         return $this->hasMany(City::class);
     }

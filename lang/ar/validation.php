@@ -248,6 +248,7 @@ return [
         ]
     ],
     'api' => [
+        'coupon_cant_be_used_with_selected_services' => 'كود الخصم لا يمكن استخدامه مع الخدمات المختارة',
         "coupon_code_min_order_value" => 'لاستخدام كود الخصم يجب ان يكون اجمالي الطلب اكبر من :value',
         'insufficient_wallet_balance' => 'رصيد المحفظة غير كافي',
         "overdue_wallet_balance" => 'الرصيد المدفوع اكبر من قيمة الطلب',

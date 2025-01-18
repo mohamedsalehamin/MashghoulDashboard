@@ -20,6 +20,7 @@ class CartResource extends JsonResource {
         return [
             'duration'=>$this->getContent()->sum(fn($product)=>$product->associatedModel->duration),
             'duration_unit'=>'minutes',
+            'complete_order_text' => $request->route('provider')->user?->options?->texts[app()->getLocale()]['text_when_order_completed']??'',
             "services" => CartServiceResource::collection($this->getContent()->values()),
             'points' => GeneralSettings::getPointsOnAction('reserve'),
             'totals' => $this->formattedTotals()

@@ -20,6 +20,9 @@
                 <li class="linkMenu">
                     <a href="#faq">@lang("site.heading.faqs")</a>
                 </li>
+                <li class="linkMenu">
+                    <a href="#contact_Us">@lang("site.heading.contact_us")</a>
+                </li>
             </ul>
         </nav>
         @livewire('register-button')

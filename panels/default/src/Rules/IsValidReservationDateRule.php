@@ -28,6 +28,7 @@ class IsValidReservationDateRule implements Rule {
             ->seats()
             ->where('id', request()->get('seat_id'))
             ->first();
+//        dd($seat);
         return $seat->canBookOnDate(Carbon::parse($value));
 
     }

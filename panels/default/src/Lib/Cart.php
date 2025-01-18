@@ -81,9 +81,9 @@ class Cart extends CoreCart {
         $conditionData = [
             'name' => "reservation_fees",
             'type' => "reservation_fees",
-            'target' => "total",
+            'target' => "subtotal",
             'value' => $fees,
-            'order' => 1,
+            'order' => 3,
             'attributes' => [
                 'original_value' => $fees,
             ]
@@ -156,10 +156,10 @@ class Cart extends CoreCart {
     }
 
 
-    function applyTaxes() {
-        $settings = new GeneralSettings();
-        $value = $settings->taxes;
-        $value = "{$value}%";
+    function applyTaxes($percentage) {
+
+        $value = "{$percentage}%";
+
         !$this->getConditionsByType("taxes")->count() ?: $this->removeConditionsByType("taxes");
         $conditionData = [
             'name' => 'Taxes',
@@ -305,6 +305,7 @@ class Cart extends CoreCart {
             ]);
             DB::table('reservations_items_lines')->insert([
                 'reservation_id' => $this->getOrderID(),
+                'service_id' => $item->associatedModel->id,
                 'name' => $item->name[app()->getLocale()] ?? $item->name,
                 'price' => $item->price,
                 'quantity' => $item->quantity,
@@ -433,7 +434,7 @@ class Cart extends CoreCart {
     public
     function getReservationFees() {
 
-        return $this->getConditionsByType('reservation_fees')?->first()?->getValue() * 100;
+        return floatval($this->getConditionsByType('reservation_fees')?->first()?->getValue() );
     }
 
     public
@@ -462,13 +463,14 @@ class Cart extends CoreCart {
     }
 
     public function totals(): array {
-        $items_total_with_options = $this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true));
+
         return [
             'services_total' => $this->getSubTotalWithoutConditions(),
             "products_total" => $this->getProductsTotal(),
             "discount" => $this->discount(),
-            "subtotal" => $this->getSubTotal(),
             "reservation_fees" => $this->getReservationFees(),
+            "subtotal" => $this->getSubTotal(),
+            "taxes" => $this->getConditionsByType("taxes")?->first()?->getCalculatedValue($this->getSubTotal()),
             'wallet_discount' => $this->walletDiscount(),
             "total" => $this->getTotal()
         ];

@@ -17,6 +17,8 @@ class ReservationServiceResource extends JsonResource {
             "quantity" => $this->quantity,
             'products' => ReservationProductResource::collection($products),
             "service_price"=>Money::parse($this->associatedModel->price)->format(),
+
+            'products_total_price' => Money::parse(collect($products)->reduce(fn($carry, $product) => $carry + ($product['price']['amount'] * data_get($product,'quantity',1)), 0))->format(),
         ];
     }
 

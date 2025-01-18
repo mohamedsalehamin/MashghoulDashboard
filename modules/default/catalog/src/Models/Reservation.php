@@ -74,18 +74,18 @@ class Reservation extends Model {
 
 
         });
-//        static::updating(function (Reservation $reservation) {
-//            if ($reservation->getOriginal('status') != $reservation->status) {
-//
-//                $reservation->customer->notify(new ReservationStatusChangedNotification($reservation));
-//                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
-//            }
-//
-//            $reservation->addTimeline([
-//                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
-//                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'en')], 'en')
-//            ], $reservation->status);
-//        });
+        static::updating(function (Reservation $reservation) {
+            if ($reservation->getOriginal('status') != $reservation->status) {
+
+                $reservation->customer->notify(new ReservationStatusChangedNotification($reservation));
+                $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
+            }
+
+            $reservation->addTimeline([
+                'ar' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'ar')], 'ar'),
+                'en' => __('panel.messages.reservation_status_changed', ['status' => __('panel.enums.' . $reservation->status->value, [], 'en')], 'en')
+            ], $reservation->status);
+        });
 
     }
 

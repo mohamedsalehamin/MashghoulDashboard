@@ -118,6 +118,6 @@
             @endforeach
         </div>
     </section>
-
+    @livewire('contact-us')
 @endsection
 
