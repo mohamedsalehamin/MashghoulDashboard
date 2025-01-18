@@ -22,7 +22,7 @@ class LightProviderResource extends JsonResource {
                 'lng'=>$this->location->getCoordinates()[0],
             ],
 
-            'working_days' =>WorkingTimesResource::collection(collect( $this->meta_data['days_list'])->where('status',1)),
+            'working_days' =>WorkingTimesResource::collection(collect( $this->meta_data['days_list']??[])->where('status',1)),
 
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
 
