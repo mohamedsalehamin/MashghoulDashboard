@@ -94,8 +94,9 @@ class BuildCartInstanceAction {
     }
 
     public function applyReservationFeesBasedOnTerms($cart): void {
-        if (!$this->providerOptions?->enabled_free_fees_in_first_reservation || auth()->user()->reservations()->count() != 0) {
-            $cart->applyReservationsFees($this->providerOptions?->reservations_fees??0);
+        $settings = new GeneralSettings();
+        if (!$settings->enabled_free_fees_in_first_reservation || auth()->user()->reservations()->count() != 0) {
+            $cart->applyReservationsFees($settings?->reservations_fess ?? 0);
         }
     }
 
