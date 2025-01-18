@@ -4,7 +4,7 @@ namespace App\DefaultPanel\Resources\Api\Customer;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class WorkingTimesResource extends JsonResource {
+class   WorkingTimesResource extends JsonResource {
 
     public function toArray($request) {
         return [
