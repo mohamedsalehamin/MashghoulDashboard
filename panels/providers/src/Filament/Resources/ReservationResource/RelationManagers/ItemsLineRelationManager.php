@@ -12,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
+use NumberFormatter;
 
 class ItemsLineRelationManager extends RelationManager {
     protected static string $relationship = 'itemsLine';
@@ -33,17 +35,19 @@ class ItemsLineRelationManager extends RelationManager {
                     ->label(__('forms.fields.name')),
 
                 Tables\Columns\TextColumn::make('products')
-                    ->state(function ($record){
+                    ->state(function ($record) {
                         $text = [];
-                        foreach ($record['attributes']['products']??[] as $index => $option) {
+                        foreach ($record['attributes']['products'] ?? [] as $index => $option) {
                             $option_name = Utils::getTranslatedField($option['title']);
-                            $price =Money::parse($option['price']['amount'])->format();
-                            $text[] = "{$option_name} ({$price}) ";
+                            $price = Money::parse($option['price']['amount'])->format(style:NumberFormatter::PATTERN_DECIMAL );
+                            $qty =__("forms.fields.quantity").":". $option['quantity'];
+
+                            $text[] = "<p>{$option_name}</p> <span class='text-gray-500'> $qty  </span>";
                         }
-                        return $text;
+                        return (new HtmlString($text))->toHtml();
 
                     })
-                    ->listWithLineBreaks()
+                    ->html()
                     ->label(__('forms.fields.products')),
 
                 Tables\Columns\TextColumn::make('total')

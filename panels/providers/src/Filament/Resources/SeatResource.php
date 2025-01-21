@@ -11,6 +11,7 @@ use App\ProviderPanel\Filament\Resources\SeatResource\Pages\CreateSeat;
 use App\ProviderPanel\Filament\Resources\SeatResource\Pages\EditSeat;
 use App\ProviderPanel\Filament\Resources\SeatResource\Pages\ListSeats;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +43,8 @@ class SeatResource extends Resource {
     public static function form(Form $form): Form {
         return $form
             ->schema([
-                Hidden::make('provider_id')->default(provider()->id),
+                Hidden::make('provider_id')->default(provider()?->id),
+
                 TextInput::make('title')
                     ->label(__('forms.fields.title'))
                     ->required(),
@@ -50,10 +52,20 @@ class SeatResource extends Resource {
                     ->required()
                     ->multiple()
                     ->searchable(false)
-                    ->relationship('services')
+                    ->relationship('services','title')
                     ->label(__('forms.fields.services'))
-                    ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id')),
-                Section::make("working_times")->schema(GeneralSettings::daysListSchema()),
+                    ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id'))
+                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title),
+
+                Section::make("working_times")->schema([
+                    Repeater::make('working_times')
+                        ->statePath('meta_data.days_list')
+                        ->label('')
+                        ->minItems(1)
+                        ->maxItems(2)
+                        ->schema(GeneralSettings::daysListSchema())
+
+                ]),
 
                 Toggle::make('status')->default(1)
                     ->onColor('success')

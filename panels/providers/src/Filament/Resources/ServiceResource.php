@@ -78,6 +78,8 @@ class ServiceResource extends Resource {
                         ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
                         ->schema([
+                            SpatieMediaLibraryFileUpload::make('avatar')
+                                ->nullable(),
                             TextInput::make('title.ar')
                                 ->formatStateUsing(fn($record) => $record?->title['ar'] ?? '')
                                 ->label(__("forms.fields.title_ar"))->required(),
