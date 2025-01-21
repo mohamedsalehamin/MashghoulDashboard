@@ -183,6 +183,7 @@ class ReservationResource extends Resource {
                                             return $code;
                                         }),
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
+                                        TextEntry::make('taxes')->state(fn() => $totals['taxes']),
                                         TextEntry::make('wallet_discount')->state(fn() => $totals['wallet_discount']),
                                         TextEntry::make('total')->state(fn() => $totals['total']),
                                     ];

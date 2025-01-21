@@ -45,7 +45,7 @@ class ProviderPanelServiceProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel {
         return $panel
-            ->domain('portal.mashghoul.com')
+            ->domain('portal.mashghoul.test')
             ->font('cairo', 'https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap')
             ->id('lab-panel')
             ->path('')

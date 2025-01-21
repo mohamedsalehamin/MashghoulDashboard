@@ -184,10 +184,10 @@ class EditProfilePage extends Page {
                     ]),
                     Tabs\Tab::make(__("sections.bank_account_information"))->schema([
                         Group::make()->schema([
-                            TextInput::make('bank_name')->required(),
-                            TextInput::make('account_name')->required(),
-                            TextInput::make('account_number')->required(),
-                            TextInput::make('iban')->required(),
+                            TextInput::make('bank_name'),
+                            TextInput::make('account_name'),
+                            TextInput::make('account_number'),
+                            TextInput::make('iban'),
                         ])->relationship('bankAccount'),
 
                     ]),
