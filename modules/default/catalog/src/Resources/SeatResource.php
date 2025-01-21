@@ -74,7 +74,7 @@ class SeatResource extends Resource {
                         ->label('')
                         ->minItems(1)
                         ->maxItems(2)
-                    ->schema(GeneralSettings::daysListSchema())
+                        ->schema(GeneralSettings::daysListSchema())
 
                 ]),
 
@@ -143,24 +143,34 @@ class SeatResource extends Resource {
 
     static public function infolist(Infolist $infolist): Infolist {
         return $infolist
-            ->schema([
+            ->schema(fn($record) => [
                 TextEntry::make('id'),
                 TextEntry::make('provider.name'),
                 TextEntry::make('title'),
                 TextEntry::make('services_count')->state(fn($record) => $record->services()->count()),
-                RepeatableEntry::make('meta_data.days_list')
-                    ->label(__("sections.working_days"))
-                    ->state(fn($record) => collect($record->meta_data['days_list'])->where('status', true))
-                    ->schema([
-                        TextEntry::make('day_name')
-                            ->formatStateUsing(fn($record, $state) => __("forms.fields.weekdays." . $state))
-                            ->label(__("forms.fields.day_name")),
-                        TextEntry::make('from'),
-                        TextEntry::make('to'),
-                    ])
-                    ->columns(3)
+                ...self::getWorkingDaysShift($record),
 
             ]);
+    }
+
+    public static function getWorkingDaysShift($record): array {
+        $schema = [];
+        foreach ($record->meta_data['days_list'] ?? [] as $index=> $slot) {
+
+            $schema[] = RepeatableEntry::make('meta_data.days_list')
+                ->label(__("sections.shift_no",['no'=>$index+1]))
+                ->state(fn($record) => collect($slot)->where('status', true)->toArray())
+                ->statePath('meta_data.days_list.'.$index)
+                ->schema([
+                    TextEntry::make('day_name')
+                        ->formatStateUsing(fn($record, $state) => __("forms.fields.weekdays." . $state))
+                        ->label(__("forms.fields.day_name")),
+                    TextEntry::make('from'),
+                    TextEntry::make('to'),
+                ])
+                ->columns(3);
+        }
+        return $schema;
     }
 
     public static function getRelations(): array {

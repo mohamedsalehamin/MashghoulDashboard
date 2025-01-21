@@ -67,6 +67,7 @@ class ManageGeneral extends SettingsPage {
                         ->type('number')
                         ->required(),
 
+                    Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
 
                 ]),
 

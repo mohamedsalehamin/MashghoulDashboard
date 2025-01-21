@@ -1,5 +1,6 @@
 <?php
 return [
+    "shift_no" => "Shift #:no",
     "providers_by_city" => "Providers according to the city",
     "providers_by_state" => "Providers according to the state",
     'send_sms' => 'Send SMS',
