@@ -160,13 +160,13 @@ class CustomerResource extends Resource {
                     ->counts('completedReservations')
                     ->sortable()
                     ->label(__('forms.fields.reservations_count'))
-                    ->searchable(),
+                    ->searchable(false),
                 TextColumn::make('completed_reservations_sum_price')
                     ->formatStateUsing(fn($state) => \Cknow\Money\Money::parse($state ?? 0, 'SAR')->format())
                     ->sum('completedReservations', 'price')
                     ->sortable()
                     ->label(__('forms.fields.reservations_totals'))
-                    ->searchable(),
+                    ->searchable(false),
                 TextColumn::make('created_at')->searchable()->date(),
                 TextColumn::make('active')
                     ->label(__('forms.fields.status'))

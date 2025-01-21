@@ -1,7 +1,13 @@
 <?php
 return [
     'fields' => [
+        "name_ar" => "Name in Arabic",
+        "name_en" => "Name in English",
+        "provider_id" => "Provider",
+        "description_ar" => "Description in Arabic",
+        "description_en" => "Description in English",
         'reservations_totals' => 'Reservations totals',
+        "service_id"=>"Service",
         "logo_in_english"=>"English logo",
         "logo_in_arabic"=>"Arabic logo",
         "text_when_order_completed" => "Text when order completed",
@@ -369,6 +375,7 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "import_products"=>"Import products",
         "show_receipt"=>'Show receipt',
         "accept"=>'Accept',
         "reject"=>'Reject',

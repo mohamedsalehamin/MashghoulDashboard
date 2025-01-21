@@ -83,7 +83,8 @@ class GeneralSettings extends Settings {
                     ->statePath("$index.status")
                     ->rules([
                         fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get, $index) {
-                            $providerTimes = Provider::find($get("../../provider_id"));
+                            $providerTimes = Provider::find($get("../../../provider_id"));
+
                             if (!$get("$index.status")) {
                                 return;
 

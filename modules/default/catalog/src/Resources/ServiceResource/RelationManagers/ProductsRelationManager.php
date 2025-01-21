@@ -9,8 +9,10 @@ use App\Notifications\LabReservationResultsAddedNotification;
 use Cknow\Money\Money;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
@@ -33,6 +35,8 @@ class ProductsRelationManager extends RelationManager {
             ->columns([
 
                 Tables\Columns\TextColumn::make('id'),
+                SpatieMediaLibraryImageColumn::make('avatar'),
+
                 Tables\Columns\TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
                 Tables\Columns\TextColumn::make('price'),
 
@@ -46,10 +50,7 @@ class ProductsRelationManager extends RelationManager {
 //            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make()->exports([
-                        ExcelExport::make()
-                            ->withFilename(date('Y-m-d') . '-products-export')
-                    ]),
+                    ExportBulkAction::make(),
 
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

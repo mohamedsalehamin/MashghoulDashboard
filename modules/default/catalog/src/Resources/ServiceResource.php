@@ -11,6 +11,8 @@ use App\CatalogModule\Resources\ServiceResource\Pages\ViewService;
 use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
+use App\Filament\Imports\ProductsImporter;
+use App\Filament\Imports\ServicesImporter;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -28,6 +30,7 @@ use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -131,7 +134,17 @@ class ServiceResource extends Resource {
             ->filters([
                 Tables\Filters\TrashedFilter::make()
             ])
+            ->headerActions([
+//                ImportAction::make('importServices')
+//                    ->visible(true)
+//                    ->importer(ServicesImporter::class),
+//                ImportAction::make('importProducts')
+//                    ->label(__('forms.actions.import_products'))
+//                    ->visible(true)
+//                    ->importer(ProductsImporter::class),
+            ])
             ->actions([
+
                 Action::make('activities')
                     ->label(__("forms.actions.activities"))
                     ->url(fn($record) => static::getUrl('activities', ['record' => $record])),

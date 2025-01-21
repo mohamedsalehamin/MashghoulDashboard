@@ -56,7 +56,7 @@ class SendEmail extends Page implements HasForms {
 
     public function submit() {
         $this->validate();
-        Mail::to(User::findMany($this->notifiable)->pluck("email")->toArray())
+        Mail::to(User::findMany($this->notifiable)->pluck("email")->filter()->toArray())
             ->send(new SendEmailNotification($this->titlee, $this->messagee));
 
         $this->resetExcept('');

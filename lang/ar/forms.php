@@ -1,6 +1,11 @@
 <?php
 return [
     'fields' => [
+        "provider_id" => "الرقم التعريفي لمقدم الخدمة",
+        "description_en" => "الوصف بالانجليزية",
+        "description_ar" => "الوصف بالعربية",
+        "name_ar" => "الاسم بالعربية",
+        "name_en" => "الاسم بالانجليزية",
         'reservations_fees' => 'رسوم الحجز',
         "user_type" => "نوع المستخدم",
         "registered_in_last_current_month" => "المسجلين في الشهر الحالي",
@@ -154,6 +159,7 @@ return [
         'image_en' => 'الصورة بالإنجليزية',
         'image_ar' => 'الصورة بالعربية',
         'id' => 'المعرف',
+        "service_id"=>"الرقم التعريفي للخدمة",
         'receipt' => 'الفاتورة',
 
         'edit' => 'تعديل',
@@ -385,6 +391,7 @@ return [
         'percentage' => '%',
     ],
     'actions' => [
+        "import_products" => "استيراد المنتجات",
         "show_receipt"=>'عرض الفاتورة',
         "accept"=>'قبول',
         "reject"=>'رفض',
