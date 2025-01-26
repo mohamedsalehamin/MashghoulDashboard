@@ -44,11 +44,8 @@ Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoo
                     'en' => __('panel.messages.reservation_created_successfully', [], 'en')
                 ], 'created');
 
-                $description = [
-                    'ar' => __("panel.messages.gift_for_reservation", ['id' => $reservation->id], 'ar'),
-                    'en' => __("panel.messages.gift_for_reservation", ['id' => $reservation->id], 'en'),
-                ];
-                AddPointToCustomerAction::run($reservation->customer, GeneralSettings::getPointsOnAction('reserve'), ['description' => $description]);
+
+
 //                $reservation->patient->notify(new ReservationCreatedSuccessfullyNotification($reservation));
 
                 Notification::send([...\App\DefaultPanel\Lib\Utils::getAdministrationUsers(), $reservation->reservable->user], new ReservationCreatedSuccessfullyNotification($reservation));

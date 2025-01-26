@@ -27,9 +27,14 @@ class Customer extends User {
             ]));
             return $customer->assignRole(self::ROLE);
         });
+
+    }
+
+    public function getMorphClass(): string {
+        return User::class;
     }
 
     public function completedReservations(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->reservations()->where('status', ReservationStatus::COMPLETED);
-}
+    }
 }

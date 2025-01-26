@@ -26,7 +26,7 @@ class Provider extends Model implements HasMedia {
     use HasSpatial;
 
     protected $guarded = ['id'];
-    protected $translatable = ['name', 'bio'];
+    protected array $translatable = ['name', 'bio'];
 
     protected $casts = [
         'location' => Point::class,

@@ -23,10 +23,9 @@ class Notification extends DatabaseNotification {
     protected function url(): Attribute {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
-
                 $data = json_decode($attributes['data'], true)['viewData'];
-                return match ($data['entity_type']) {
-                    'reservation' =>provider()->id?ReservationResource::getUrl('view',[$data['entity_id']]):\App\CatalogModule\Resources\ReservationResource::getUrl('view',[$data['entity_id']]),
+                return match (data_get($data, 'entity_type', '')) {
+                    'reservation' => provider()->id ? ReservationResource::getUrl('view', [$data['entity_id']]) : \App\CatalogModule\Resources\ReservationResource::getUrl('view', [$data['entity_id']]),
                     default => null,
                 };
 

@@ -16,6 +16,7 @@ use App\UsersModule\Resources\CustomerResource\Pages\CreateCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\EditCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\ListCustomers;
 use App\UsersModule\Resources\CustomerResource\Pages\ViewCustomer;
+use App\UsersModule\Resources\CustomerResource\Pages\WalletPage;
 use App\UsersModule\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Group;
@@ -208,6 +209,11 @@ class CustomerResource extends Resource {
                 DateFilter::make(),
             ])
             ->actions([
+                Action::make("wallet")
+                    ->icon('heroicon-o-wallet')
+                    ->url(fn($record) => static::getUrl('wallet', ['record' => $record->id]))
+                    ->label(__('menu.wallet')),
+
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -227,6 +233,7 @@ class CustomerResource extends Resource {
             'create' => CreateCustomer::route('/create'),
             'edit' => EditCustomer::route('/{record}/edit'),
             'view' => ViewCustomer::route('/{record}'),
+            'wallet' => WalletPage::route('/{record}/wallet'),
         ];
     }
 

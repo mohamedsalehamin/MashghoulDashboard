@@ -233,6 +233,7 @@ class Reservation extends Model {
 
 
     public function getAvailableStatus() {
+
         $statuses = collect(ReservationStatus::cases())->map(fn($status) => $status->value);
         $standardStatus = collect($statuses)
             ->splice(1, $statuses->count())
@@ -245,9 +246,11 @@ class Reservation extends Model {
                 ];
             })
             ->values();
-
-
-        return $standardStatus->values();
+        $standardStatus = $standardStatus->values();
+        if (auth()->user()->hasRole('provider')) {
+            $standardStatus = $standardStatus->filter(fn($status) => $status['value'] != ReservationStatus::CANCELED->value);
+        }
+        return $standardStatus;
     }
 
     public function serviceRate() {

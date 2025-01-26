@@ -18,27 +18,11 @@ class PayTransactionViaWallet {
 
         $transactionPrice = $transaction->price->formatByDecimal();
 
-        $points = $transaction->user->pointsExchanges()
-            ->where('expired_at', '>', now())->where('reset_price', '>', 0)
-            ->where('used', 0)
-            ->get();
-
-
-        foreach ($points as $point) {
-            if ($transactionPrice >= $point->reset_price) {
-                $transactionPrice -= $point->reset_price;
-                $point->update(['used' => true, 'reset_price' => 0]);
-            } else {
-                $point->update(['reset_price' => $point->reset_price - $transactionPrice]);
-                break;
-            }
-
-        }
-
-        PointsUsage::create([
-            'user_id' => $transaction->user_id,
-            'reservation_id' => $transaction->transactionable_id,
-            'price' => $transaction->price,
+        $transaction->transactionable->customer?->withdraw($transactionPrice,[
+            'description'=>[
+                'ar'=>__('panel.messages.paid_reservation_no', ['no'=> $transaction->transactionable->id,'amount'=>$transactionPrice],'ar'),
+                'en'=>__('panel.messages.paid_reservation_no', ['no'=> $transaction->transactionable->id,'amount'=>$transactionPrice],'en'),
+            ]
         ]);
     }
 

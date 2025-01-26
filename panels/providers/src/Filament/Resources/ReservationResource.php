@@ -159,6 +159,10 @@ class ReservationResource extends Resource {
                                     ->label(__('forms.fields.status'))
                                     ->color(fn($record) => $record?->status?->getColor())
                                     ->badge(),
+                                TextEntry::make('meta_data.cancel_reason')
+                                    ->label(__('forms.fields.cancel_reason'))
+                                    ->visible(fn($record) => $record->meta_data['cancel_reason'] ?? false)
+                                    ->badge(),
                                 TextEntry::make('transaction.status')
                                     ->formatStateUsing(fn($record) => $record->getPaymentStatus()->getLabel())
                                     ->label(__('forms.fields.payment_status'))
@@ -185,6 +189,7 @@ class ReservationResource extends Resource {
                                         TextEntry::make('reservation_fees')->state(fn() => $totals['reservation_fees']),
                                         TextEntry::make('taxes')->state(fn() => $totals['taxes']),
                                         TextEntry::make('wallet_discount')->state(fn() => $totals['wallet_discount']),
+                                        TextEntry::make('points_discount')->state(fn() => $totals['points_discount']),
                                         TextEntry::make('total')->state(fn() => $totals['total']),
                                     ];
                                 })

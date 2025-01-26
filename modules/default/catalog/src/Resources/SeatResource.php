@@ -12,6 +12,8 @@ use App\CatalogModule\Resources\SeatResource\Pages\ViewSeat;
 use App\CatalogModule\Resources\ServiceResource\Pages\ListServiceActivities;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
+use App\Filament\Imports\SeatsImporter;
+use App\Filament\Imports\ServicesImporter;
 use App\UsersModule\Models\Provider;
 use Closure;
 use Filament\Forms\Components\Hidden;
@@ -30,6 +32,7 @@ use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -115,6 +118,11 @@ class SeatResource extends Resource {
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
+            ])
+            ->headerActions([
+                ImportAction::make('importServices')
+                    ->visible(true)
+                    ->importer(SeatsImporter::class),
             ])
             ->actions([
                 Action::make('activities')

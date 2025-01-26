@@ -135,13 +135,13 @@ class ServiceResource extends Resource {
                 Tables\Filters\TrashedFilter::make()
             ])
             ->headerActions([
-//                ImportAction::make('importServices')
-//                    ->visible(true)
-//                    ->importer(ServicesImporter::class),
-//                ImportAction::make('importProducts')
-//                    ->label(__('forms.actions.import_products'))
-//                    ->visible(true)
-//                    ->importer(ProductsImporter::class),
+                ImportAction::make('importServices')
+                    ->visible(true)
+                    ->importer(ServicesImporter::class),
+                ImportAction::make('importProducts')
+                    ->label(__('forms.actions.import_products'))
+                    ->visible(true)
+                    ->importer(ProductsImporter::class),
             ])
             ->actions([
 

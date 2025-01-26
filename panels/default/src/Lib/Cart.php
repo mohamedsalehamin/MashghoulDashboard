@@ -238,6 +238,23 @@ class Cart extends CoreCart {
         $this->condition(new CartCondition($conditionData));
         return true;
     }
+    function applyPointsDiscount($discount): bool {
+
+        !$this->getConditionsByType("points")->count() ?: $this->removeConditionsByType("points");
+        $conditionData = [
+            'name' => 'points',
+            'type' => "points",
+            'target' => "total",
+            'value' => -$discount,
+            'order' => 2,
+            'attributes' => [
+                'original_value' => $discount,
+            ]
+        ];
+        $conditionData['attributes'] = $conditionData;
+        $this->condition(new CartCondition($conditionData));
+        return true;
+    }
 
     public
     function setOrderConditions(): static {
@@ -442,10 +459,13 @@ class Cart extends CoreCart {
         return $this->getConditionsByType('discount')?->first()?->getCalculatedValue($this->getSubTotal());
     }
 
-    public
-    function walletDiscount() {
+    public function walletDiscount() {
 
         return (float)$this->getConditionsByType('wallet')?->first()?->getValue();
+    }
+    public function pointsDiscount() {
+
+        return (float)$this->getConditionsByType('points')?->first()?->getValue();
     }
 
     public
@@ -472,6 +492,7 @@ class Cart extends CoreCart {
             "subtotal" => $this->getSubTotal(),
             "taxes" => $this->getConditionsByType("taxes")?->first()?->getCalculatedValue($this->getSubTotal()),
             'wallet_discount' => $this->walletDiscount(),
+            'points_discount' => $this->pointsDiscount(),
             "total" => $this->getTotal()
         ];
     }

@@ -141,6 +141,8 @@ return [
 
     ],
     'api' => [
+        "overdue_points_balance" => 'Overdue points balance',
+        "insufficient_points_balance"=> 'Insufficient points balance',
         'coupon_cant_be_used_with_selected_services' => 'Coupon cant be used with selected services',
         "coupon_code_min_order_value" => 'Minimum order value must be :value to use this code',
         'product' => [

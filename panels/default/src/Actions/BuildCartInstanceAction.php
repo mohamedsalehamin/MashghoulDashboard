@@ -40,6 +40,7 @@ class BuildCartInstanceAction {
 
         $cart->applyTaxes($this->getTaxesPercentageBasedOnProviderCountry($request->route('provider')));
         $this->applyWalletToCart($cart, $request);
+        $this->applyPointsToCart($cart, $request);
 
         $this->applyReservationFeesBasedOnTerms($cart);
 
@@ -81,15 +82,32 @@ class BuildCartInstanceAction {
      * @throws APIException
      */
     public function applyWalletToCart($cart, $request): void {
+
         if ($request->filled('wallet') && $cart->getTotal() < $request->get('wallet')) {
             throw new APIException(__("validation.api.overdue_wallet_balance"));
         }
 
-        if ($request->filled('wallet') && auth()->user()->getTotalPointsBalance() < $request->get('wallet')) {
+        if ($request->filled('wallet') && auth()->user()->balance < $request->get('wallet')) {
             throw new APIException(__("validation.api.insufficient_wallet_balance"));
         }
         if ($request->filled('wallet')) {
             $cart->applyWalletDiscount($request->get('wallet'));
+        }
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function applyPointsToCart($cart, $request): void {
+        if ($request->filled('points') && $cart->getTotal() < $request->get('points')) {
+            throw new APIException(__("validation.api.overdue_points_balance"));
+        }
+
+        if ($request->filled('points') && auth()->user()->getTotalPointsBalance() < $request->get('points')) {
+            throw new APIException(__("validation.api.insufficient_points_balance"));
+        }
+        if ($request->filled('points')) {
+            $cart->applyPointsDiscount($request->get('points'));
         }
     }
 

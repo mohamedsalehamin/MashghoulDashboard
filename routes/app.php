@@ -27,6 +27,7 @@ Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Mo
 
 //return view('site.pages.invoice', ['reservation' => $reservation]);
     $pdf = PDF::loadView('site.pages.invoice', ['reservation' => $reservation]);
+//    dd('as');
     $suffix = "{$reservation->id}_" . date("Y_m_d");
     return $pdf->download("invoice_$suffix.pdf");
 })->name('reservations.invoice');

@@ -9,6 +9,7 @@ enum ReservationStatus: string implements HasLabel {
     case PROCESSING = 'processing';
 
     case COMPLETED = 'completed';
+    case NOT_PERFORMED = 'not_performed';
     case CANCELED = 'canceled';
 
     public function getLabel(): ?string {
@@ -20,7 +21,7 @@ enum ReservationStatus: string implements HasLabel {
             'pending','created', => 'warning',
             'processing' => 'info',
             'completed' => 'success',
-            'canceled' => 'danger',
+            default => 'danger',
         };
 
     }
@@ -29,7 +30,7 @@ enum ReservationStatus: string implements HasLabel {
             'pending','created', => 'heroicon-m-bolt',
             'processing' => 'heroicon-m-document-magnifying-glass',
             'completed' => 'heroicon-m-rocket-launch',
-            'canceled', => 'heroicon-m-rocket-launch',
+            default, => 'heroicon-m-rocket-launch',
 
         };
     }
