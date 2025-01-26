@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Actions;
 
+use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Transaction;
 use Lorisleiva\Actions\Concerns\AsAction;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
@@ -9,21 +10,15 @@ use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 class RefundTransaction {
     use AsAction;
 
-    public function handle($invoiceID, $amount) {
-        $myfatoorahApiV2 = app(PaymentMyfatoorahApiV2::class);
-
-
-        return $myfatoorahApiV2->refund(
-            keyId: $invoiceID,
-            amount: $amount,
-            currencyCode: 'SAR',
-            comment: 'Refund',
-            keyType: 'InvoiceId'
-        );
-
-
+    public function handle(Reservation $reservation) {
+        $amount =$reservation->price->formatByDecimal();
+        $reservation->customer?->deposit($amount, [
+            'description' => [
+                'ar' => __("panel.messages.refund_reservation", ['no' => $reservation->id,'amount'=>$amount], 'ar'),
+                'en' => __("panel.messages.refund_reservation", ['no' => $reservation->id,'amount'=>$amount], 'en'),
+            ]
+        ]);
     }
-
 
 
 }

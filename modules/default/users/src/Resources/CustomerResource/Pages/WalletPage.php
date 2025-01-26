@@ -1,0 +1,125 @@
+<?php
+
+namespace App\UsersModule\Resources\CustomerResource\Pages;
+
+use App\UsersModule\Resources\CustomerResource;
+use App\UsersModule\Resources\CustomerResource\Widgets\WalletStats;
+use Filament\Forms\Components\DatePicker;
+use Filament\Resources\Concerns\HasTabs;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use Filament\Resources\Pages\Page;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Theamostafa\Wallet\Models\Transaction;
+
+class WalletPage extends Page implements HasTable {
+    use InteractsWithRecord;
+    use HasTabs;
+    use InteractsWithTable;
+
+//    public ?array $tableFilters = null;
+    public string|int|null|\Illuminate\Database\Eloquent\Model $record;
+
+
+    protected static string $view = 'filament-panels::resources.pages.list-records';
+
+    protected static string $resource = CustomerResource::class;
+
+    public function mount(int|string $record): void {
+        $this->record = $this->resolveRecord($record);
+    }
+
+    public function table(Table $table): Table {
+        return $table->query($this->getTableQuery())
+            ->emptyStateHeading(__("site.no_data"))
+            ->filters([
+                SelectFilter::make('type')
+                    ->options([
+                        'deposit' => __('panel.enums.deposit'),
+                        'withdraw' => __('panel.enums.withdraw'),
+                    ]),
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('date_from'),
+                        DatePicker::make('date_to'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['date_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['date_to'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
+            ])
+            ->columns([
+                TextColumn::make('id')->translateLabel()
+                    ->searchable(false),
+
+                TextColumn::make('type')
+                    ->label(__('forms.fields.transaction_type'))
+                    ->formatStateUsing(fn($state) => __("panel.enums.$state"))
+                    ->searchable(false),
+                TextColumn::make('amount')->searchable(false),
+                TextColumn::make('meta.description')
+                    ->formatStateUsing(fn($record) => $record->meta['description'][app()->getLocale()])
+                    ->searchable(false),
+                TextColumn::make('created_at')
+                    ->date()
+                    ->searchable(false)
+            ])
+            ->striped();
+
+    }
+
+//    protected function getHeaderWidgets(): array {
+//        return [
+//            LabResource\Widgets\WalletSummary::make(['record' => $this->record->lab])
+//        ];
+//    }
+//
+//    protected function getWidgets(): array {
+//        return [
+//            LabResource\Widgets\WalletSummary::make(['record' => $this->record->lab])
+//        ];
+//    }
+
+
+    protected function getTableQuery(): ?Builder {
+
+        return Transaction::whereHas('wallet', fn($query) => $query
+            ->where('holder_id', $this->record?->id)
+            ->where('holder_type', $this->record?->getMorphClass())
+        );
+    }
+
+    public function getHeading(): string|Htmlable {
+        return __('menu.wallet');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBreadcrumbs(): array {
+        return [
+            __('menu.dashboard'),
+            $this->record?->provider?->title,
+            __('menu.wallet')
+        ];
+    }
+
+    protected function getHeaderWidgets(): array {
+        return [
+            WalletStats::make(['record' => $this->record])
+        ];
+    }
+}

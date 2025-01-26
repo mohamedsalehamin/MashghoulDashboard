@@ -1,6 +1,9 @@
 <?php
 return [
     'fields' => [
+        "points_discount"=>"Points discount",
+        "cancel_reason"=>"Cancel reason",
+        "refund_customer_balance"=>"Refund customer balance",
         "name_ar" => "Name in Arabic",
         "name_en" => "Name in English",
         "provider_id" => "Provider",

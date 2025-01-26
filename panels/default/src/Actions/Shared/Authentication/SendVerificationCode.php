@@ -10,7 +10,7 @@ use App\DefaultPanel\Lib\Utils;
 class SendVerificationCode {
     use AsAction;
 
-    public function handle($user=null, $phone = null) {
+    public function handle($user = null, $phone = null) {
         $code = Utils::randomOtpCode();
 
         VerificationCode::create([
@@ -18,7 +18,7 @@ class SendVerificationCode {
             "code" => $code,
             'user_id' => $user?->id,
         ]);
-        SMS::run($user->phone ?? $phone, "Mashghoul OTP code: $code");
+        SMS::make($user->phone ?? $phone, "Mashghoul OTP code: $code")->send();
 
 
     }

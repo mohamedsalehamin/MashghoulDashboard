@@ -28,7 +28,7 @@ class ReservationServices {
             ->when(request()->filled('date_from'), fn($query) => $query->whereDate('date', '>=', request('date_from')))
             ->when(request()->filled('date_to'), fn($query) => $query->whereDate('date', '<=', request('date_to')))
             ->when(request()->filled('id'), fn($query) => $query->where('id', request('id')))
-            ->when(request()->filled('direction'), fn($query) => $query->orderBy('date', request('direction')))
+            ->when(request()->filled('direction'), fn($query) => $query->orderBy('id', request('direction')))
             ->paginate(10);
         return Api::isOk(__("Reservations list"), LightReservationResource::collection($reservations));
     }

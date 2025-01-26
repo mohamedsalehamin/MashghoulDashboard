@@ -1,6 +1,9 @@
 <?php
 return [
     'fields' => [
+        "points_discount" => "خصم النقاط",
+        "cancel_reason" => "سبب الإلغاء",
+        "refund_customer_balance" => "استرجاع رصيد العميل علي المحفظة",
         "provider_id" => "الرقم التعريفي لمقدم الخدمة",
         "description_en" => "الوصف بالانجليزية",
         "description_ar" => "الوصف بالعربية",

@@ -1,6 +1,8 @@
 <?php
 return [
     'messages' => [
+        "refund_reservation" => "تم استرجاع مبلغ :amount نظير الحجز رقم :no",
+        'paid_reservation_no'=>"تم سحب مبلغ :amount نظير الحجز رقم :no",
         'sms_sent_successfully' => 'تم إرسال الرسالة النصية بنجاح',
         'sms_email_successfully' => 'تم إرسال البريد الإلكتروني بنجاح',
         'send_sms_description' => 'يمكنك إرسال رسالة نصية للعملاء',
@@ -142,7 +144,8 @@ return [
         'doctor_late' => 'ﺗﻢ اﻟﺘﺨﻠﻒ ﻋﻦ اﻟﻤﻮﻋﺪ ﻣﻦ قبل الطبيب',
         'patient_canceled' => 'ملغي  ﻣﻦ قبل المريض',
         'doctor_canceled' => 'ملغي  ﻣﻦ قبل الطبيب',
-        'canceled' => 'لم يتم تنفيذ الخدمة',
+        'not_performed' => 'لم يتم تنفيذ الخدمة',
+        'canceled' => 'ملغي',
         'problematic' => 'بة مشكلة',
         'paid' => 'تم الدفع',
 

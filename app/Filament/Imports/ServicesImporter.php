@@ -72,7 +72,8 @@ class ServicesImporter extends Importer {
             'price' => data_get($this->getData(), 'price',0),
             'meta_data'=>[
                 'import_id'=>data_get($this->getData(), 'id')
-            ]
+            ],
+            'status'=>1
 
         ]);
 

@@ -48,7 +48,7 @@ class SendSMS extends Page implements HasForms {
                         ->multiple()
                         ->required()
                         ->visible(fn($get) => $get('notification_type') == 'specific')
-                        ->options(fn()=>$this->getUsers()->mapWithKeys(fn($record) => [$record->id => $record->name . '-' . $record->phone])),
+                        ->options(fn() => $this->getUsers()->mapWithKeys(fn($record) => [$record->id => $record->name . '-' . $record->phone])),
                 ]),
         ];
     }
@@ -56,7 +56,7 @@ class SendSMS extends Page implements HasForms {
     public function submit() {
         $this->validate();
         foreach ($this->getUsers() as $user) {
-//            SMS::make($phone, $message,'')->send();
+            SMS::make($user->phone, $this->sms_body, 'SmSupMrk-AD')->send();
         }
         $this->reset($this->except(''));
 

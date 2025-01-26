@@ -43,6 +43,9 @@ class CartServices {
         if ($request->filled('wallet')) {
             $reservation->pay($request->float('wallet'), 'wallet');
         }
+        if ($request->filled('points')) {
+            $reservation->pay($request->float('points'), 'points');
+        }
         if ($cart->getTotal() > 0) {
             $reservation->pay($cart->getTotal());
         }
