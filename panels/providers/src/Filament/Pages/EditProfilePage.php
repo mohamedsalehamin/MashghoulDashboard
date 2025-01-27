@@ -162,6 +162,8 @@ class EditProfilePage extends Page {
 
                             Map::make('location')
                                 ->live()
+                                ->geolocate()
+                                ->geolocateLabel(__('panel.messages.locate_my_location'))
                                 ->formatStateUsing(function ($record) {
                                     if (!$record || !$record?->location) return;
                                     return [

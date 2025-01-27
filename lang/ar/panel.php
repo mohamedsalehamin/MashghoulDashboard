@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        "locate_my_location"=>"تحديد موقعي",
         "refund_reservation" => "تم استرجاع مبلغ :amount نظير الحجز رقم :no",
         'paid_reservation_no'=>"تم سحب مبلغ :amount نظير الحجز رقم :no",
         'sms_sent_successfully' => 'تم إرسال الرسالة النصية بنجاح',

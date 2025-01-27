@@ -1,6 +1,7 @@
 <?php
 return [
     'messages' => [
+        "locate_my_location"=>"Locate my location",
         'you_are_gain_points_for_reservation'=>'You have gained :points points for reservation',
         "refund_reservation" => "Reservation no :no has been refunded",
         'paid_reservation_no'=>":amount has been paid for reservation no :no",
