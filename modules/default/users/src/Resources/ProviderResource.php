@@ -175,6 +175,8 @@ class ProviderResource extends Resource {
                             ->options(fn($get) => City::where('state_id', $get('state_id'))->pluck('name', 'id')),
                         Map::make('location')
                             ->live()
+                            ->geolocate()
+                            ->geolocateLabel(__('panel.messages.locate_my_location'))
                             ->formatStateUsing(function ($record) {
                                 if (!$record || !$record?->location) return;
                                 return [
