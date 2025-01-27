@@ -44,7 +44,6 @@ class Seat extends Model {
     }
 
     public function availableTimes(Carbon $date, $interval = 60) {
-
         return $this->getAvailablePeriodsOnDate($date, true, $interval);
 
     }
@@ -79,9 +78,13 @@ class Seat extends Model {
 
 
         if ($date->isToday()) {
+
             $slots = collect($slots)->map(function ($slot) {
-                $slot->filter(function ($period) {
+
+              return   $slot->filter(function ($period) {
+
                     $from = \Str::before($period, " -");
+
                     return Carbon::today()->setTimeFromTimeString($from)->isFuture();
                 });
             });
