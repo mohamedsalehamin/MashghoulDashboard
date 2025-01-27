@@ -1,23 +1,33 @@
 <?php
 return [
     'mode' => '',
-    'format' => 'A2',
+    'format' => 'A4',
     'default_font_size' => '12',
-    'default_font' => 'sans-serif',
-    'margin_left' => 0,
-    'margin_right' => 0,
-    'margin_top' => 0,
-    'margin_bottom' => 0,
+    'default_font' => 'din-light',
+    'margin_left' => 10,
+    'margin_right' => 10,
+    'margin_top' => 10,
+    'margin_bottom' => 10,
     'margin_header' => 0,
     'margin_footer' => 0,
     'orientation' => 'P',
-    'title' => 'Laravel mPDF',
+    'title' => 'Mashghoul',
+    'custom_font_dir' => base_path('resources/fonts/'), // don't forget the trailing slash!
+    'custom_font_data' => [
+//        'din-light' => [ // must be lowercase and snake_case
+//            'R' => 'Tajawal-Light.ttf',    // regular font// optional: bold-italic font
+//        ],
+//        'din-bold' => [ // must be lowercase and snake_case
+//            'R' => 'Tajawal-Bold.ttf',    // regular font// optional: bold-italic font
+//        ],
+        // ...add as many as you want.
+    ],
     'author' => '',
     'creator' => '',
     'subject' => '',
     'keywords' => '',
-    'watermark' => '',
-    'show_watermark' => false,
+    'watermark' => 'مشغول',
+    'show_watermark' => true,
     'show_watermark_image' => false,
     'watermark_font' => 'sans-serif',
     'display_mode' => 'fullpage',
@@ -26,9 +36,7 @@ return [
     'watermark_image_alpha' => 0.2,
     'watermark_image_size' => 'D',
     'watermark_image_position' => 'P',
-    'custom_font_dir' => base_path('public/qr/assets/webfonts/fonts_design'),
-    'custom_font_data' => [],
-    'auto_language_detection' => true,
+    'auto_language_detection' => false,
     'temp_dir' => storage_path('app'),
     'pdfa' => false,
     'pdfaauto' => false,
