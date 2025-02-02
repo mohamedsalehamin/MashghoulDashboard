@@ -37,6 +37,10 @@ class ProductsImporter extends Importer {
                 ->label(__("forms.fields.price"))
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('image')
+                ->label(__("forms.fields.image"))
+                ->requiredMapping()
+                ->rules(['required']),
         ];
     }
 
@@ -69,8 +73,17 @@ class ProductsImporter extends Importer {
     public function saveRecord(): void {
         $this->record->offsetUnset('id');
         $this->record->offsetUnset('import_service_id');
+        $this->record->offsetUnset('image');
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
         $this->record->save();
+        if (isset($this->data['image'])) {
+            try {
+                $this->record->addMediaFromUrl($this->data['image'])->toMediaCollection();
+            } catch (\Exception $exception) {
+
+
+            }
+        }
     }
 }
