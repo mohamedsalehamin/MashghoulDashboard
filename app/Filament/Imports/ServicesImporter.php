@@ -15,6 +15,8 @@ class ServicesImporter extends Importer {
 
     public static function getColumns(): array {
         return [
+            ImportColumn::make('db_row_id')
+                ->label(__("forms.fields.db_row_id")),
             ImportColumn::make('id')
                 ->label(__("forms.fields.id"))
                 ->requiredMapping()
@@ -62,7 +64,9 @@ class ServicesImporter extends Importer {
 
     public function resolveRecord(): ?Service {
 
-        return Service::firstOrNew([
+        return Service::updateOrCreate([
+            'id' => data_get($this->getData(), 'db_row_id', 0),
+        ], [
             'provider_id' => $this->options['provider_id'] ?? null,
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
@@ -96,6 +100,7 @@ class ServicesImporter extends Importer {
 
     public function saveRecord(): void {
         $this->record->offsetUnset('id');
+        $this->record->offsetUnset('db_row_id');
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('description_ar');
         $this->record->offsetUnset('description_en');

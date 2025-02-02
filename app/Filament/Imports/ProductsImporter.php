@@ -16,6 +16,8 @@ class ProductsImporter extends Importer {
 
     public static function getColumns(): array {
         return [
+            ImportColumn::make('db_row_id')
+                ->label(__("forms.fields.db_row_id")),
             ImportColumn::make('id')
                 ->label(__("forms.fields.id"))
                 ->requiredMapping()
@@ -47,7 +49,9 @@ class ProductsImporter extends Importer {
 
     public function resolveRecord(): ?Product {
 
-        return Product::firstOrNew([
+        return Product::updateOrCreate([
+            'id' => data_get($this->getData(), 'db_row_id', 0),
+        ], [
             'service_id' => Service::where('meta_data->import_id', data_get($this->getData(), 'import_service_id'))->get()->first()?->id,
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
@@ -72,6 +76,7 @@ class ProductsImporter extends Importer {
 
     public function saveRecord(): void {
         $this->record->offsetUnset('id');
+        $this->record->offsetUnset('db_row_id');
         $this->record->offsetUnset('import_service_id');
         $this->record->offsetUnset('image');
         $this->record->offsetUnset('name_ar');

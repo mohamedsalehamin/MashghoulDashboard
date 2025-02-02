@@ -2,6 +2,7 @@
 return [
     'fields' => [
         "e_invoice_url" => "فاتورة الكترونية",
+        "db_row_id"=>"الرقم التعريفي في قاعده البيانات",
         "points_discount" => "خصم النقاط",
         "cancel_reason" => "سبب الإلغاء",
         "refund_customer_balance" => "استرجاع رصيد العميل علي المحفظة",

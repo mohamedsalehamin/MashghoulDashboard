@@ -17,6 +17,8 @@ class SeatsImporter extends Importer {
 
     public static function getColumns(): array {
         return [
+            ImportColumn::make('db_row_id')
+                ->label(__("forms.fields.db_row_id")),
             ImportColumn::make('name_ar')
                 ->label(__("forms.fields.name_ar"))
                 ->requiredMapping()
@@ -45,7 +47,9 @@ class SeatsImporter extends Importer {
 
     public function resolveRecord(): ?Seat {
 
-        return Seat::firstOrNew([
+        return Seat::updateOrCreate([
+            'id' => data_get($this->getData(), 'db_row_id', 0),
+        ], [
             'provider_id' => $this->options['provider_id'] ?? null,
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
@@ -73,6 +77,7 @@ class SeatsImporter extends Importer {
         $services = Service::whereIn('meta_data->import_id', explode(", ", $this->getData()['services']))->pluck("id")->toArray();
 
         $this->record->offsetUnset('id');
+        $this->record->offsetUnset('db_row_id');
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
         $this->record->offsetUnset('services');

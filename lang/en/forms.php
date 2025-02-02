@@ -2,6 +2,7 @@
 return [
     'fields' => [
         'e_invoice_url'=>'E Invoice',
+        "db_row_id"=>"DB Row ID",
         "points_discount"=>"Points discount",
         "cancel_reason"=>"Cancel reason",
         "refund_customer_balance"=>"Refund customer balance",
