@@ -1,6 +1,7 @@
 <?php
 return [
     'fields' => [
+        'e_invoice_url'=>'E Invoice',
         "points_discount"=>"Points discount",
         "cancel_reason"=>"Cancel reason",
         "refund_customer_balance"=>"Refund customer balance",

@@ -27,7 +27,7 @@ return [
     'subject' => '',
     'keywords' => '',
     'watermark' => 'مشغول',
-    'show_watermark' => true,
+    'show_watermark' => false,
     'show_watermark_image' => false,
     'watermark_font' => 'sans-serif',
     'display_mode' => 'fullpage',

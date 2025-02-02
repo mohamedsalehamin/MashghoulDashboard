@@ -44,7 +44,6 @@ class ManageGeneral extends SettingsPage {
                         ->email()
                         ->required(),
                     TextInput::make('app_address')
-                        ->email()
                         ->required(),
                     TextInput::make('app_phone')
                         ->type('number')

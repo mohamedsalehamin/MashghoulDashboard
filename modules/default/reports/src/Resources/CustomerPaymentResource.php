@@ -75,11 +75,10 @@ class CustomerPaymentResource extends Resource {
                 TextColumn::make('price')
                     ->searchable(),
 
-                TextColumn::make('invoice_url')
+                TextColumn::make('e_invoice_url')
                     ->state(fn($record) => isset($record->meta_data['invoiceURL']) ? __('forms.fields.show_invoice') : __('forms.fields.no_invoice'))
                     ->url(fn($record) => isset($record->meta_data['invoiceURL']) ? $record->meta_data['invoiceURL'] : '', true)
                     ->searchable(false),
-
                 TextColumn::make('price')
                     ->formatStateUsing(fn($record) => $record->price->format())
                     ->summarize(Tables\Columns\Summarizers\Sum::make()->money('SAR')),
@@ -115,6 +114,9 @@ class CustomerPaymentResource extends Resource {
                     })
             ])
             ->actions([
+                Tables\Actions\Action::make('download')
+                    ->label(__("site.fields.download_invoice"))
+                    ->action(fn($record) => redirect()->route('reservations.invoice', $record->transactionable_id))
             ])
             ->bulkActions([
 
