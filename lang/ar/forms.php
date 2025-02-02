@@ -1,6 +1,7 @@
 <?php
 return [
     'fields' => [
+        "e_invoice_url" => "فاتورة الكترونية",
         "points_discount" => "خصم النقاط",
         "cancel_reason" => "سبب الإلغاء",
         "refund_customer_balance" => "استرجاع رصيد العميل علي المحفظة",
