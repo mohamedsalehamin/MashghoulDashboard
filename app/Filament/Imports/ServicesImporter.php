@@ -43,6 +43,10 @@ class ServicesImporter extends Importer {
                 ->label(__("forms.fields.price"))
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('image')
+                ->label(__("forms.fields.image"))
+                ->requiredMapping()
+                ->rules(['required']),
         ];
     }
 
@@ -69,11 +73,11 @@ class ServicesImporter extends Importer {
                 'en' => data_get($this->getData(), 'description_en'),
             ],
             'duration' => data_get($this->getData(), 'duration'),
-            'price' => data_get($this->getData(), 'price',0),
-            'meta_data'=>[
-                'import_id'=>data_get($this->getData(), 'id')
+            'price' => data_get($this->getData(), 'price', 0),
+            'meta_data' => [
+                'import_id' => data_get($this->getData(), 'id')
             ],
-            'status'=>1
+            'status' => 1
 
         ]);
 
@@ -95,7 +99,16 @@ class ServicesImporter extends Importer {
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('description_ar');
         $this->record->offsetUnset('description_en');
+        $this->record->offsetUnset('image');
         $this->record->offsetUnset('name_en');
         $this->record->save();
+        if (isset($this->data['image'])) {
+            try {
+                $this->record->addMediaFromUrl($this->data['image'])->toMediaCollection();
+            } catch (\Exception $exception) {
+
+
+            }
+        }
     }
 }
