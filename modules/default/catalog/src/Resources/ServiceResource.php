@@ -163,6 +163,7 @@ class ServiceResource extends Resource {
                             ->withColumns([
                                 Column::make('id')->heading(__("forms.fields.db_row_id")),
                                 Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+                                Column::make('provider_id')->heading(__("forms.fields.provider_id")),
                                 Column::make('title.ar')
                                     ->heading(__("forms.fields.title_ar"))
                                     ->getStateUsing(fn($record) => $record->price)
@@ -210,6 +211,7 @@ class ServiceResource extends Resource {
                             ->withColumns([
                                 Column::make('id')->heading(__("forms.fields.db_row_id")),
                                 Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+
                                 Column::make('service_id')
                                     ->heading(__("forms.fields.service_id"))
                                     ->formatStateUsing(fn($record) => data_get(Service::find($record->service_id)?->meta_data, ['import_id'])),

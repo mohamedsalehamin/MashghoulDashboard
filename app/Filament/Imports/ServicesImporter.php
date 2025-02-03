@@ -21,6 +21,10 @@ class ServicesImporter extends Importer {
                 ->label(__("forms.fields.id"))
                 ->requiredMapping()
                 ->rules(['required']),
+            ImportColumn::make('provider_id')
+                ->label(__("forms.fields.provider_id"))
+                ->requiredMapping()
+                ->rules(['required']),
             ImportColumn::make('name_ar')
                 ->label(__("forms.fields.name_ar"))
                 ->requiredMapping()
@@ -52,22 +56,14 @@ class ServicesImporter extends Importer {
         ];
     }
 
-    public static function getOptionsFormComponents(): array {
-        return [
-            Select::make('provider_id')
-                ->searchable()
-                ->label(__('forms.fields.provider_name'))
-                ->options(fn() => Provider::pluck('name', 'id'))
-                ->required(),
-        ];
-    }
 
     public function resolveRecord(): ?Service {
 
         return Service::updateOrCreate([
             'id' => data_get($this->getData(), 'db_row_id', 0),
         ], [
-            'provider_id' => $this->options['provider_id'] ?? null,
+            'provider_id' => data_get($this->getData(), 'provider_id', 0),
+
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
                 'en' => data_get($this->getData(), 'name_en'),
