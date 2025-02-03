@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Resources;
 
+use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\SeatResource\Pages\CreateSeat;
@@ -38,7 +39,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tasawk\Models\Catalog\Category;
 
 
@@ -120,6 +124,35 @@ class SeatResource extends Resource {
                 Tables\Filters\TrashedFilter::make()
             ])
             ->headerActions([
+                ExportAction::make()
+                    ->modalHeading('')
+                    ->modalDescription('')
+                    ->exports([
+
+                        ExcelExport::make()
+                            ->label(__("forms.fields.export_services"))
+                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+                            ->withColumns([
+                                Column::make('id')->heading(__("forms.fields.db_row_id")),
+                                Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+                                Column::make('title.ar')
+                                    ->heading(__("forms.fields.name_ar"))
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar'] ?? ''),
+
+                                Column::make('title.en')
+                                    ->heading(__("forms.fields.title_en"))
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en'] ?? ''),
+
+
+                                Column::make('services')
+                                    ->heading(__("forms.fields.services"))
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) => $record->services->pluck('id')->toArray()),
+                            ])->withFilename(fn() => 'seats' . now()->format('Y-m-d')),
+
+                    ]),
                 ImportAction::make('importServices')
                     ->visible(true)
                     ->importer(SeatsImporter::class),
@@ -163,12 +196,12 @@ class SeatResource extends Resource {
 
     public static function getWorkingDaysShift($record): array {
         $schema = [];
-        foreach ($record->meta_data['days_list'] ?? [] as $index=> $slot) {
+        foreach ($record->meta_data['days_list'] ?? [] as $index => $slot) {
 
             $schema[] = RepeatableEntry::make('meta_data.days_list')
-                ->label(__("sections.shift_no",['no'=>$index+1]))
+                ->label(__("sections.shift_no", ['no' => $index + 1]))
                 ->state(fn($record) => collect($slot)->where('status', true)->toArray())
-                ->statePath('meta_data.days_list.'.$index)
+                ->statePath('meta_data.days_list.' . $index)
                 ->schema([
                     TextEntry::make('day_name')
                         ->formatStateUsing(fn($record, $state) => __("forms.fields.weekdays." . $state))
