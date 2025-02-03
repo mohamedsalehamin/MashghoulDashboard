@@ -90,7 +90,7 @@ class Reservation extends Model {
     }
 
     public function getDurationAttribute() {
-        return __("panel.enums.minutes", ['minutes' => $this->as_cart->getContent()->sum(fn($item) => $item->associatedModel->duration)]);
+        return __("panel.enums.minutes", ['minutes' => $this->as_cart->getContent()->sum(fn($item) => $item->associatedModel?->duration)]);
     }
 
     public function scopeBelongsToAuthUser($builder) {

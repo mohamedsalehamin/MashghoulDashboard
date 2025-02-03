@@ -27,6 +27,8 @@ class Service extends Model implements HasMedia {
 
     protected $casts = [
         'meta_data' => 'array',
+        'title' => 'array',
+        'description' => 'array',
 
     ];
 

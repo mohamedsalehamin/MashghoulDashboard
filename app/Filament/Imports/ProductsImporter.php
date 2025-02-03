@@ -20,8 +20,7 @@ class ProductsImporter extends Importer {
                 ->label(__("forms.fields.db_row_id")),
             ImportColumn::make('id')
                 ->label(__("forms.fields.id"))
-                ->requiredMapping()
-                ->rules(['required']),
+                ,
             ImportColumn::make('import_service_id')
                 ->label(__("forms.fields.service_id"))
                 ->requiredMapping()
@@ -48,7 +47,6 @@ class ProductsImporter extends Importer {
 
 
     public function resolveRecord(): ?Product {
-
         return Product::updateOrCreate([
             'id' => data_get($this->getData(), 'db_row_id', 0),
         ], [

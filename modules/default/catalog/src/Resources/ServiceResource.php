@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Resources;
 
+use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
 use App\CatalogModule\Resources\ServiceResource\Pages\EditService;
@@ -31,11 +32,14 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ImportAction;
+use pxlrbt\FilamentExcel\Columns\Column;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 
 class ServiceResource extends Resource {
@@ -134,15 +138,6 @@ class ServiceResource extends Resource {
             ->filters([
                 Tables\Filters\TrashedFilter::make()
             ])
-            ->headerActions([
-                ImportAction::make('importServices')
-                    ->visible(true)
-                    ->importer(ServicesImporter::class),
-                ImportAction::make('importProducts')
-                    ->label(__('forms.actions.import_products'))
-                    ->visible(true)
-                    ->importer(ProductsImporter::class),
-            ])
             ->actions([
 
                 Action::make('activities')
@@ -155,12 +150,105 @@ class ServiceResource extends Resource {
                 Tables\Actions\DeleteAction::make(),
 
             ])
+            ->headerActions([
+                ExportAction::make("exportServices")
+                    ->label(__('forms.fields.export_services'))
+                    ->modalHeading('')
+                    ->modalDescription('')
+                    ->exports([
+
+                        ExcelExport::make("export_services")
+                            ->label(__("forms.fields.export_services"))
+                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+                            ->withColumns([
+                                Column::make('id')->heading(__("forms.fields.db_row_id")),
+                                Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+                                Column::make('title.ar')
+                                    ->heading(__("forms.fields.title_ar"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar']),
+
+                                Column::make('title.en')
+                                    ->heading(__("forms.fields.title_en"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en']),
+
+                                Column::make('description.ar')
+                                    ->heading(__("forms.fields.description_ar"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['ar']),
+
+                                Column::make('description.en')
+                                    ->heading(__("forms.fields.description_en"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['en']),
+
+                                Column::make('duration')->heading(__("forms.fields.duration")),
+                                Column::make('price')
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) => $record->price->formatByDecimal())
+                                    ->heading(__("forms.fields.price")),
+                                Column::make('image')
+                                    ->heading(__("forms.fields.image"))
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) =>url($record->getFirstMediaUrl())),
+                            ])->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
+
+
+                    ]),
+
+                ExportAction::make("exportProducts")
+                    ->label(__('forms.fields.export_products'))
+                    ->modalHeading('')
+                    ->modalDescription('')
+                    ->exports([
+
+                        ExcelExport::make("export_products")
+                            ->label(__("forms.fields.export_products"))
+                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+                            ->modifyQueryUsing(fn($query) => Product::whereHas('service'))
+                            ->withColumns([
+                                Column::make('id')->heading(__("forms.fields.db_row_id")),
+                                Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+                                Column::make('service_id')
+                                    ->heading(__("forms.fields.service_id"))
+                                    ->formatStateUsing(fn($record) => data_get(Service::find($record->service_id)?->meta_data, ['import_id'])),
+                                Column::make('title.ar')
+                                    ->heading(__("forms.fields.title_ar"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar']),
+
+                                Column::make('title.en')
+                                    ->heading(__("forms.fields.title_en"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en']),
+
+                                Column::make('price')
+                                    ->formatStateUsing(fn($record) => $record->price->formatByDecimal())
+                                    ->heading(__("forms.fields.price")),
+
+                                Column::make('image')
+                                    ->heading(__("forms.fields.image"))
+                                    ->getStateUsing(fn($record) => $record->price)
+                                    ->formatStateUsing(fn($record) =>url( $record->getFirstMediaUrl())),
+                            ])->withFilename(fn() => 'products-' . now()->format('Y-m-d'))
+                    ]),
+                ImportAction::make('importServices')
+                    ->visible(true)
+                    ->importer(ServicesImporter::class),
+
+                ImportAction::make('importProducts')
+                    ->label(__('forms.actions.import_products'))
+                    ->visible(true)
+                    ->importer(ProductsImporter::class),
+            ])
             ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                ExportBulkAction::make(),
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ])
+                Tables\Actions\BulkActionGroup::make([
+
+
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make(),

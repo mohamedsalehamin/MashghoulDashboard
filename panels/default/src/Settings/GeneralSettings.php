@@ -94,7 +94,7 @@ class GeneralSettings extends Settings {
                                 return;
                             }
 
-                            $day = collect($providerTimes->meta_data['days_list'])
+                            $day = collect($providerTimes->meta_data['days_list']??[])
                                 ->where('status', true)
                                 ->where('day_name', $get("{$index}.day_name"))->first();
 
