@@ -237,8 +237,11 @@ class ProviderResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query) => $query->whereHas('provider'))
             ->columns([
-                TextColumn::make('id')->searchable(),
+                TextColumn::make('provider.id')
+                    ->default('')
+                    ->searchable(),
 
                 TextColumn::make('name')->label(__('forms.fields.provider_account_name'))->searchable(),
                 TextColumn::make('provider.name')->label(__('forms.fields.provider_name')),
