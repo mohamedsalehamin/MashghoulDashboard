@@ -35,7 +35,8 @@ class CartServices {
             'status' => ReservationStatus::PENDING,
             'price' => $cart->getTotal(),
             'meta_data' => [
-                'points' => GeneralSettings::getPointsOnAction('reserve')
+                'points' => GeneralSettings::getPointsOnAction('reserve'),
+                'reservation_flow' => $provider->user?->options?->reservation_flow
             ]
         ]);
         $cart->saveItemsToOrder($reservation->id);

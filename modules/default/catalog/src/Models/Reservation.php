@@ -208,6 +208,54 @@ class Reservation extends Model {
         return $cart;
     }
 
+    public function getPrintCartAttribute() {
+        $totalProducts = 0;
+        $eventsClass = config('shopping_cart.events');
+        $events = $eventsClass ? new $eventsClass() : app('events');
+        $session_key = md5($this->cart_id . \Str::random());
+        $instanceName = $session_key . 'back_end_order_cart';
+        $cart = new CoreCart(
+            new ArrayStorage,
+            $events,
+            $instanceName,
+            $session_key,
+            config('shopping_cart')
+        );
+
+        $this->itemsLine->transform(function (ItemsLine $item) use (&$totalProducts) {
+            foreach ($item['attributes']['products'] as $product) {
+                $totalProducts += $product['price']['amount'] / 100;
+            }
+            $conditions = collect($item->conditions)->map(/**
+             * @throws InvalidConditionException
+             */ fn($cond) => new CartCondition($cond))->toArray();
+
+            $item['quantity'] = $item->quantity > 0 ? $item->quantity : 1;
+            $item['associatedModel'] = Service::find($item->model['id']);
+            $item['price'] = Service::find($item->model['id'])->price->formatByDecimal();
+            $item['new_conditions'] = $conditions;
+            return $item;
+        })->each(function ($item) use ($cart) {
+            $d = $item->toArray();
+            $d['conditions'] = $d['new_conditions'];
+            return $cart->add($d);
+        });
+
+        $this->conditions
+            ->filter(fn($condition) => $condition->type !== 'products')
+            ->each(/**
+             * @throws InvalidConditionException
+             */ fn($condition) => $cart->condition(new CartCondition($condition->toArray())));
+        $cart->condition(new CartCondition([
+            "name" => "products",
+            "type" => "products",
+            "target" => "subtotal",
+            "value" => floatval($totalProducts),
+            "order" => 1,
+        ]));
+        return $cart;
+    }
+
 
     public function rate() {
         return $this->hasOne(Rate::class);
