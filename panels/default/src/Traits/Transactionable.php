@@ -14,6 +14,10 @@ trait Transactionable {
         return $query->whereHas('transactions', fn($q) => $q->where('status', 'paid')->orWhere('status', 'refunded'));
     }
 
+    public function isPaid() {
+        return $this->transactions()->where('status', 'paid')->exists();
+    }
+
 
     public function transactions() {
         return $this->morphMany(Transaction::class, 'transactionable');

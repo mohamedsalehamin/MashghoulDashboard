@@ -80,13 +80,15 @@ class ProductsImporter extends Importer {
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
         $this->record->save();
+        $record = Product::find($this->record->getOriginal('id'));
         if (isset($this->data['image'])) {
             try {
-                $this->record->addMediaFromUrl($this->data['image'])->toMediaCollection();
-            } catch (\Exception $exception) {
+                $record->addMediaFromUrl($this->data['image'])->toMediaCollection();
 
+            } catch (\Exception $exception) {
 
             }
         }
+
     }
 }

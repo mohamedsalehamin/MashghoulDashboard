@@ -121,6 +121,10 @@ class SeatResource extends Resource {
 
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('provider_id')
+                    ->options(fn() => Provider::pluck('name', 'id'))
+                    ->label(__('forms.fields.provider_name'))
+                    ->searchable(),
                 Tables\Filters\TrashedFilter::make()
             ])
             ->headerActions([

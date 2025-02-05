@@ -1,8 +1,9 @@
 @php use App\DefaultPanel\Lib\Utils;use Cknow\Money\Money; @endphp
 @php($settings = new \App\DefaultPanel\Settings\GeneralSettings())
-@php($totals = $reservation->as_cart->formattedTotals())
+@php($totals = $reservation->print_cart->formattedTotals())
+@php($totalsWithoutFormat = $reservation->print_cart->totals())
 @php(app()->setLocale('ar'))
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8"/>
@@ -340,7 +341,7 @@
                             <p class="code-tit">فاتورة ضريبية مبسطة</p>
                             <img src="https://barcodeapi.org/api/39/{{$settings->tax_number}}" alt="Code" class=""
                                  width="200"/>
-{{--                            <p class="code-num">{{$settings->tax_number}}</p>--}}
+                            {{--                            <p class="code-num">{{$settings->tax_number}}</p>--}}
                         </div>
                     </div>
                     <div class="col-md-8 col-6">
@@ -382,7 +383,7 @@
                         <div class="col-6">
                             <div class="hold-details">
                                 <p><strong>اسم العميل:</strong>{{$reservation->customer?->name}}</p>
-                                <p ><strong>رقم
+                                <p><strong>رقم
                                         الهاتف:</strong> {{$reservation?->customer?->phone}}</p>
                                 <p><strong>البريد الإلكتروني:</strong> {{$reservation?->customer?->email}}</p>
                             </div>
@@ -456,7 +457,7 @@
                                     ?>
                                 <td>{{$loop->iteration}}</td>
 
-                                <td  colspan="2" class="product-name">
+                                <td colspan="2" class="product-name">
                                     <p class="product-title">
                                         {{$option_name}}
                                     </p>
@@ -464,7 +465,7 @@
 
                                 <td>{{$price}}</td>
 
-                                <td  colspan="2">{{$option['price']['quantity']??1}}</td>
+                                <td colspan="2">{{$option['price']['quantity']??1}}</td>
                                 <td>{{$price}}</td>
                             </tr>
                         @endforeach
@@ -496,8 +497,23 @@
                         <td>{{$totals['products_total']}}</td>
                     </tr>
                     <tr>
+                        <td>
+                            رسوم الحجز
+                            @if(data_get($reservation->meta_data,'reservation_flow','') =='fees' && $reservation->isPaid())
+                                <span class="text-danger"> (تم دفعها)</span>
+                            @endif
+                        </td>
+                        <td>{{$totals['reservation_fees']}}</td>
+                    </tr>
+                    <tr>
                         <td>إجمالي التكلفة</td>
-                        <td>{{$totals['subtotal']}}</td>
+                        <td>
+                            {{$totals['subtotal']}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ضريبة القيمة المضافة</td>
+                        <td>{{$totals['taxes']}}</td>
                     </tr>
                     <tr>
                         <td>كود الخصم</td>
@@ -508,13 +524,16 @@
                         <td>{{$totals['wallet_discount']}}</td>
                     </tr>
 
-                    <tr>
-                        <td>رسوم الحجز</td>
-                        <td>{{$totals['reservation_fees']}}</td>
-                    </tr>
+
                     <tr class="total-row">
                         <td>الإجمالي النهائي</td>
-                        <td class="final-total">{{$totals['total']}}</td>
+                        <td class="final-total">
+                            @if(data_get($reservation->meta_data,'reservation_flow','') =='fees' &&$reservation->isPaid())
+                                {{Money::parse($totalsWithoutFormat['total'] - $totalsWithoutFormat['reservation_fees'])->format()}}
+                            @else
+                                {{$totals['total']}}
+                            @endif
+                        </td>
                     </tr>
                     </tbody>
                 </table>

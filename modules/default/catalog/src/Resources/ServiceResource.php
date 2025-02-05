@@ -136,7 +136,11 @@ class ServiceResource extends Resource {
 
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('provider_id')
+                    ->options(fn() => Provider::pluck('name', 'id'))
+                    ->label(__('forms.fields.provider_name'))
+                    ->searchable(),
             ])
             ->actions([
 

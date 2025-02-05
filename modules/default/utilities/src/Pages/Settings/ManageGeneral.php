@@ -58,7 +58,8 @@ class ManageGeneral extends SettingsPage {
                         ->type('number')
                         ->numeric()
                         ->required(),
-                    TextInput::make('reservations_fees')
+                    TextInput::make('reservations_fess')
+                        ->label(__('forms.fields.reservations_fees'))
 
                         ->type('number')
                         ->suffix(__("forms.suffixes.sar"))

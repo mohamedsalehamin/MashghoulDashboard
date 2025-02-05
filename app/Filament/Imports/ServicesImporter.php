@@ -60,10 +60,9 @@ class ServicesImporter extends Importer {
     public function resolveRecord(): ?Service {
 
         return Service::updateOrCreate([
+            'id' => data_get($this->getData(), 'db_row_id', 0)], [
             'id' => data_get($this->getData(), 'db_row_id', 0),
-        ], [
             'provider_id' => data_get($this->getData(), 'provider_id', 0),
-
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
                 'en' => data_get($this->getData(), 'name_en'),
@@ -77,8 +76,7 @@ class ServicesImporter extends Importer {
             'meta_data' => [
                 'import_id' => data_get($this->getData(), 'id')
             ],
-            'status' => 1
-
+            'status' => 1,
         ]);
 
 
@@ -102,12 +100,13 @@ class ServicesImporter extends Importer {
         $this->record->offsetUnset('description_en');
         $this->record->offsetUnset('image');
         $this->record->offsetUnset('name_en');
-        $this->record->save();
+
+        $record = Service::find($this->record->getOriginal('id'));
         if (isset($this->data['image'])) {
             try {
-                $this->record->addMediaFromUrl($this->data['image'])->toMediaCollection();
-            } catch (\Exception $exception) {
+                $record->addMediaFromUrl($this->data['image'])->toMediaCollection();
 
+            } catch (\Exception $exception) {
 
             }
         }
