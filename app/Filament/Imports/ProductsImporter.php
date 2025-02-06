@@ -12,7 +12,7 @@ use Filament\Actions\Imports\Models\Import;
 use Filament\Forms\Components\Select;
 
 class ProductsImporter extends Importer {
-    protected static ?string $model = Service::class;
+    protected static ?string $model = Product::class;
 
     public static function getColumns(): array {
         return [
@@ -20,7 +20,7 @@ class ProductsImporter extends Importer {
                 ->label(__("forms.fields.db_row_id")),
             ImportColumn::make('id')
                 ->label(__("forms.fields.id"))
-                ,
+            ,
             ImportColumn::make('import_service_id')
                 ->label(__("forms.fields.service_id"))
                 ->requiredMapping()
@@ -40,16 +40,16 @@ class ProductsImporter extends Importer {
                 ->rules(['required', 'max:255']),
             ImportColumn::make('image')
                 ->label(__("forms.fields.image"))
-                ->requiredMapping()
-                ->rules(['required']),
+            ,
         ];
     }
 
 
     public function resolveRecord(): ?Product {
-        return Product::updateOrCreate([
+        return Product::firstOrNew([
             'id' => data_get($this->getData(), 'db_row_id', 0),
         ], [
+            'id' => data_get($this->getData(), 'db_row_id', 0),
             'service_id' => Service::where('meta_data->import_id', data_get($this->getData(), 'import_service_id'))->get()->first()?->id,
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
@@ -80,13 +80,12 @@ class ProductsImporter extends Importer {
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
         $this->record->save();
-        $record = Product::find($this->record->getOriginal('id'));
+
         if (isset($this->data['image'])) {
+
             try {
-                $record->addMediaFromUrl($this->data['image'])->toMediaCollection();
-
+                $this->record?->addMediaFromUrl($this->data['image'])->toMediaCollection();
             } catch (\Exception $exception) {
-
             }
         }
 

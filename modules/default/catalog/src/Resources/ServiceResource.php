@@ -164,6 +164,13 @@ class ServiceResource extends Resource {
                         ExcelExport::make("export_services")
                             ->label(__("forms.fields.export_services"))
                             ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+                            ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
+                                $filters = $livewire->getTable()->getFilters();
+
+                                $provider_id = $filters['provider_id']->getState()['value'] ?? null;
+
+                                return Service::query()->when($provider_id, fn($q) => $q->where('provider_id', $provider_id));
+                            })
                             ->withColumns([
                                 Column::make('id')->heading(__("forms.fields.db_row_id")),
                                 Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
@@ -171,22 +178,22 @@ class ServiceResource extends Resource {
                                 Column::make('title.ar')
                                     ->heading(__("forms.fields.title_ar"))
                                     ->getStateUsing(fn($record) => $record->price)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar']),
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar'] ?? ''),
 
                                 Column::make('title.en')
                                     ->heading(__("forms.fields.title_en"))
                                     ->getStateUsing(fn($record) => $record->price)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en']),
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en'] ?? ''),
 
                                 Column::make('description.ar')
                                     ->heading(__("forms.fields.description_ar"))
                                     ->getStateUsing(fn($record) => $record->price)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['ar']),
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['ar'] ?? ''),
 
                                 Column::make('description.en')
                                     ->heading(__("forms.fields.description_en"))
                                     ->getStateUsing(fn($record) => $record->price)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['en']),
+                                    ->formatStateUsing(fn($record) => $record->getOriginal('description')['en'] ?? ''),
 
                                 Column::make('duration')->heading(__("forms.fields.duration")),
                                 Column::make('price')
@@ -196,7 +203,7 @@ class ServiceResource extends Resource {
                                 Column::make('image')
                                     ->heading(__("forms.fields.image"))
                                     ->getStateUsing(fn($record) => $record->title)
-                                    ->formatStateUsing(fn($record) =>url($record->getFirstMediaUrl())),
+                                    ->formatStateUsing(fn($record) => url($record->getFirstMediaUrl())),
                             ])->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
 
 
@@ -206,12 +213,20 @@ class ServiceResource extends Resource {
                     ->label(__('forms.fields.export_products'))
                     ->modalHeading('')
                     ->modalDescription('')
+
                     ->exports([
 
                         ExcelExport::make("export_products")
                             ->label(__("forms.fields.export_products"))
                             ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
-                            ->modifyQueryUsing(fn($query) => Product::whereHas('service'))
+                            ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
+                                $filters = $livewire->getTable()->getFilters();
+
+                                $provider_id = $filters['provider_id']->getState()['value'] ?? null;
+
+                                return Product::query()->whereHas('service',fn($query2)=>$query2->when($provider_id, fn($q) => $q->where('provider_id', $provider_id)));
+                            })
+
                             ->withColumns([
                                 Column::make('id')->heading(__("forms.fields.db_row_id")),
                                 Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
@@ -236,7 +251,7 @@ class ServiceResource extends Resource {
                                 Column::make('image')
                                     ->heading(__("forms.fields.image"))
                                     ->getStateUsing(fn($record) => $record->price)
-                                    ->formatStateUsing(fn($record) =>url( $record->getFirstMediaUrl())),
+                                    ->formatStateUsing(fn($record) => url($record->getFirstMediaUrl())),
                             ])->withFilename(fn() => 'products-' . now()->format('Y-m-d'))
                     ]),
                 ImportAction::make('importServices')
