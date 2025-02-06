@@ -260,6 +260,7 @@ class ServiceResource extends Resource {
 
                 ImportAction::make('importProducts')
                     ->label(__('forms.actions.import_products'))
+                    ->modalHeading(__('forms.actions.import_products'))
                     ->visible(true)
                     ->importer(ProductsImporter::class),
             ])
