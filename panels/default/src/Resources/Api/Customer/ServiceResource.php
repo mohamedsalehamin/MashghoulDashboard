@@ -12,6 +12,8 @@ class ServiceResource extends JsonResource {
             'title' => $this->title,
             'description' => $this->description,
             'price' => $this->price->format(),
+            'price_include_taxes' => $this->price_include_taxes->format(),
+
             'duration' => $this->duration,
             'image' => $this->getFirstMediaUrl(),
             'products' => ProductsResource::collection($this->products),

@@ -19,6 +19,7 @@ class ProviderResources extends JsonResource {
      * @return array
      */
     public function toArray($request) {
+
         return [
             'id' => $this->id,
 
@@ -36,7 +37,9 @@ class ProviderResources extends JsonResource {
                 'longitude' => $this->location?->getCoordinates()[0],
             ],
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list']??[])->where('status', 1)),
+
             'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]??'',
+
         ];
     }
 }
