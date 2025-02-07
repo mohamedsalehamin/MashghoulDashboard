@@ -1,5 +1,6 @@
 <?php
 return [
+    "rates"=>"Rates",
     'send_email' => 'Send emails',
     'send_sms' => 'Send SMS',
     "mashghoul_pages" => "Mashghoul pages",
