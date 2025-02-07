@@ -40,7 +40,7 @@ class SeatsImporter extends Importer {
 
     public function resolveRecord(): ?Seat {
 
-        return Seat::updateOrCreate([
+        return Seat::firstOrNew([
             'id' => data_get($this->getData(), 'db_row_id', 0),
 
         ], [
