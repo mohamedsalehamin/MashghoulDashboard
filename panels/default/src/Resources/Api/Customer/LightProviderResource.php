@@ -25,7 +25,7 @@ class LightProviderResource extends JsonResource {
             ],
 
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list'] ?? [])->where('status', 1)),
-            'reservation_fees_include_taxes' => \Cknow\Money\Money::parse($this->reservation_fees_include_taxes)->format(),
+            'reservation_fees_include_taxes' => \Cknow\Money\Money::parse(floatval($this->reservation_fees_include_taxes))->format(),
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
 
         ];
