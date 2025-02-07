@@ -71,11 +71,11 @@ class BuildCartInstanceAction {
                         ->setAttribute('image', $product->getFirstMediaUrl());
                 });
 
-            $price = !$this->isReservationFlowIsFees() ? $service->price->formatByDecimal() : 0;
+            $price = $service->price->formatByDecimal();
             $productPrice += $products->sum(fn($product) => $product->price->formatByDecimal() * $product['quantity']);
             $cart->applyItem($service, $price, 1, ['products' => $products]);
         }
-        $cart->applyProducts(!$this->isReservationFlowIsFees() ? $productPrice : 0);
+        $cart->applyProducts($productPrice);
     }
 
     /**

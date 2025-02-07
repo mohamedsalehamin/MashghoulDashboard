@@ -11,6 +11,7 @@ class ProductsResource extends JsonResource {
             'id' => $this->id,
             'title' => $this->title[app()->getLocale()]??'',
             'price' => $this->price->format(),
+            'price_include_taxes' => $this->price_include_taxes->format(),
             'image' => $this->getFirstMediaUrl(),
 
 

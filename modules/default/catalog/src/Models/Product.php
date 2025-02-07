@@ -13,7 +13,7 @@ use Spatie\Translatable\HasTranslations;
 
 class Product extends Model implements HasMedia {
 
-    use HasFactory, Publishable, HasTranslations,InteractsWithMedia;
+    use HasFactory, Publishable, HasTranslations, InteractsWithMedia;
 
     public array $translatable = [];
     protected $guarded = ['id'];
@@ -25,6 +25,17 @@ class Product extends Model implements HasMedia {
 
         return Attribute::make(
             get: fn($value) => Money::parse($value)
+        );
+    }
+
+    public function priceIncludeTaxes(): Attribute {
+
+        $taxes = $this->service?->provider?->city?->state?->country?->taxes ?? 0;
+        $price = $this->attributes['price'];
+        $finalPrice = $price + ($price * $taxes / 100);
+
+        return Attribute::make(
+            get: fn($value) => Money::parse($finalPrice)
         );
     }
 

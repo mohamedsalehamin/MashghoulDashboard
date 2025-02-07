@@ -12,6 +12,7 @@ use Darryldecode\Cart\Helpers\Helpers;
 use Darryldecode\Cart\ItemCollection;
 use DB;
 use App\DefaultPanel\Settings\GeneralSettings;
+use Str;
 
 class Cart extends CoreCart {
     private $orderId;
@@ -238,6 +239,7 @@ class Cart extends CoreCart {
         $this->condition(new CartCondition($conditionData));
         return true;
     }
+
     function applyPointsDiscount($discount): bool {
 
         !$this->getConditionsByType("points")->count() ?: $this->removeConditionsByType("points");
@@ -451,7 +453,7 @@ class Cart extends CoreCart {
     public
     function getReservationFees() {
 
-        return floatval($this->getConditionsByType('reservation_fees')?->first()?->getValue() );
+        return floatval($this->getConditionsByType('reservation_fees')?->first()?->getValue());
     }
 
     public
@@ -463,6 +465,7 @@ class Cart extends CoreCart {
 
         return (float)$this->getConditionsByType('wallet')?->first()?->getValue();
     }
+
     public function pointsDiscount() {
 
         return (float)$this->getConditionsByType('points')?->first()?->getValue();
@@ -482,6 +485,19 @@ class Cart extends CoreCart {
         return $this->totals()['subtotal'] + $this->totals()['wallet_discount'];
     }
 
+    public function getReservationFeesIncludeTaxes() {
+        $reservation_fees = $this->getReservationFees();
+        $taxes = $this->getReservationFeesTaxes();
+        return $taxes + $reservation_fees;
+    }
+
+    public function getReservationFeesTaxes(): float|int {
+        $taxes = Str::replace("%", "", $this->getConditionsByType("taxes")?->first()->getValue());
+
+        $reservation_fees = $this->getReservationFees();
+        return $reservation_fees / 100 * $taxes;
+    }
+
     public function totals(): array {
 
         return [
@@ -489,10 +505,13 @@ class Cart extends CoreCart {
             "products_total" => $this->getProductsTotal(),
             "discount" => $this->discount(),
             "reservation_fees" => $this->getReservationFees(),
+            'reservation_fees_include_taxes' => $this->getReservationFeesIncludeTaxes(),
+            'reservation_fees_taxes' => $this->getReservationFeesTaxes(),
             "subtotal" => $this->getSubTotal(),
             "taxes" => $this->getConditionsByType("taxes")?->first()?->getCalculatedValue($this->getSubTotal()),
             'wallet_discount' => $this->walletDiscount(),
             'points_discount' => $this->pointsDiscount(),
+            "total_without_reservation_fees_include_taxes" => $this->getTotal() - $this->getReservationFeesIncludeTaxes(),
             "total" => $this->getTotal()
         ];
     }

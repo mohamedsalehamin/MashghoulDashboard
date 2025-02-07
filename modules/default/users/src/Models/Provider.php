@@ -8,6 +8,7 @@ use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Models\Seat;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
+use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -73,5 +74,11 @@ class Provider extends Model implements HasMedia {
 
     public function avgRate(): float|int {
         return (float)$this->rate()->avg('rate') ?? 0;
+    }
+
+    public function getReservationFeesIncludeTaxesAttribute(): float|int {
+        $taxes = $this->city->state->country->taxes;
+        $settings = new GeneralSettings();
+        return $settings->reservations_fess / 100 * $taxes;
     }
 }

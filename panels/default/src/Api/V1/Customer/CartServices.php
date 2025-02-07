@@ -23,6 +23,8 @@ class CartServices {
 
     public function checkout(CartCheckoutRequest $request, Provider $provider) {
         $cart = BuildCartInstanceAction::run($request);
+        $total = $provider->user->options->reservation_flow == 'fees' ? $cart->totals()['reservation_fees_include_taxes'] : $cart->getTotal();
+
         /**
          * @var Reservation $reservation
          * */
@@ -48,7 +50,7 @@ class CartServices {
             $reservation->pay($request->float('points'), 'points');
         }
         if ($cart->getTotal() > 0) {
-            $reservation->pay($cart->getTotal());
+            $reservation->pay($total);
         }
         AddReservationCommissionAction::run($reservation);
         return Api::isOk(__("Reservation created"), ReservationResource::make($reservation));
