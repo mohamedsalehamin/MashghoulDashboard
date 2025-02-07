@@ -29,6 +29,7 @@ class ProviderResource extends JsonResource {
             'working_days' =>WorkingTimesResource::collection(collect( $this->meta_data['days_list']??[])->where('status',1)),
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
             'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]['text_when_order_completed']??'',
+            'reservation_fees_include_taxes' => \Cknow\Money\Money::parse($this->reservation_fees_include_taxes),
         ];
     }
 }
