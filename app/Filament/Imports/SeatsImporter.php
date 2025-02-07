@@ -42,8 +42,8 @@ class SeatsImporter extends Importer {
 
         return Seat::firstOrNew([
             'id' => data_get($this->getData(), 'db_row_id', 0),
-
         ], [
+            'id' => data_get($this->getData(), 'db_row_id', 0),
             'provider_id' => data_get($this->getData(), 'provider_id', 0),
             'title' => [
                 'ar' => data_get($this->getData(), 'name_ar'),
@@ -69,8 +69,7 @@ class SeatsImporter extends Importer {
 
     public function saveRecord(): void {
         $services = Service::whereIn('meta_data->import_id', explode(",", $this->getData()['services']))->pluck("id")->toArray();
-
-        $this->record->offsetUnset('id');
+//        $this->record->offsetUnset('id');
         $this->record->offsetUnset('db_row_id');
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
