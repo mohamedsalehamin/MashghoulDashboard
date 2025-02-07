@@ -68,7 +68,7 @@ class SeatsImporter extends Importer {
     }
 
     public function saveRecord(): void {
-        $services = Service::whereIn('meta_data->import_id', explode(", ", $this->getData()['services']))->pluck("id")->toArray();
+        $services = Service::whereIn('meta_data->import_id', explode(",", $this->getData()['services']))->pluck("id")->toArray();
 
         $this->record->offsetUnset('id');
         $this->record->offsetUnset('db_row_id');
