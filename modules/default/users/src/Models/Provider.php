@@ -76,9 +76,10 @@ class Provider extends Model implements HasMedia {
         return (float)$this->rate()->avg('rate') ?? 0;
     }
 
-    public function getReservationFeesIncludeTaxesAttribute(): float|int {
+    public function getReservationFeesIncludeTaxesAttribute(): float|int|string {
         $taxes = $this->city->state->country->taxes;
-        $settings = new GeneralSettings();
-        return $settings->reservations_fess / 100 * $taxes;
+        $reservationFees = (new GeneralSettings())->reservations_fess;
+        $taxes = $reservationFees / 100 * $taxes;
+        return $taxes + $reservationFees;
     }
 }

@@ -20,7 +20,7 @@ class GeneralSettings extends Settings {
     public string $app_phone;
     public string $tax_number;
     public string $commercial_register;
-    public string $reservations_fess;
+    public float $reservations_fess;
     public string $app_percentage;
     public string $reservation_flow;
     public string $enabled_free_fees_in_first_reservation;
@@ -40,7 +40,7 @@ class GeneralSettings extends Settings {
         return 'general';
     }
 
-    public static function getDayTimesSlot($from = '00:00', $to = '23:59',$interval=60) {
+    public static function getDayTimesSlot($from = '00:00', $to = '23:59', $interval = 60) {
         $startPeriod = Carbon::parse($from);
         $endPeriod = Carbon::parse($to);
         $interval = "$interval minutes";
@@ -55,7 +55,7 @@ class GeneralSettings extends Settings {
 
     public static function getDurations() {
         return [
-            '15' => __("panel.enums.minutes",[ 'minutes' => 15]),
+            '15' => __("panel.enums.minutes", ['minutes' => 15]),
             '30' => __("panel.enums.30_minutes"),
             '45' => __("panel.enums.minutes", ["minutes" => 45]),
             '60' => __("panel.enums.60_minutes"),
@@ -94,7 +94,7 @@ class GeneralSettings extends Settings {
                                 return;
                             }
 
-                            $day = collect($providerTimes->meta_data['days_list']??[])
+                            $day = collect($providerTimes->meta_data['days_list'] ?? [])
                                 ->where('status', true)
                                 ->where('day_name', $get("{$index}.day_name"))->first();
 
