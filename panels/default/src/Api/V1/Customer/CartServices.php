@@ -23,7 +23,7 @@ class CartServices {
 
     public function checkout(CartCheckoutRequest $request, Provider $provider) {
         $cart = BuildCartInstanceAction::run($request);
-        $total = $provider->user->options->reservation_flow == 'fees' ? $cart->totals()['reservation_fees_include_taxes'] : $cart->getTotal();
+        $total = $provider->user?->options?->reservation_flow == 'fees' ? $cart->totals()['reservation_fees_include_taxes'] : $cart->getTotal();
 
         /**
          * @var Reservation $reservation

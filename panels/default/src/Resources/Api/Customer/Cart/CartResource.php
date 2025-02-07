@@ -18,10 +18,10 @@ class CartResource extends JsonResource {
      */
     public function toArray($request) {
         return [
-            'duration'=>$this->getContent()->sum(fn($product)=>$product->associatedModel->duration),
-            'duration_unit'=>'minutes',
-            'complete_order_text' => $request->route('provider')->user?->options?->texts[app()->getLocale()]['text_when_order_completed']??'',
-            'reservation_flow' => $request->route('provider')?->user?->options?->reservation_flow,
+            'duration' => $this->getContent()->sum(fn($product) => $product->associatedModel->duration),
+            'duration_unit' => 'minutes',
+            'complete_order_text' => $request->route('provider')->user?->options?->texts[app()->getLocale()]['text_when_order_completed'] ?? '',
+            'reservation_flow' => $request->route('provider')?->user?->options?->reservation_flow ?? 'total',
             "services" => CartServiceResource::collection($this->getContent()->values()),
             'points' => GeneralSettings::getPointsOnAction('reserve'),
             'totals' => $this->formattedTotals()

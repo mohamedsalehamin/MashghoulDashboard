@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Resources\Api\Customer;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Money\Money;
 
 class LightProviderResource extends JsonResource {
 
@@ -24,7 +25,7 @@ class LightProviderResource extends JsonResource {
             ],
 
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list'] ?? [])->where('status', 1)),
-            'reservation_fees_include_taxes' => $this->reservation_fees_include_taxes,
+            'reservation_fees_include_taxes' => \Cknow\Money\Money::parse($this->reservation_fees_include_taxes),
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
 
         ];
