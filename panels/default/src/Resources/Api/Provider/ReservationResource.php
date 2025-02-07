@@ -28,6 +28,7 @@ class ReservationResource extends JsonResource {
             $this->mergeWhen($this->rate()->exists(), [
                 'rates' => RateResource::collection($this->rates),
             ]),
+            'reservation_flow' => $this->meta_data['reservation_flow'] ?? 'total',
 
             'can' => [
                 'rate' => $this->canRate(),

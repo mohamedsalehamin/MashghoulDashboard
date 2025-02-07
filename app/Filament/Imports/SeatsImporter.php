@@ -75,7 +75,7 @@ class SeatsImporter extends Importer {
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
         $this->record->offsetUnset('services');
-        $record = $this->record->save();
+        $this->record->save();
         $this->record->services()->sync($services);
     }
 }

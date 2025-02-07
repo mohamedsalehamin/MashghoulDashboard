@@ -19,6 +19,8 @@ class LightReservationResource extends JsonResource {
             'date' => $this->date->format('Y-m-d'),
             'from' => Carbon::parse($this->from)->format('H:i'),
             'to' => Carbon::parse($this->to)->format('H:i'),
+            'reservation_flow' => $this->meta_data['reservation_flow'] ?? 'total',
+
             'enums' => [
                 'status' => $this->status,
             ],
