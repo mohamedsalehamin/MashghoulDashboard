@@ -221,7 +221,6 @@ class ServiceResource extends Resource {
                             ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
-
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;
                                 return Product::query()->whereHas('service')->whereHas('service',fn($query2)=>$query2->when($provider_id, fn($q) => $q->where('provider_id', $provider_id)));
                             })
