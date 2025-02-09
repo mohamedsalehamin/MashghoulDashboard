@@ -49,7 +49,7 @@ class CartServices {
         if ($request->filled('points')) {
             $reservation->pay($request->float('points'), 'points');
         }
-        if ($cart->getTotal() > 0) {
+        if ($total> 0 ) {
             $reservation->pay($total);
         }
         AddReservationCommissionAction::run($reservation);

@@ -163,7 +163,6 @@ class ServiceResource extends Resource {
 
                         ExcelExport::make("export_services")
                             ->label(__("forms.fields.export_services"))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
 
@@ -204,7 +203,8 @@ class ServiceResource extends Resource {
                                     ->heading(__("forms.fields.image"))
                                     ->getStateUsing(fn($record) => $record->title)
                                     ->formatStateUsing(fn($record) => url($record->getFirstMediaUrl())),
-                            ])->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
+                            ])
+                            ->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
 
 
                     ]),
@@ -218,10 +218,9 @@ class ServiceResource extends Resource {
 
                         ExcelExport::make("export_products")
                             ->label(__("forms.fields.export_products"))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
-
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;
                                 return Product::query()->whereHas('service')->whereHas('service',fn($query2)=>$query2->when($provider_id, fn($q) => $q->where('provider_id', $provider_id)));
                             })
