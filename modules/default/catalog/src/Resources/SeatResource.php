@@ -137,7 +137,6 @@ class SeatResource extends Resource {
 
                         ExcelExport::make()
                             ->label(__("forms.fields.export_services"))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;

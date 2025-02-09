@@ -163,7 +163,6 @@ class ServiceResource extends Resource {
 
                         ExcelExport::make("export_services")
                             ->label(__("forms.fields.export_services"))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
 
@@ -218,7 +217,7 @@ class ServiceResource extends Resource {
 
                         ExcelExport::make("export_products")
                             ->label(__("forms.fields.export_products"))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::CSV)
+
                             ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;
