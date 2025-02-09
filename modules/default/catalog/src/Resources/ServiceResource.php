@@ -203,7 +203,8 @@ class ServiceResource extends Resource {
                                     ->heading(__("forms.fields.image"))
                                     ->getStateUsing(fn($record) => $record->title)
                                     ->formatStateUsing(fn($record) => url($record->getFirstMediaUrl())),
-                            ])->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
+                            ])
+                            ->withFilename(fn() => 'services-' . now()->format('Y-m-d')),
 
 
                     ]),
