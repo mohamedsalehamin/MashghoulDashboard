@@ -27,7 +27,8 @@ class Firebase {
         return new self();
     }
 
-    function do(): void {
+    function do(){
+        $response = null;
         foreach ($this->getTokens() as $token) {
 
             $data = $this->getFields();
@@ -38,8 +39,9 @@ class Firebase {
                 );
 
         }
-        $this->isSent = true;
 
+        $this->isSent = true;
+        return $response;
     }
 
     private function getAccessToken() {
