@@ -40,7 +40,7 @@ class YourReservationScheduledRequestAcceptedNotification extends Notification
             ->setBody($this->getBody($notifiable)[$notifiable->preferredLocale()])
             ->setMoreData([
                 'entity_type' => 'reservation',
-                'entity_id' => $this->reservation->id,
+                'entity_id' => "{$this->reservation->id}",
             ])
             ;
     }

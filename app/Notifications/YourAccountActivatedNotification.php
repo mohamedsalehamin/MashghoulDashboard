@@ -30,7 +30,7 @@ class YourAccountActivatedNotification extends Notification {
             ->setBody($this->getBody($notifiable)[$notifiable->preferredLocale()])
             ->setMoreData([
                 'entity_type' => 'user',
-                'entity_id' => $notifiable->id
+                'entity_id' => "{$notifiable->id}"
             ])
             ;
     }
