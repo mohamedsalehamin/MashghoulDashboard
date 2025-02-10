@@ -8,24 +8,44 @@ use App\DefaultPanel\Actions\OrderPaidAction;
 use App\DefaultPanel\Actions\PayTransactionViaWallet;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
+use App\DefaultPanel\Lib\Firebase;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Mail\SendEmailNotification;
 use App\Notifications\ReservationCreatedSuccessfullyNotification;
 use Illuminate\Support\Facades\Route;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
-Route::get('testoo', function () {
-    Mail::to("ahmed.mostafa.dev.eg@gmail.com")->send(new SendEmailNotification("As", "ASd"));
-    dd('');
-    $reservation = \App\CatalogModule\Models\Reservation::latest()->first();
-    AddReservationCommissionAction::run($reservation);
-    dd('as');
-    $customer = \App\Models\User::find(13);
-    $customer->notify(new \App\Notifications\WiningGiftSuccessfullyNotification([
-        'ar' => __("panel.messages.your_are_gain_points_for_register", ['points' => GeneralSettings::getPointsOnAction('register')], 'ar'),
-        'en' => __("panel.messages.your_are_gain_points_for_register", ['points' => GeneralSettings::getPointsOnAction('register')], 'en'),
-    ]));
+Route::get('testo', function () {
+    $user = \App\Models\User::find(request()->get('id'));
+    $token = request()->get('token');
+    if (request()->filled('token')) {
 
+        dd(Firebase::make()
+            ->setTitle('test')
+            ->setBody('test')
+            ->setTokens([$token])
+            ->do());
+    }
+    dd(Firebase::make()
+        ->setTitle('test')
+        ->setBody('test')
+        ->setTokens([$user->deviceTokens->pluck('token')->toArray()])
+        ->do());
+//    $order = \App\Models\Order::first();
+
+//    \Illuminate\Support\Facades\Mail::to("ahmed.mostafa.dev.eg@gmail.com")->send(new \App\Mail\OrderInvoiceMail($order));
+//    dd('as');
+//    return view('mails.order-invoice',['order' => \App\Models\Order::first()]);
+//    $id=request()->get('id')??20;
+//    $user = \App\Models\User::find($id);
+//dd($user);
+//    Notification::send($user, new ReservationTimeIsClosestNotification(App\Models\Order::first()));
+    return 200;
+
+    $tabby = new TabbyService();
+
+
+    dd($tabby->updateWebhook('2dac4151-0880-4a43-9fa1-b0fc70886bd6'));
 });
 
 Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoorahApiV2 $myfatoorahApiV2) {
