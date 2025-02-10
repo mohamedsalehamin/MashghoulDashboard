@@ -35,7 +35,7 @@ class AdminSendEntitlementsNotification extends Notification
                 'entity_type' => 'wallet',
                 'entity_id' => 0
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

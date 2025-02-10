@@ -39,7 +39,7 @@ class CustomerRegisteredNotification extends Notification {
                 'entity_id' => $notifiable->id,
                 'entity_type' => 'customer',
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

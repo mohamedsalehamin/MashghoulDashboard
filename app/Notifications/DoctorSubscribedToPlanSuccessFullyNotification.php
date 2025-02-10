@@ -39,7 +39,7 @@ class DoctorSubscribedToPlanSuccessFullyNotification extends Notification {
                 'entity_type' => null,
                 'entity_id' => 0,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

@@ -39,7 +39,7 @@ class ProviderDuesNotification extends Notification {
                 'entity_type' => 'provider',
                 'entity_id' => $this->provider->id,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

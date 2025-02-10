@@ -46,7 +46,7 @@ class NewOrderCreatedNotification extends Notification {
                 'entity_id' => $this->order->id,
                 'entity_type' => 'order',
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

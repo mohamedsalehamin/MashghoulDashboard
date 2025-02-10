@@ -39,7 +39,7 @@ class NewProductCreatedNotification extends Notification {
                 'entity_id' => $this->product->id,
                 'entity_type' => 'product',
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {
