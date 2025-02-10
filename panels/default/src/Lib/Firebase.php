@@ -2,8 +2,8 @@
 
 namespace App\DefaultPanel\Lib;
 
+use Google\Client;
 use Illuminate\Support\Facades\Http;
-use App\DefaultPanel\Settings\ThirdPartySettings;
 
 class Firebase {
 
@@ -27,11 +27,30 @@ class Firebase {
         return new self();
     }
 
-    function do() {
-        $response = Http::withToken($this->getAuthorizationKey())->post('https://fcm.googleapis.com/fcm/send', $this->getFields());
-        $this->isSent = true;
-        return $response->json();
+    function do(): void {
+        foreach ($this->getTokens() as $token) {
 
+            $data = $this->getFields();
+            $data['message']['token'] = $token;
+            $response = Http::withToken($this->getAccessToken())
+                ->post('https://fcm.googleapis.com/v1/projects/mashghoul-1c31b/messages:send',
+                    $data
+                );
+
+        }
+        $this->isSent = true;
+
+    }
+
+    private function getAccessToken() {
+        $credentialsPath = storage_path('app/mashghoul-1c31b-firebase-adminsdk-lp8iv-196651a897.json'); // Path to your service account file
+
+        $client = new  Client();
+        $client->setAuthConfig($credentialsPath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+
+        $token = $client->fetchAccessTokenWithAssertion();
+        return $token['access_token'];
     }
 
     /**
@@ -133,26 +152,51 @@ class Firebase {
 
     public function getFields(): array {
         $fields = [
-            'registration_ids' => $this->getTokens(),
-            'data' => [
-                'title' => $this->getTitle(),
-                'body' => $this->getBody(),
-            ]
-//            'notification' => [
-//                'title' => $this->getTitle(),
-//                'body' => $this->getBody(),
-//                'type' => $this->getType(),
-//                'tickerText' => '',
-//                'vibrate' => 1,
-//                'sound' => 1,
-//                'largeIcon' => 'large_icon',
-//                'smallIcon' => 'small_icon',
-//            ],
+            'message' => [
+                'token' => $this->getTokens()[0] ?? '',
+
+                "webpush" => [
+                    'data' => [
+                        'title' => $this->getTitle(),
+                        'body' => $this->getBody(),
+                    ],
+
+                ],
+                'android' => [
+                    'priority' => 'HIGH',
+                    'notification' => [
+                        'title' => $this->getTitle(),
+                        'body' => $this->getBody(),
+//                        'icon' => '@mipmap/ic_notification',
+//                        "color" => '#ff0000',
+//                        'sound' => 'notification.mp3',
+//                        "channel_id" => "playmakerChannelId",
+                        'default_vibrate_timings' => true,
+                        'default_sound' => true,
+                    ],
+                ],
+                'apns' => [
+                    'headers' => [
+                        'apns-priority' => '10',
+                    ],
+                    'payload' => [
+                        'title' => $this->getTitle(),
+                        'body' => $this->getBody(),
+                        'aps' => [
+                            "sound" => "bingbong.aiff",
+                            "alert" => [
+                                "title" => $this->getTitle(),
+                                "body" => $this->getBody()
+                            ],
+                        ],
+                    ],
+                ]
+            ],
 
 
         ];
         if (count($this->getMoreData())) {
-            $fields['data'] =[...$fields['data'], ...$this->getMoreData()];
+            $fields['message']['data'] = [...$fields['message']['data'] ?? [], ...$this->getMoreData()];
         }
         return $fields;
     }
@@ -160,5 +204,6 @@ class Firebase {
     public function getMoreData(): array {
         return $this->moreData;
     }
+
 
 }

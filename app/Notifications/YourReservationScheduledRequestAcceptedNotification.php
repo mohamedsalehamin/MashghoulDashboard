@@ -42,7 +42,7 @@ class YourReservationScheduledRequestAcceptedNotification extends Notification
                 'entity_type' => 'reservation',
                 'entity_id' => $this->reservation->id,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

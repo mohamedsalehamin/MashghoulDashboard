@@ -42,7 +42,7 @@ class RemindingDoctorToRenewPlanNotification extends Notification
                 'entity_type' => 'subscription',
                 'entity_id' => null,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

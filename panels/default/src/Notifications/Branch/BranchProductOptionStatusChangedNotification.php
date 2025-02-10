@@ -39,7 +39,7 @@ class BranchProductOptionStatusChangedNotification extends Notification {
                 'entity_id' => $this->inventory->branch->id,
                 'entity_type' => 'branch',
             ])
-            ->do();
+            ;
 
     }
 

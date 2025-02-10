@@ -38,7 +38,7 @@ class BranchMaintenanceModeChangedNotification extends Notification {
                 'entity_id' => $this->branch->id,
                 'entity_type' => 'branch',
             ])
-            ->do();
+            ;
 
     }
 

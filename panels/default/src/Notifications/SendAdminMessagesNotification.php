@@ -28,7 +28,7 @@ class SendAdminMessagesNotification extends Notification {
             ->setTokens($tokens)
             ->setTitle($this->title[$notifiable->preferredLocale()])
             ->setBody($this->body[$notifiable->preferredLocale()])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

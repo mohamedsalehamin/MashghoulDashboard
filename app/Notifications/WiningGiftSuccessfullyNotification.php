@@ -41,7 +41,7 @@ class WiningGiftSuccessfullyNotification extends Notification {
                 'entity_type' => 'points',
                 'entity_id' => 0,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

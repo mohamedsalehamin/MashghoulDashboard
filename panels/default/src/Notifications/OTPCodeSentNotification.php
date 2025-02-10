@@ -37,7 +37,7 @@ class OTPCodeSentNotification extends Notification {
             ->setMoreData([
 
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {

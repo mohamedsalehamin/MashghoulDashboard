@@ -35,7 +35,7 @@ class YourAccountInActivatedNotification extends Notification
                 'entity_type' => 'user',
                 'entity_id' => $notifiable->id,
             ])
-            ->do();
+            ;
     }
 
     public function toArray($notifiable): array {
