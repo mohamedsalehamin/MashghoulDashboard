@@ -41,7 +41,7 @@ class Firebase {
         }
 
         $this->isSent = true;
-        return $response->json();
+        return $response?->json();
     }
 
     private function getAccessToken() {
