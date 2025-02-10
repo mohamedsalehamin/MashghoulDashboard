@@ -39,7 +39,7 @@ class WiningGiftSuccessfullyNotification extends Notification {
             ->setBody($this->getBody($notifiable)[$notifiable->preferredLocale()])
             ->setMoreData([
                 'entity_type' => 'points',
-                'entity_id' => 0,
+                'entity_id' => '0',
             ])
             ;
     }
