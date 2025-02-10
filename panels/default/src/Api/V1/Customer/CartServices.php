@@ -5,6 +5,7 @@ namespace App\DefaultPanel\Api\V1\Customer;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\BuildCartInstanceAction;
+use App\DefaultPanel\Actions\OrderPaidAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Requests\Api\Customer\Order\CartCheckoutRequest;
 use App\DefaultPanel\Requests\Api\Customer\Order\CartDetailsRequest;
@@ -49,8 +50,13 @@ class CartServices {
         if ($request->filled('points')) {
             $reservation->pay($request->float('points'), 'points');
         }
-        if ($total> 0 ) {
+
+        if ($total > 0) {
             $reservation->pay($total);
+        }
+
+        if ($total <= 0) {
+            OrderPaidAction::run($reservation);
         }
         AddReservationCommissionAction::run($reservation);
         return Api::isOk(__("Reservation created"), ReservationResource::make($reservation));
