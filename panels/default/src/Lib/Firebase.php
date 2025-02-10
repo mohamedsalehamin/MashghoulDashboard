@@ -4,6 +4,7 @@ namespace App\DefaultPanel\Lib;
 
 use Google\Client;
 use Illuminate\Support\Facades\Http;
+use Log;
 
 class Firebase {
 
@@ -27,7 +28,7 @@ class Firebase {
         return new self();
     }
 
-    function do(){
+    function do() {
         $response = null;
         foreach ($this->getTokens() as $token) {
 
@@ -37,7 +38,7 @@ class Firebase {
                 ->post('https://fcm.googleapis.com/v1/projects/mashghoul-1c31b/messages:send',
                     $data
                 );
-
+            Log::info("Firebase notifications",$response->json());
         }
 
         $this->isSent = true;
