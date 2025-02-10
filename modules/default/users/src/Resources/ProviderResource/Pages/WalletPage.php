@@ -89,7 +89,6 @@ class WalletPage extends Page implements HasTable {
                     ])
                     ->action(function ($data) {
                         $operation = $this->record->provider->withdraw(amount: $data['amount'], meta: [
-
                             'description' => [
                                 'ar' => __('panel.messages.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']], 'ar'),
                                 'en' => __('forms.fields.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']], 'en')
