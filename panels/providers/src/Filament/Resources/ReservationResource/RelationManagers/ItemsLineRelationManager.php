@@ -31,7 +31,7 @@ class ItemsLineRelationManager extends RelationManager {
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('model.id')
-                    ->formatStateUsing(fn( ItemsLine $record) => Service::find($record->model['id'])->title)
+                    ->formatStateUsing(fn( ItemsLine $record) => Service::find($record->model['id'])?->title)
                     ->label(__('forms.fields.name')),
 
                 Tables\Columns\TextColumn::make('products')
