@@ -15,8 +15,8 @@ Route::group([
     'prefix' => GlobalLaravelLocalization::setLocale(),
     'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
 ], function () {
-    Route::view('/', 'site.pages.index')->name('site.home');
-    Route::view('/register', 'site.pages.register')->name('site.pages.register');
+    Route::get('/', [SiteController::class, 'index'])->name('site.home');
+    Route::get('/register', [SiteController::class, 'register'])->name('site.pages.register');
     Route::get('/{page}', [SiteController::class, 'page'])->name('site.page');
 });
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {

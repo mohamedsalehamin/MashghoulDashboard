@@ -13,6 +13,7 @@ use App\DefaultPanel\Settings\GeneralSettings;
 use App\Mail\SendEmailNotification;
 use App\Notifications\ReservationCreatedSuccessfullyNotification;
 use Illuminate\Support\Facades\Route;
+use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
 Route::get('testo', function () {
@@ -48,7 +49,7 @@ Route::get('testo', function () {
     dd($tabby->updateWebhook('2dac4151-0880-4a43-9fa1-b0fc70886bd6'));
 });
 
-Route::get('webhooks/myfatoorah/transactions/callback', function (PaymentMyfatoorahApiV2 $myfatoorahApiV2) {
+Route::any('webhooks/myfatoorah/transactions/callback', function (MyFatoorahPaymentStatus $myfatoorahApiV2) {
     $response = $myfatoorahApiV2->getPaymentStatus(request()->get('Id'), 'PaymentId');
     $transaction = Transaction::where('meta_data->invoiceId', $response->InvoiceId)->first();
     if ($response->InvoiceStatus == 'Paid') {

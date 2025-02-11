@@ -40,7 +40,7 @@
         "matanyadaev/laravel-eloquent-spatial": "^3.2",
         "mcamara/laravel-localization": "^2.2",
         "mpdf/mpdf": "^8.2",
-        "myfatoorah/laravel-package": "2.1",
+        "myfatoorah/laravel-package": "^2",
         "pxlrbt/filament-activity-log": "^1.1",
         "pxlrbt/filament-excel": "^2.3",
         "saade/filament-fullcalendar": "^3.0",
@@ -56,7 +56,8 @@
         "theamostafa/laravel-wallet": "^1.0",
         "tightenco/ziggy": "^1.6",
         "wire-elements/modal": "^2.0",
-        "ysfkaya/filament-phone-input": "^2.2"
+        "ysfkaya/filament-phone-input": "^2.2",
+"google/apiclient": "^2.18"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",

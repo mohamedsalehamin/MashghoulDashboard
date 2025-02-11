@@ -30,6 +30,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use MyFatoorah\Library\API\Payment\MyFatoorahPayment;
+use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 use App\DefaultPanel\Lib\Cart;
 use App\DefaultPanel\Notifications\Notification;
@@ -44,28 +46,22 @@ class AppServiceProvider extends ServiceProvider {
     public function register(): void {
 
         $this->cart();
-        view()->composer('*', function ($view) {
-            $settings = new GeneralSettings();
-            $landingSettings = new LandingSettings();
 
-            $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
 
-                return [$pageName => Page::find($page)];
-
-            });
-            return $view
-                ->with('landing_settings', $landingSettings)
-                ->with('settings', $settings)
-                ->with('social_links', $settings->social_links)
-                ->with('locale', $this->app->getLocale())
-                ->with('pages', $pages);
+        $this->app->bind(MyFatoorahPayment::class, function () {
+            return new MyFatoorahPayment([
+                    'apiKey' => config('myfatoorah.api_key'),
+                    'isTest' => config('myfatoorah.test_mode'),
+                    'countryCode' => config('myfatoorah.country_iso'),
+                ]
+            );
         });
-
-        $this->app->bind(PaymentMyfatoorahApiV2::class, function () {
-            return new PaymentMyfatoorahApiV2(
-                config('myfatoorah.api_key'),
-                config('myfatoorah.country_iso'),
-                config('myfatoorah.test_mode')
+        $this->app->bind(MyFatoorahPaymentStatus::class, function () {
+            return new MyFatoorahPaymentStatus([
+                    'apiKey' => config('myfatoorah.api_key'),
+                    'isTest' => config('myfatoorah.test_mode'),
+                    'countryCode' => config('myfatoorah.country_iso'),
+                ]
             );
         });
     }

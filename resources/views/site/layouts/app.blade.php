@@ -1,3 +1,16 @@
+<?php
+
+use App\ContentModule\Models\Page;
+use App\DefaultPanel\Settings\GeneralSettings;
+use App\DefaultPanel\Settings\LandingSettings;
+
+$settings = new GeneralSettings();
+$landing_settings = new LandingSettings();
+$pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
+    return [$pageName => Page::find($page)];
+
+});
+?>
 <!doctype html>
 <html lang="{{app()->getLocale()}}" dir="{{app()->getLocale() == 'ar'?'rtl':'ltr'}}">
 <head>
@@ -19,6 +32,9 @@
     @livewireStyles
 </head>
 <body>
+
+
+
 <div class="sidebar_pagebody">
     @include('site.components.sidebar')
     <main id="bodyWrap">

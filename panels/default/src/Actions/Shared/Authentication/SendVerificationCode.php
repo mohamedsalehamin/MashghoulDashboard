@@ -18,7 +18,7 @@ class SendVerificationCode {
             "code" => $code,
             'user_id' => $user?->id,
         ]);
-        SMS::make($user->phone ?? $phone, "Mashghoul OTP code: $code")->send();
+        SMS::make($user->phone ?? $phone, "Login OTP code: $code")->send();
 
 
     }
