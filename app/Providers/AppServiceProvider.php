@@ -44,22 +44,7 @@ class AppServiceProvider extends ServiceProvider {
     public function register(): void {
 
         $this->cart();
-        view()->composer('*', function ($view) {
-            $settings = new GeneralSettings();
-            $landingSettings = new LandingSettings();
 
-            $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
-
-                return [$pageName => Page::find($page)];
-
-            });
-            return $view
-                ->with('landing_settings', $landingSettings)
-                ->with('settings', $settings)
-                ->with('social_links', $settings->social_links)
-                ->with('locale', $this->app->getLocale())
-                ->with('pages', $pages);
-        });
 
         $this->app->bind(PaymentMyfatoorahApiV2::class, function () {
             return new PaymentMyfatoorahApiV2(

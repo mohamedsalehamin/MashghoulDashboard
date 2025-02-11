@@ -13,7 +13,7 @@
         "alexpechkarev/geometry-library": "1.0.4",
         "bezhansalleh/filament-language-switch": "^3.1",
         "bezhansalleh/filament-shield": "3.1.2",
-        "carlos-meneses/laravel-mfpdf": "^2.1",
+        "carlos-meneses/laravel-mpdf": "^2.1",
         "cheesegrits/filament-google-maps": "^3.0",
         "christiankuri/laravel-favorite": "^1.4",
         "cknow/laravel-money": "^7.2",
@@ -58,6 +58,7 @@
         "ysfkaya/filament-phone-input": "^2.2"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.14",
         "barryvdh/laravel-ide-helper": "^2.13",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
