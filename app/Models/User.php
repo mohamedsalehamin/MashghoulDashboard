@@ -37,7 +37,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     use HasApiTokens, HasFactory, Notifiable;
     use HasRoles, InteractsWithMedia;
     use HasPanelShield, Favoriteability, HasWallet;
-    use SoftDeletes;
+
 
     protected $table = 'users';
     public $guard_name = 'web';
