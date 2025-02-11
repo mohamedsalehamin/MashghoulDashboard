@@ -13,6 +13,7 @@ use App\CatalogModule\Widgets\CustomersChart;
 use App\CatalogModule\Widgets\ReservationsCountChart;
 use App\CatalogModule\Widgets\ReservationsTotalsChart;
 use App\ContentModule\ContentPlugin;
+use App\ContentModule\Widgets\Contacts;
 use App\DefaultPanel\Notifications\Notification;
 use App\DefaultPanel\Pages\ResetPassword;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -147,7 +148,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 CustomersChart::class,
                 ReservationsTotalsChart::class,
                 ReservationsCountChart::class,
-                \Contacts::class
+                Contacts::class
 
             ])
             ->darkMode(false)
