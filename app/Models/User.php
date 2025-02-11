@@ -23,6 +23,7 @@ use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -36,6 +37,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     use HasApiTokens, HasFactory, Notifiable;
     use HasRoles, InteractsWithMedia;
     use HasPanelShield, Favoriteability, HasWallet;
+    use SoftDeletes;
 
     protected $table = 'users';
     public $guard_name = 'web';
@@ -215,6 +217,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
             ->where('transferred', false)
             ->sum('reset_points');
     }
+
     public function walletTransactions(): HasMany {
         return $this->hasMany(Transaction::class, 'wallet_id');
     }
