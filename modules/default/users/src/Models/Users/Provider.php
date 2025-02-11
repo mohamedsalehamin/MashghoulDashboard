@@ -16,6 +16,7 @@ class Provider extends User {
         parent::booted();
         static::addGlobalScope('role', fn($query) => $query->whereHas('roles', fn($query) => $query->where('name', self::ROLE)));
         static::created(fn($patient) => $patient->assignRole(self::ROLE));
+        static::deleting(fn($patient) => $patient->provider()->delete());
     }
 
 
