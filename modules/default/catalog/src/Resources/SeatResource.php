@@ -94,6 +94,7 @@ class SeatResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->modifyQueryUsing(fn($query) => $query->whereHas("provider"))
             ->columns([
                 TextColumn::make('id')
                     ->translateLabel()
