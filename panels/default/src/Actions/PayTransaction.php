@@ -4,13 +4,14 @@ namespace App\DefaultPanel\Actions;
 
 use App\CatalogModule\Models\Transaction;
 use Lorisleiva\Actions\Concerns\AsAction;
+use MyFatoorah\Library\API\Payment\MyFatoorahPayment;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
 class PayTransaction {
     use AsAction;
 
     public function handle(Transaction $transaction) {
-        $myfatoorahApiV2 = app(PaymentMyfatoorahApiV2::class);
+        $myfatoorahApiV2 = app(MyFatoorahPayment::class);
         $payment_data = $myfatoorahApiV2->getInvoiceURL([
             'CustomerName' => $transaction->user->name,
             'InvoiceValue' => $transaction->price->formatByDecimal(),
