@@ -14,6 +14,7 @@ use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Spatie\MediaLibrary\HasMedia;
@@ -25,6 +26,7 @@ class Provider extends Model implements HasMedia {
     use InteractsWithMedia, HasWallet, HasTranslations;
     use Favoriteable;
     use HasSpatial;
+    use SoftDeletes;
 
     protected $guarded = ['id'];
     protected array $translatable = ['name', 'bio'];
