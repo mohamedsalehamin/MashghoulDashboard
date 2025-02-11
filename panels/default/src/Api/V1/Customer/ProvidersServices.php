@@ -21,6 +21,7 @@ class ProvidersServices {
             'lng' => request()->get('longitude', 0),
         ];
         $providers = Provider::enabled()
+            ->whereHas("user")
             ->when(request()->has('term'), fn($query) => $query
                 ->where('name->ar', 'like', '%' . request('term') . '%')
                 ->orWhere('name->en', 'like', '%' . request('term') . '%')

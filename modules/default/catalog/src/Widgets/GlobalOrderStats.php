@@ -54,7 +54,7 @@ class GlobalOrderStats extends BaseWidget {
                 ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
 
             Stat::make(__('panel.stats.customers_count'), Customer::count()),
-            Stat::make(__('panel.stats.providers_count'), Provider::count()),
+            Stat::make(__('panel.stats.providers_count'), Provider::whereHas('user')->count()),
             Stat::make(__('panel.stats.administrators_count'), User::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider', 'patient', 'panel_user', 'super_admin']))->count()),
             Stat::make(__('panel.stats.contact_us_messages'), Contact::count()),
 
