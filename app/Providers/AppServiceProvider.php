@@ -94,9 +94,8 @@ class AppServiceProvider extends ServiceProvider {
         );
 
         FilamentAsset::register([
-            Css::make('fontawesome', asset('https://pro.fontawesome.com/releases/v5.10.0/css/all.css')),
-            Css::make('agora', asset('assets/css/agora.css')),
-            Js::make('jquery', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'),
+//            Css::make('fontawesome', asset('https://pro.fontawesome.com/releases/v5.10.0/css/all.css')),
+//            Js::make('jquery', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'),
         ]);
 
         Collection::macro('paginate', function ($perPage, $total = null, $page = null, $pageName = 'page') {
