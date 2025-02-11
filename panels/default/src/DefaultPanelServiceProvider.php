@@ -148,7 +148,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 CustomersChart::class,
                 ReservationsTotalsChart::class,
                 ReservationsCountChart::class,
-                Contacts::class
+//                Contacts::class
 
             ])
             ->darkMode(false)
