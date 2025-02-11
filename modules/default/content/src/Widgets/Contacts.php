@@ -1,6 +1,6 @@
 <?php
 
-
+namespace App\ContentModule\Widgets;
 use App\ContentModule\Models\Contact;
 use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Filters\DateFilter;
