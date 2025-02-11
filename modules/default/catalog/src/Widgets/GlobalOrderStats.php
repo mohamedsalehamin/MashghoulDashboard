@@ -11,9 +11,10 @@ use App\ContentModule\Models\Contact;
 use App\Models\User;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Lab;
-use App\UsersModule\Models\Provider;
+
 use App\UsersModule\Models\User\Patient;
 use App\UsersModule\Models\Users\Customer;
+use App\UsersModule\Models\Users\Provider;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Cknow\Money\Money;
 use DB;
@@ -54,7 +55,7 @@ class GlobalOrderStats extends BaseWidget {
                 ->url(route('filament.admin.resources.reservations.index', ['tableFilters[status][value]' => 'canceled'])),
 
             Stat::make(__('panel.stats.customers_count'), Customer::count()),
-            Stat::make(__('panel.stats.providers_count'), Provider::whereHas('user')->count()),
+            Stat::make(__('panel.stats.providers_count'), Provider::whereHas('provider')->count()),
             Stat::make(__('panel.stats.administrators_count'), User::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider', 'patient', 'panel_user', 'super_admin']))->count()),
             Stat::make(__('panel.stats.contact_us_messages'), Contact::count()),
 
