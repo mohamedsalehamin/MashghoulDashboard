@@ -87,7 +87,7 @@ class SeatResource extends Resource {
                     ->searchable(),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('services_count')
-                    ->state(fn(Model $record) => $record->services()->where('provider_id',$record->provider->id)->count())
+                    ->state(fn(Model $record) => $record->services()->where('provider_id',$record->provider?->id)->count())
                     ->searchable(false),
 
                 IconColumn::make('status')
