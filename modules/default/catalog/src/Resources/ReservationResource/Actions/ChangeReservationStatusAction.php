@@ -40,19 +40,19 @@ class ChangeReservationStatusAction {
                         'en' => __("panel.messages.gift_for_reservation", ['id' => $record->id], 'en'),
                     ];
                     AddPointToCustomerAction::run($record->customer, GeneralSettings::getPointsOnAction('reserve'), ['description' => $description]);
-                    if (!$record->commission->transferred) {
-                        $record->reservable?->user?->notify(new AdminSendEntitlementsNotification());
-                        $record->reservable?->deposit(
-                            amount: $record->commission?->amount->formatByDecimal(),
-                            meta: [
-                                'description' => [
-                                    'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->commission->amount, 'ID' => $record->id], 'ar'),
-                                    'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->commission->amount, 'ID' => $record->id], 'en'),
-                                ],
-                            ]
-                        );
-                        $record->commission?->update(['transferred' => true, 'confirmed' => true]);
-                    }
+//                    if (!$record->commission->transferred) {
+//                        $record->reservable?->user?->notify(new AdminSendEntitlementsNotification());
+//                        $record->reservable?->deposit(
+//                            amount: $record->commission?->amount->formatByDecimal(),
+//                            meta: [
+//                                'description' => [
+//                                    'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->commission->amount, 'ID' => $record->id], 'ar'),
+//                                    'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->commission->amount, 'ID' => $record->id], 'en'),
+//                                ],
+//                            ]
+//                        );
+//                        $record->commission?->update(['transferred' => true, 'confirmed' => true]);
+//                    }
                 }
                 $record->update(['status' => $data['status'], 'meta_data' => [... $record->meta_data, ...$data['meta_data'] ?? []]]);
                 if (data_get($data, 'refund_customer_balance', false)) {
