@@ -243,7 +243,7 @@ class SeatResource extends Resource {
 
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::count();
+        return static::getModel()::whereHas("provider")->count();
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string {

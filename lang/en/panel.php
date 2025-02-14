@@ -130,7 +130,7 @@ return [
         'radio' => 'Radio',
         'checkbox' => 'Checkbox',
         'credit_card' => 'Credit card',
-        'cash' => 'Cash on delivery',
+        'cash' => 'Cash',
 
         'priority_of_reservation' => 'Priority of reservation',
         'offline' => 'Offline',
