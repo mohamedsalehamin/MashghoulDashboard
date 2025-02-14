@@ -390,7 +390,7 @@
                         </div>
                         <div class="col-6">
                             <div class="hold-details">
-                                <p><strong>طريقة الدفع:</strong> {{$reservation->transaction->meta_data['method']??''}}
+                                <p><strong>طريقة الدفع:</strong> {{$reservation->transaction->meta_data['method']??__("panel.enums.cash")}}
                                 </p>
                             </div>
                         </div>

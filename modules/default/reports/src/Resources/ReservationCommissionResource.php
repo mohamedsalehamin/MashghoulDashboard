@@ -41,7 +41,12 @@ class ReservationCommissionResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->whereHas('reservation', fn($builder) => $builder->paid())->where('amount', ">", 0))
+            ->modifyQueryUsing(fn($query) => $query
+                ->whereHas('reservation', fn($builder) => $builder
+                    ->paid()
+                    ->whereHas("conditions",fn($builder) => $builder->where('type', 'reservation_fees')->where("value", ">", 0))
+                )
+                ->where('amount', ">", 0))
             ->columns([
 
 
