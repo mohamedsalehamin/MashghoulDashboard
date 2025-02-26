@@ -29,7 +29,10 @@ $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) 
     <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}"/>
     <!-- Main Css File Template -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}"/>
+    <style>.iti{    width: 100%;}</style>
+    @stack("css")
     @livewireStyles
+
 </head>
 <body>
 
@@ -73,12 +76,10 @@ $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) 
 
 <!-- Main Plugin JS (optional custom plugin file) -->
 <script src="{{asset('assets/js/plugin.js')}}"></script>
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{--<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>--}}
 
 <!-- Focus plugin -->
 <script defer src="https://unpkg.com/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-<script>
-
-</script>
+@stack("scripts")
 </body>
 </html>
