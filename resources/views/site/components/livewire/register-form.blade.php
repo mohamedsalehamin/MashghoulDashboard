@@ -36,14 +36,15 @@
                         @error('email')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
                     <div class="col-lg-6">
-                        <label for="phone">@lang("site.fields.phone") <span style="color: red;">*</span></label>
-                        <input type="tel" id="phone" name="phone"
-                               placeholder="+9665xxxxxxxx"
-                               wire:model="phone"
-                        >
+                        <div wire:ignore>
+                            <label for="phone">@lang("site.fields.phone") <span style="color: red;">*</span></label>
+                            @include('livewire._phone-input')
+                        </div>
+
                         @error('phone')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 mt-2">
+
                         <label for="gender">@lang("site.fields.gender")</label>
                         <select id="gender" name="gender"
                                 wire:model="gender"
@@ -55,7 +56,7 @@
                         @error('gender')<p class="text-danger">{{$message}}</p>@enderror
 
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 mt-2">
                         <label for="password">@lang("site.fields.password")</label>
                         <input type="password" id="password" name="password"
                                wire:model="password"
