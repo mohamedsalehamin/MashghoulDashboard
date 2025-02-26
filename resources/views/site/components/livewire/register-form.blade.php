@@ -32,6 +32,7 @@
                         <input type="email" id="email" name="email"
                                placeholder="example@example.com"
                                wire:model="email"
+                               autocomplete="new-username"
                         >
                         @error('email')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
@@ -60,6 +61,7 @@
                         <label for="password">@lang("site.fields.password")</label>
                         <input type="password" id="password" name="password"
                                wire:model="password"
+                               autocomplete="new-password"
                                placeholder="@lang("site.fields.password")" >
                         @error('password')<p class="text-danger">{{$message}}</p>@enderror
                     </div>
