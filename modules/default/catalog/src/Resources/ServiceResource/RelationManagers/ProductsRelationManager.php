@@ -39,7 +39,7 @@ class ProductsRelationManager extends RelationManager {
 
                 Tables\Columns\TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
                 Tables\Columns\TextColumn::make('price'),
-
+                Tables\Columns\TextColumn::make('sale_price'),
 
             ])
             ->filters([
@@ -48,9 +48,10 @@ class ProductsRelationManager extends RelationManager {
 //            ->headerActions([
 //                Tables\Actions\CreateAction::make(),
 //            ])
+            ->emptyStateHeading(__('panel.messages.no_products'))
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make(),
+                    // ExportBulkAction::make(),
 
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

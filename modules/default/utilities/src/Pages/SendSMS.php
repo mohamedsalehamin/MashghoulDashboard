@@ -58,7 +58,8 @@ class SendSMS extends Page implements HasForms {
         foreach ($this->getUsers() as $user) {
             SMS::make($user->phone, $this->sms_body, 'SmSupMrk-AD')->send();
         }
-        $this->reset($this->except(''));
+        // $this->reset($this->except(''));
+        $this->resetExcept('');
 
         \Filament\Notifications\Notification::make()->title(__('panel.messages.success'))
             ->body(__('panel.messages.sms_sent_successfully'))

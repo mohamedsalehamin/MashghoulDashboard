@@ -16,13 +16,22 @@ class CartProductResource extends JsonResource {
      * @return array
      */
     public function toArray($request) {
+         $regularPrice = $this->price->getAmount();
+        $salePrice = $this->sale_price->getAmount();
+        
+        $discountPercentage = false;
+        if (!$this->sale_price->isZero() && $regularPrice > 0) {
+            $discountPercentage = round(($regularPrice - $salePrice) / $regularPrice * 100);
+        }
         return [
             'id' => $this->id,
             'name' => $this->title[app()->getLocale()]??'',
             'image' => $this->getFirstMediaUrl(),
             'price' => $this->price->format(),
+            'sale_price' => !$this->sale_price->isZero() ? $this->sale_price->format() : false,
+            'discount_percentage' => $discountPercentage, 
             'quantity' => $this->quantity,
-            'total_price' => \Cknow\Money\Money::parse($this->price->formatByDecimal() * $this->quantity)->format(),
+            'total_price' => \Cknow\Money\Money::parse((!$this->sale_price->isZero() ? $this->sale_price->formatByDecimal() : $this->price->formatByDecimal()) * $this->quantity)->format(),
 
         ];
     }

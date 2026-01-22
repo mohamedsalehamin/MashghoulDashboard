@@ -32,6 +32,7 @@ class CartCheckoutRequest extends FormRequest {
 //            'date' => ['required', 'date', new IsValidReservationDateRule(), new IsValidPeriodFormatRule()],
             'from' => ['required', 'date_format:H:i'],
             'to' => ['required', 'date_format:H:i'],
+            // 'payment_method' => ['required', 'in:myfatoorah,tabby'],
 
         ];
     }

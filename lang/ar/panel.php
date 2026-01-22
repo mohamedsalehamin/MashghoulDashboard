@@ -1,9 +1,10 @@
 <?php
 return [
     'messages' => [
-        "locate_my_location"=>"تحديد موقعي",
+        "by" => "بواسطة",
+        "locate_my_location" => "تحديد موقعي",
         "refund_reservation" => "تم استرجاع مبلغ :amount نظير الحجز رقم :no",
-        'paid_reservation_no'=>"تم سحب مبلغ :amount نظير الحجز رقم :no",
+        'paid_reservation_no' => "تم سحب مبلغ :amount نظير الحجز رقم :no",
         'sms_sent_successfully' => 'تم إرسال الرسالة النصية بنجاح',
         'sms_email_successfully' => 'تم إرسال البريد الإلكتروني بنجاح',
         'send_sms_description' => 'يمكنك إرسال رسالة نصية للعملاء',
@@ -70,8 +71,12 @@ return [
         'address_not_in_branch_boundaries' => 'العنوان المحدد خارج نطاق الحي',
         'city_has_many_zones' => 'لا يمكنك حذف المدينة  لوجود مناطق مرتبطة بها',
         'city_has_many_addresses' => 'لا يمكنك حذف المدينة  لوجود عناوين مرتبطة بها',
-
-
+        'you_already_have_pending_withdrawal_request' => 'لديك بالفعل طلب سحب معلق',
+        'insufficient_balance' => 'رصيدك غير كافي',
+        'amount_exceeds_balance' => 'لا يمكن أن يتجاوز المبلغ المطلوب علي رصيدك المتاح',
+        'withdrawal_request_created' => 'تم إنشاء طلب سحب',
+        'no_transactions_wallet' => 'لا يوجد عمليات على المحفظة',
+        'no_products' => 'لا يوجد منتجات',
     ],
     'languages' => [
         'arabic' => 'العربية',
@@ -90,6 +95,7 @@ return [
     ],
     'enums' => [
         "REJECTED" => 'مرفوض',
+        "rejected" => 'مرفوض',
         "withdraw_request" => "طلب سحب",
         "refunded" => "مستردة",
         'ACCEPTED' => 'مقبول',
@@ -97,6 +103,7 @@ return [
         'lab_canceled' => 'ملغي من قبل المختبر',
         'created' => 'تم الإنشاء',
         'system_canceled' => 'ملغي من قبل النظام',
+        'waiting_transfer' => 'في انتظار التحويل',
         'transferred' => 'تم التحويل',
         'deposit' => 'إيداع',
         'withdraw' => 'سحب',
@@ -168,7 +175,8 @@ return [
         'KNET' => 'كي نت',
         'specific_dates' => 'مواعيد محددة',
         'priority_of_reservation' => 'أسبقية الحجز',
-
+        'TRANSFERRED' => 'تم التحويل',
+        'WAITING_TRANSFER' => 'في انتظار التحويل',
 
     ],
     'notifications' => [
@@ -251,6 +259,12 @@ return [
         "providerduesnotificationbody" => "تم طلب مستحقاتك من قبل المشغل :name",
         "customer_registered" => " حساب جديد",
         "customer_registered_body" => "قام :name بتسجيل حساب جديد",
+        'withdrawalrequeststatuschangednotification' => 'تم تغير حالة السحب',
+        'withdrawalrequeststatuschangednotificationbody' => 'تم تغير حالة السحب رقم :id إلى :status',
+        'withdrawal_request_status_changed' => 'تم تغير حالة السحب إلى :status',
+        'withdrawal_request_created' => 'تم إنشاء طلب سحب',
+        'reservationupdatestatusnotification' => 'تحديث حالة الحجز',
+        'reservationupdatestatusnotificationbody' => 'يرجى التحقق من حالة الحجز رقم :id واذا كان هنالك اي مشكلة برجاء االتواصل مع الإدارة',
     ],
     'stats' => [
         'reservation_according_to_country' => 'عدد مقدمي الخدمة حسب الدولة',
@@ -374,6 +388,12 @@ return [
         'contacts' => 'التواصل',
         'orders_group_by_branches' => 'الطلبات حسب الفروع',
     ],
-
+    'gateways' => [
+        'cash' => 'نقدي',
+        'card' => 'بطاقة',
+        'wallet' => 'محفظة',
+        'tabby' => 'تابي',
+        'myfatoorah' => 'ماى فاتورة',
+    ],
 
 ];

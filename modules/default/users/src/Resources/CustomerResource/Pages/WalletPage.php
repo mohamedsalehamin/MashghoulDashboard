@@ -17,7 +17,9 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Theamostafa\Wallet\Models\Transaction;
-
+use Filament\Tables\Actions\Action;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 class WalletPage extends Page implements HasTable {
     use InteractsWithRecord;
     use HasTabs;
@@ -60,6 +62,29 @@ class WalletPage extends Page implements HasTable {
                                 fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
+            ])
+            ->headerActions([
+                Action::make('pay')
+                    ->visible(fn() => $this->record->wallet->balance > 0)
+                    ->label(__('panel.enums.withdraw'))
+                    ->form([
+                        TextInput::make('amount')
+                            // ->rules(['lte:' . $this->record->wallet->balance])
+                            ->label(__('forms.fields.amount'))
+                            ->required(),
+                        TextInput::make('description.ar')
+                            ->label(__("forms.fields.reason_ar"))->required(),
+                        TextInput::make('description.en')->label(__("forms.fields.reason_en"))
+                            ->required(),
+                        SpatieMediaLibraryFileUpload::make('receipt')
+                            ->columnSpan(2),
+                    ])->action(function ($data) {
+                        $this->record->withdraw(amount: $data['amount'], meta: [
+
+                            'description' => $data['description']
+                        ]);
+
+                    })
             ])
             ->columns([
                 TextColumn::make('id')->translateLabel()

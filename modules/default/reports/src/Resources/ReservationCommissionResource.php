@@ -44,7 +44,7 @@ class ReservationCommissionResource extends Resource {
             ->modifyQueryUsing(fn($query) => $query
                 ->whereHas('reservation', fn($builder) => $builder
                     ->paid()
-                    ->whereHas("conditions",fn($builder) => $builder->where('type', 'reservation_fees')->where("value", ">", 0))
+                    // ->whereHas("conditions",fn($builder) => $builder->where('type', 'reservation_fees')->where("value", ">", 0))
                 )
                 ->where('amount', ">", 0))
             ->columns([
@@ -56,7 +56,7 @@ class ReservationCommissionResource extends Resource {
 
                 TextColumn::make('reservation.id')
                     ->label(__('forms.fields.reservation_id'))
-                    ->formatStateUsing(fn($record) => $record->reservation->reservation_number)
+                    // ->formatStateUsing(fn($record) => $record->reservation->reservation_number)
                     ->searchable(),
 
 

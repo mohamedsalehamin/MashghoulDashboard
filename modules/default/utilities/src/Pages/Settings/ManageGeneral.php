@@ -33,13 +33,9 @@ class ManageGeneral extends SettingsPage {
         return $form
             ->schema([
                 Forms\Components\Section::make("General")->schema([
-                    FileUpload::make('app_logo')
-
-                    ,
-
+                    FileUpload::make('app_logo'),
                     TextInput::make('app_name')
-                        ->required()
-                    ,
+                        ->required(),
                     TextInput::make('app_email')
                         ->email()
                         ->required(),
@@ -47,6 +43,10 @@ class ManageGeneral extends SettingsPage {
                         ->required(),
 
                     TextInput::make('app_phone')
+                        ->type('number')
+                        ->numeric()
+                        ->required(),
+                    TextInput::make('app_whatsapp')
                         ->type('number')
                         ->numeric()
                         ->required(),
@@ -60,17 +60,19 @@ class ManageGeneral extends SettingsPage {
                         ->required(),
                     TextInput::make('reservations_fess')
                         ->label(__('forms.fields.reservations_fees'))
-
                         ->type('number')
+                        ->step(0.01) 
                         ->suffix(__("forms.suffixes.sar"))
                         ->required(),
 
                     TextInput::make('app_percentage')
                         ->suffix(__("forms.suffixes.percentage"))
                         ->type('number')
+                        ->step(0.01)
                         ->required(),
 
                     Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
+                    Forms\Components\Toggle::make('enabled_whatsapp_icon'),
 
                 ]),
 

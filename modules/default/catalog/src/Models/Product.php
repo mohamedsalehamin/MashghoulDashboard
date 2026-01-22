@@ -27,8 +27,22 @@ class Product extends Model implements HasMedia {
             get: fn($value) => Money::parse($value)
         );
     }
+    public function salePrice(): Attribute
+    {
 
-    public function priceIncludeTaxes(): Attribute {
+        return Attribute::make(
+            get: fn($value) => Money::parse($value)
+        );
+    }
+
+    public function finalPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->sale_price->getAmount() > 0 ? $this->sale_price : $this->price
+        );
+    }
+    public function priceIncludeTaxes(): Attribute
+    {
 
         $taxes = $this->service?->provider?->city?->state?->country?->taxes ?? 0;
         $price = $this->attributes['price'];
@@ -38,6 +52,26 @@ class Product extends Model implements HasMedia {
             get: fn($value) => Money::parse($finalPrice)
         );
     }
+    public function salePriceIncludeTaxes(): Attribute
+    {
+
+        $taxes = $this->service?->provider?->city?->state?->country?->taxes ?? 0;
+        $price = $this->attributes['sale_price'];
+        $finalPrice = $this->attributes['sale_price'] > 0  ? $price + ($price * $taxes / 100) : 0;
+        return Attribute::make(
+            get: fn($value) => Money::parse($finalPrice)
+        );
+    }
+    // public function priceIncludeTaxes(): Attribute {
+
+    //     $taxes = $this->service?->provider?->city?->state?->country?->taxes ?? 0;
+    //     $price = $this->attributes['price'];
+    //     $finalPrice = $price + ($price * $taxes / 100);
+
+    //     return Attribute::make(
+    //         get: fn($value) => Money::parse($finalPrice)
+    //     );
+    // }
 
     public function service() {
         return $this->belongsTo(Service::class);

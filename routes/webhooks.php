@@ -15,27 +15,26 @@ use App\Notifications\ReservationCreatedSuccessfullyNotification;
 use Illuminate\Support\Facades\Route;
 use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
+use App\Http\Controllers\Webhook\TabbyController;
 
 Route::get('testo', function () {
-    $user = \App\Models\User::find(request()->get('id'));
-    $token = request()->get('token');
-    if (request()->filled('token')) {
+    // $user = \App\Models\User::find(request()->get('id'));
+    // $token = request()->get('token');
+    // if (request()->filled('token')) {
 
-        dd(Firebase::make()
-            ->setTitle('test')
-            ->setBody('test')
-            ->setTokens([$token])
-            ->do());
-    }
-    dd(Firebase::make()
-        ->setTitle('test')
-        ->setBody('test')
-        ->setTokens([$user->deviceTokens->pluck('token')->toArray()])
-        ->do());
-//    $order = \App\Models\Order::first();
-
-//    \Illuminate\Support\Facades\Mail::to("ahmed.mostafa.dev.eg@gmail.com")->send(new \App\Mail\OrderInvoiceMail($order));
-//    dd('as');
+    //     dd(Firebase::make()
+    //         ->setTitle('test')
+    //         ->setBody('test')
+    //         ->setTokens([$token])
+    //         ->do());
+    // }
+    // dd(Firebase::make()
+    //     ->setTitle('test')
+    //     ->setBody('test')
+    //     ->setTokens([$user->deviceTokens->pluck('token')->toArray()])
+    //     ->do());
+    Mail::to('ahmed.mostafa.dev.eg@gmail.com')->send(new SendEmailNotification('test', 'test'));
+    dd('as');
 //    return view('mails.order-invoice',['order' => \App\Models\Order::first()]);
 //    $id=request()->get('id')??20;
 //    $user = \App\Models\User::find($id);
@@ -73,3 +72,10 @@ Route::get('categories/arrange', function () {
         Category::find($record['id'])->update(['parent_id' => $record['parent'] ?? null]);
     }
 })->name('cp.categories.arrange');
+Route::prefix('tabby')->group(function () {
+    Route::match(['get', 'post'], 'success', [TabbyController::class, 'success'])->name('webhooks.tabby.success');
+    Route::match(['get', 'post'], 'cancel', [TabbyController::class, 'cancel'])->name('webhooks.tabby.cancel');
+    Route::match(['get', 'post'], 'failure', [TabbyController::class, 'failure'])->name('webhooks.tabby.failure');
+    Route::match(['get', 'post'], 'capture', [TabbyController::class, 'capture'])->name('webhooks.tabby.capture');
+});
+

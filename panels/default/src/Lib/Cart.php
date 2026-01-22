@@ -320,6 +320,7 @@ class Cart extends CoreCart {
                 "name",
                 "status",
                 "price",
+                "sale_price",
                 "image",
             ]);
             DB::table('reservations_items_lines')->insert([
@@ -327,6 +328,7 @@ class Cart extends CoreCart {
                 'service_id' => $item->associatedModel->id,
                 'name' => $item->name[app()->getLocale()] ?? $item->name,
                 'price' => $item->price,
+                'sale_price' => $item->sale_price,
                 'quantity' => $item->quantity,
                 'attributes' => json_encode($item->attributes),
                 'conditions' => json_encode($this->getOrderItemConditions($item)),
@@ -492,9 +494,13 @@ class Cart extends CoreCart {
     }
 
     public function getReservationFeesTaxes(): float|int {
-        $taxes = Str::replace("%", "", $this->getConditionsByType("taxes")?->first()->getValue());
-
-        $reservation_fees = $this->getReservationFees();
+        $taxCondition = $this->getConditionsByType("taxes")?->first();
+        if (!$taxCondition) {
+            return 0;
+        }
+        
+        $taxes = (float)Str::replace("%", "", $taxCondition->getValue());
+        $reservation_fees = (float)$this->getReservationFees();
         return $reservation_fees / 100 * $taxes;
     }
 

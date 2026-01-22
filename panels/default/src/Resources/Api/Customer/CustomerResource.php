@@ -3,9 +3,10 @@
 namespace App\DefaultPanel\Resources\Api\Customer;
 
 use App\DefaultPanel\Enum\GenderEnum;
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
 use App\Models\PointsExchange;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+ 
 class CustomerResource extends JsonResource {
 
     /**
@@ -16,6 +17,11 @@ class CustomerResource extends JsonResource {
      */
 
     public function toArray($request) {
+        $pendingWithdrawalAmount = $this->withdrawalRequests() 
+        ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
+        ->sum('amount');
+
+        $availableBalance = $this->wallet?->balance - $pendingWithdrawalAmount;
         return [
             'id' => $this->id,
             'avatar' => $this->getFirstMediaUrl(),
@@ -31,7 +37,7 @@ class CustomerResource extends JsonResource {
             'city' => CityResource::make($this->city),
             'gender' => GenderEnum::from($this->gender)->getLabel(),
             'gender_enum' => GenderEnum::from($this->gender)->value,
-            'wallet_balance'=>(float)$this->wallet?->balance ?? 0,
+            'wallet_balance'=>(float)$availableBalance ?? 0,
             'points_balance' =>$this->getTotalPointsBalance(),
             'points'=>$this->getTotalPoints(),
             'notification_status' => $this->settings['notification_status'] ?? 1,

@@ -10,7 +10,6 @@ use App\DefaultPanel\Resources\Api\Customer\ProviderResource;
 use App\DefaultPanel\Resources\Api\Customer\SeatResource;
 use App\UsersModule\Models\Provider;
 use MatanYadaev\EloquentSpatial\Objects\Point;
-use Str;
 use Tasawk\Api\Facade\Api;
 
 
@@ -21,6 +20,7 @@ class ProvidersServices {
             'lng' => request()->get('longitude', 0),
         ];
         $providers = Provider::enabled()
+            ->withoutTrashed()
             ->whereHas("user")
             ->when(request()->has('term'), fn($query) => $query
                 ->where('name->ar', 'like', '%' . request('term') . '%')

@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use App\ContentModule\Models\JoinRequest;
 use App\DefaultPanel\Rules\FormatPhoneRule;
+use App\DefaultPanel\Rules\JoinRequestPhoneRule;
 use App\Traits\Livewire\HasPhoneForm;
+use App\UsersModule\Models\Provider;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use LivewireUI\Modal\ModalComponent;
@@ -18,7 +20,7 @@ class RegisterForm extends ModalComponent {
     public $last_name;
     #[Rule(['required', 'email'])]
     public $email;
-    #[Rule(['required',new FormatPhoneRule])]
+    #[Rule(['required', new JoinRequestPhoneRule])]
     public $phone;
     #[Rule(['required'])]
     public $gender;
@@ -34,6 +36,7 @@ class RegisterForm extends ModalComponent {
 
     public function submit() {
         $this->validate();
+        
         JoinRequest::create([
             ...$this->except('phone'),
             'phone' => $this->fullPhone(),

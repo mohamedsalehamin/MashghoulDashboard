@@ -58,11 +58,21 @@ class JoinRequestResource extends Resource {
                     ->email()
                     ->autocomplete('off')
                     ->unique(ignoreRecord: true),
-                TextInput::make('phone')
-                    ->prefix('+966')
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->autocomplete('off'),
+                    PhoneInput::make('phone')
+                            ->required()
+                            ->onlyCountries(['SA'])
+                            ->validateFor(
+                               // country: 'SA' | ['SA'], 
+                                type: [PhoneNumberType::MOBILE],
+                                lenient: true
+                            )
+                            ->unique(ignoreRecord: true)
+                            ->displayNumberFormat(PhoneInputNumberType::E164),
+                // TextInput::make('phone')
+                //     ->prefix('+966')
+                //     ->required()
+                //     ->unique(ignoreRecord: true)
+                //     ->autocomplete('off'),
                 Select::make('zone_id')
                     ->options(Zone::get()->pluck('name', 'id')),
                 // TextInput::make('address'),
@@ -122,13 +132,17 @@ class JoinRequestResource extends Resource {
 
                         PhoneInput::make('phone')
                             ->required()
-                            ->onlyCountries(['SA', 'EG'])
+                            ->onlyCountries(['SA'])
                             ->validateFor(
-                                type: PhoneNumberType::MOBILE,
+                                type: [PhoneNumberType::MOBILE],
                                 lenient: true
                             )
                             ->unique(ignoreRecord: true)
-                            ->displayNumberFormat(PhoneInputNumberType::E164),
+                            ->displayNumberFormat(PhoneInputNumberType::E164)
+                            ->initialCountry('SA')
+                            //->preferredCountries(['SA'])
+                            ,
+                            
 
 
                         TextInput::make('email')

@@ -24,8 +24,8 @@ class CartServices {
 
     public function checkout(CartCheckoutRequest $request, Provider $provider) {
         $cart = BuildCartInstanceAction::run($request);
-        $total = $provider->user?->options?->reservation_flow == 'fees' ? $cart->totals()['reservation_fees_include_taxes'] : $cart->getTotal();
-
+        $isFeesOnly = $provider->user?->options?->reservation_flow == 'fees';
+        $total = $isFeesOnly ? $cart->totals()['reservation_fees_include_taxes'] : $cart->getTotal();
         /**
          * @var Reservation $reservation
          * */
@@ -45,20 +45,39 @@ class CartServices {
         $cart->saveItemsToOrder($reservation->id);
 
         if ($request->filled('wallet')) {
-            $reservation->pay($request->float('wallet'), 'wallet');
+            $walletAmount = max($request->float('wallet'), $total);
+            $reservation->pay($walletAmount, 'wallet');
         }
         if ($request->filled('points')) {
             $reservation->pay($request->float('points'), 'points');
         }
 
+        // if ($total > 0) {
+        //     $paymentMethod = $request->get('payment_method');
+        //     $reservation->pay($total, $paymentMethod ?? 'myfatoorah');
+        // }
+        
         if ($total > 0) {
-            $reservation->pay($total);
+            $paymentMethod = $request->get('payment_method');
+            $paymentResponse = $reservation->pay($total, $paymentMethod ?? 'myfatoorah');
+
+            // Handle payment response
+            if ($paymentResponse instanceof \Illuminate\Http\JsonResponse) {
+                $responseData = json_decode($paymentResponse->getContent(), true);
+                
+                // If payment failed (including Tabby rejections)
+                if (isset($responseData['status']) && ($responseData['status'] === 'error' || $responseData['status'] === 400)) {
+                    return $paymentResponse;
+                }
+            }
         }
 
-        if ($total <= 0) {
+        if ($isFeesOnly && $total == 0) {
             OrderPaidAction::run($reservation);
         }
-        AddReservationCommissionAction::run($reservation);
+        if (!$isFeesOnly) {
+            AddReservationCommissionAction::run($reservation);
+        }
         return Api::isOk(__("Reservation created"), ReservationResource::make($reservation));
     }
 

@@ -12,6 +12,9 @@ use App\ProviderPanel\Filament\Pages\RequestPasswordReset;
 use App\ProviderPanel\Filament\Pages\TermsAndConditionsPage;
 use App\CatalogModule\Resources\ReservationResource;
 use App\CatalogModule\Resources\ReservationResource\Widgets\ReservationStats;
+use App\ProviderPanel\Filament\Widgets\ProfileUrlWidget;
+
+
 
 use App\ProviderPanel\Filament\Resources\CustomerResource;
 use App\ProviderPanel\Filament\Resources\NotificationResource;
@@ -43,9 +46,14 @@ use Storage;
 
 class ProviderPanelServiceProvider extends PanelProvider
 {
+    public function boot(): void
+    {
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'provider-panel');
+    }
     public function panel(Panel $panel): Panel {
         return $panel
-            ->domain('portal.mashghoul.com')
+            // ->domain('portal.mashghoul.com')
+            ->domain(env('PORTAL_URL', 'portal.mashghoul.com'))
             ->font('cairo', 'https://fonts.googleapis.com/css2?family=Cairo:wght@700;800&display=swap')
             ->id('lab-panel')
             ->path('')
@@ -104,6 +112,7 @@ class ProviderPanelServiceProvider extends PanelProvider
             ])
             ->widgets([
                 ReservationStats::class,
+                ProfileUrlWidget::class,
             ])
             ->resources([
 

@@ -66,6 +66,12 @@ class ServiceResource extends Resource {
                         ->suffix(__("forms.suffixes.sar"))
                         ->formatStateUsing(fn($record) => $record ? $record->price?->formatByDecimal() : null)
                         ->required(),
+                    TextInput::make('sale_price')
+                        ->suffix(__("forms.suffixes.sar"))
+                        ->formatStateUsing(fn($record) => $record ? $record?->sale_price?->formatByDecimal() : null)
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(fn($get) => $get('price')),
 
 
                     Toggle::make('status')->default(1)
@@ -87,8 +93,17 @@ class ServiceResource extends Resource {
                                 ->formatStateUsing(fn($record) => $record?->title['en'] ?? '')
                                 ->required(),
                             TextInput::make('price')
-                                ->numeric()
-                                ->required()->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
+                        ->suffix(__("forms.suffixes.sar"))
+                        ->formatStateUsing(fn($record) => $record ? $record->price?->formatByDecimal() : null)
+                        ->required(),
+                    TextInput::make('sale_price')
+                        ->suffix(__("forms.suffixes.sar"))
+                        ->formatStateUsing(fn($record) => $record ? $record?->sale_price?->formatByDecimal() : null)
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(fn($get) => $get('price')),
+
+
                         ])->relationship('products'),
                 ])->columnSpan(1),
 
@@ -104,6 +119,8 @@ class ServiceResource extends Resource {
 
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('price')->searchable(),
+                TextColumn::make('sale_price')
+                    ->money('SAR'),
                 TextColumn::make('products_count')->counts("products")->searchable(false),
 
 
@@ -131,7 +148,7 @@ class ServiceResource extends Resource {
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make(),
+                    // ExportBulkAction::make(),
 
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

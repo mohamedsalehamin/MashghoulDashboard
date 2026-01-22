@@ -19,13 +19,13 @@ class ListReservations extends ListRecords {
 
         foreach (ReservationStatus::cases() as $case) {
             $tabs[__("panel.enums.$case->value")] = Tab::make()
-                ->badge(Reservation::paid()->where('status', $case->value)->count())
+                ->badge(Reservation::where('status', $case->value)->count())
                 ->badgeColor($case->getColor())
-                ->modifyQueryUsing(fn(Builder $query) => $query->paid()->where('status', $case->value));
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', $case->value));
         }
         return [
             __('panel.enums.all') => Tab::make()
-                ->badge(Reservation::paid()->count()),
+                ->badge(Reservation::count()),
             ...$tabs
         ];
     }

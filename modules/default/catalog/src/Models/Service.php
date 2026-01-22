@@ -38,11 +38,39 @@ class Service extends Model implements HasMedia {
             get: fn($value) => Money::parse($value)
         );
     }
+    public function salePrice(): Attribute {
+        return Attribute::make(
+            get: fn($value) =>  Money::parse($value)
+        );
+    }
+
+    public function finalPrice(): Attribute {
+        return Attribute::make(
+            get: function() {
+                if ($this->sale_price && $this->sale_price > 0) {
+                    return $this->sale_price;
+                }
+                return $this->price;
+            }
+        );
+    }
     public function priceIncludeTaxes(): Attribute {
 
         $taxes = $this->provider?->city?->state?->country?->taxes ?? 0;
         $price = $this->attributes['price'];
         $finalPrice = $price + ($price * $taxes / 100);
+
+        return Attribute::make(
+            get: fn($value) => Money::parse($finalPrice)
+        );
+    }
+     public function salePriceIncludeTaxes(): Attribute
+    {
+
+        $taxes = $this->provider?->city?->state?->country?->taxes ?? 0;
+
+        $price = $this->attributes['sale_price'];
+        $finalPrice = $this->attributes['sale_price'] > 0  ? $price + ($price * $taxes / 100) : 0;
 
         return Attribute::make(
             get: fn($value) => Money::parse($finalPrice)

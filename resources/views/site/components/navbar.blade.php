@@ -12,16 +12,16 @@
         <nav>
             <ul class="nav-list d-flex align-items-center">
                 <li class="linkMenu">
-                    <a href="#about"> @lang("site.heading.about_us") </a>
+                    <a href="{{url(App::getLocale() . '/')}}/#about"> @lang("site.heading.about_us") </a>
                 </li>
                 <li class="linkMenu">
-                    <a href="#features">@lang("site.heading.mashghoul_features")</a>
+                    <a href="{{url(App::getLocale() . '/')}}/#features">@lang("site.heading.mashghoul_features")</a>
                 </li>
                 <li class="linkMenu">
-                    <a href="#faq">@lang("site.heading.faqs")</a>
+                    <a href="{{url(App::getLocale() . '/')}}/#faq">@lang("site.heading.faqs")</a>
                 </li>
                 <li class="linkMenu">
-                    <a href="#contact_Us">@lang("site.heading.contact_us")</a>
+                    <a href="{{url(App::getLocale() . '/')}}/#contact_Us">@lang("site.heading.contact_us")</a>
                 </li>
             </ul>
         </nav>

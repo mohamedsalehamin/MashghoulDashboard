@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest {
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'phone' => ['required', new FormatPhoneRule],
-            'gender' => ['required', 'in:male,female'],
+            // 'gender' => ['required', 'in:male,female'],
             'password' => [
                 'required',
                 'confirmed'

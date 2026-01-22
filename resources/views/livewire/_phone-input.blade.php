@@ -21,7 +21,7 @@
             autoPlaceholder: "aggressive",
             separateDialCode: true,
             initialCountry: 'sa',
-            onlyCountries: ["sa", 'eg',],
+            onlyCountries: ["sa", ],
 
             nationalMode: true
         });

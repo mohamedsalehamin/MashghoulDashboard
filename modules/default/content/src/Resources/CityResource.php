@@ -22,7 +22,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-
+use App\DefaultPanel\Rules\TranslatableRequired;
 class CityResource extends Resource {
     use Translatable;
     use HasTranslationLabel;
@@ -36,8 +36,9 @@ class CityResource extends Resource {
             ->schema([
                 Section::make('basic_information')
                     ->schema([
-                        TextInput::make('name')->required(),
-
+                        
+                        TextInput::make('name')->required()
+                        ->rules([new TranslatableRequired()]),
                         Select::make("state_id")
                             ->searchable()
                             ->options(fn() => State::pluck('name', 'id'))

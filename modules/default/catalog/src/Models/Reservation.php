@@ -208,7 +208,8 @@ class Reservation extends Model {
         return $cart;
     }
 
-    public function getPrintCartAttribute() {
+    public function getPrintCartAttribute()
+    {
         $totalProducts = 0;
         $eventsClass = config('shopping_cart.events');
         $events = $eventsClass ? new $eventsClass() : app('events');
@@ -224,28 +225,39 @@ class Reservation extends Model {
 
         $this->itemsLine->transform(function (ItemsLine $item) use (&$totalProducts) {
             foreach ($item['attributes']['products'] as $product) {
-                $totalProducts += $product['price']['amount'] / 100;
+                $price = $product['sale_price']['amount'] > 0 ? $product['sale_price']['amount'] : $product['price']['amount'];
+                $totalProducts += ($price * ($product['quantity'] ?? 1)) / 100;
             }
-            $conditions = collect($item->conditions)->map(/**
-             * @throws InvalidConditionException
-             */ fn($cond) => new CartCondition($cond))->toArray();
+            $conditions = collect($item->conditions)->map(
+                /**
+                 * @throws InvalidConditionException
+                 */
+                fn($cond) => new CartCondition($cond)
+            )->toArray();
 
             $item['quantity'] = $item->quantity > 0 ? $item->quantity : 1;
             $item['associatedModel'] = Service::find($item->model['id']);
             $item['price'] = Service::find($item->model['id'])->price->formatByDecimal();
+            $item['sale_price'] = Service::find($item->model['id'])->sale_price->formatByDecimal();
             $item['new_conditions'] = $conditions;
             return $item;
         })->each(function ($item) use ($cart) {
             $d = $item->toArray();
             $d['conditions'] = $d['new_conditions'];
+            // Use sale price if available, otherwise use regular price
+            $price = $d['sale_price'] > 0 ? $d['sale_price'] : $d['price'];
+            $d['price'] = $price;
             return $cart->add($d);
         });
 
         $this->conditions
             ->filter(fn($condition) => $condition->type !== 'products')
-            ->each(/**
-             * @throws InvalidConditionException
-             */ fn($condition) => $cart->condition(new CartCondition($condition->toArray())));
+            ->each(
+                /**
+                 * @throws InvalidConditionException
+                 */
+                fn($condition) => $cart->condition(new CartCondition($condition->toArray()))
+            );
         $cart->condition(new CartCondition([
             "name" => "products",
             "type" => "products",
@@ -255,8 +267,6 @@ class Reservation extends Model {
         ]));
         return $cart;
     }
-
-
     public function rate() {
         return $this->hasOne(Rate::class);
     }
@@ -328,8 +338,17 @@ class Reservation extends Model {
         return $this->hasMany(Timeline::class);
     }
 
-    public function getPaymentStatus(): ReservationPaymentStatus {
+    // public function getPaymentStatus(): ReservationPaymentStatus {
 
-        return $this->transactions()->count() == $this->transactions()->where('status', 'paid')->count() ? ReservationPaymentStatus::PAID : ReservationPaymentStatus::PENDING;
+    //     return $this->transactions()->count() == $this->transactions()->where('status', 'paid')->count() ? ReservationPaymentStatus::PAID : ReservationPaymentStatus::PENDING;
+    // }
+    public function getPaymentStatus()
+    {
+        if ($this->transactions()->count() == 0) {
+            return ReservationPaymentStatus::PENDING;
+        }
+        
+        $currentStatus = $this->transactions()->latest()->first()->status;
+        return $currentStatus ?: ReservationPaymentStatus::PENDING;
     }
 }

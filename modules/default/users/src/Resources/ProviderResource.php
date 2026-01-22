@@ -76,9 +76,9 @@ class ProviderResource extends Resource {
 
                     PhoneInput::make('phone')
                         ->required()
-                        ->onlyCountries(['SA', 'EG'])
+                        ->onlyCountries(['SA'])
                         ->validateFor(
-                            type: PhoneNumberType::MOBILE,
+                            type: [PhoneNumberType::MOBILE],
                             lenient: true
                         )
                         ->unique(ignoreRecord: true)
@@ -237,7 +237,7 @@ class ProviderResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->whereHas('provider'))
+            ->modifyQueryUsing(fn($query) => $query)
             ->columns([
                 TextColumn::make('provider.id')
                     ->default('')
@@ -329,7 +329,7 @@ class ProviderResource extends Resource {
     }
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::whereHas('provider')->count();
+        return static::getModel()::count();
     }
 
     public static function getNavigationGroup(): ?string {

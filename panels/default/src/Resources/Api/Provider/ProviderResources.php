@@ -19,10 +19,8 @@ class ProviderResources extends JsonResource {
      * @return array
      */
     public function toArray($request) {
-
         return [
             'id' => $this->id,
-
             'name' => $this->name,
             'bio' => $this->bio,
             'image' => $this->getFirstMediaUrl(),
@@ -37,9 +35,8 @@ class ProviderResources extends JsonResource {
                 'longitude' => $this->location?->getCoordinates()[0],
             ],
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list']??[])->where('status', 1)),
-
             'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]??'',
-
+            "share_link" => route('site.share_provider', str_replace(" ", "&", $this->getTranslation('name', 'en') ?? $this->name)),
         ];
     }
 }

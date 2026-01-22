@@ -30,6 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class CategoryResource extends Resource implements HasShieldPermissions {
     use Translatable;
@@ -72,7 +73,7 @@ class CategoryResource extends Resource implements HasShieldPermissions {
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('name'),
-
+                SpatieMediaLibraryImageColumn::make('image')->collection(app()->getLocale()),
                 IconColumn::make('status')
                     ->boolean()
                     ->action(

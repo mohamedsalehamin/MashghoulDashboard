@@ -28,6 +28,7 @@ class ListWalletTransactions extends ListRecords {
 
             Action::make('request')
                 ->label(__('panel.enums.withdraw_request'))
+                ->visible(fn() => provider()->balance > 0)
                 ->requiresConfirmation()
                 ->modalHeading(__("panel.messages.make_sure_that_bank_account_info_is_right"))
                 ->action(function ($data) {

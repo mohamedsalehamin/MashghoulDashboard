@@ -6,6 +6,7 @@ use App\CatalogModule\Models\Transaction;
 use App\DefaultPanel\Actions\PayTransaction;
 use App\DefaultPanel\Actions\PayTransactionViaPoints;
 use App\DefaultPanel\Actions\PayTransactionViaWallet;
+use App\DefaultPanel\Actions\PayTransactionViaTabby;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 
@@ -30,8 +31,9 @@ trait Transactionable {
 
     public function pay($price, $method = 'myfatoorah') {
         $transaction = $this->transactions()->create(['user_id' => $this->user_id, 'price' => $price]);
-        match ($method) {
+        return match ($method) { 
             'myfatoorah' => PayTransaction::run($transaction),
+            'tabby' => PayTransactionViaTabby::run($transaction),
             'points' => PayTransactionViaPoints::run($transaction),
             default => PayTransactionViaWallet::run($transaction),
 

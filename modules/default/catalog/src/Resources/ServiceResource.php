@@ -71,11 +71,16 @@ class ServiceResource extends Resource {
                         ->options(GeneralSettings::getDurations())
                         ->required()
                         ->suffix(__('forms.suffixes.minutes')),
-                    TextInput::make('price')
+                   TextInput::make('price')
                         ->suffix(__("forms.suffixes.sar"))
-                        ->formatStateUsing(fn($record) => $record ? $record->price?->formatByDecimal() : null)
+                        ->formatStateUsing(fn($record) => $record ? $record->price?->formatByDecimal() : 0)
                         ->required(),
-
+                    TextInput::make('sale_price')
+                        ->suffix(__("forms.suffixes.sar"))
+                        ->formatStateUsing(fn($record) => $record ? $record?->sale_price?->formatByDecimal() : 0)
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(fn($get) => $get('price')),
 
                     Toggle::make('status')->default(1)
                         ->onColor('success')
@@ -95,9 +100,15 @@ class ServiceResource extends Resource {
                             TextInput::make('title.en')->label(__("forms.fields.title_en"))
                                 ->formatStateUsing(fn($record) => $record->title['en'] ?? '')
                                 ->required(),
-                            TextInput::make('price')->required()
+                             TextInput::make('price')->required()
                                 ->numeric()
                                 ->formatStateUsing(fn($record) => $record?->price?->formatByDecimal()),
+                                TextInput::make('sale_price')
+                            ->suffix(__("forms.suffixes.sar"))
+                            ->formatStateUsing(fn($record) => $record ? $record?->sale_price?->formatByDecimal() : 0)
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(fn($get) => $get('price')),
                         ])
                         ->relationship('products'),
                 ])->columnSpan(1),
@@ -119,6 +130,7 @@ class ServiceResource extends Resource {
                     )),
                 TextColumn::make('title')->searchable(),
                 TextColumn::make('price')->searchable(),
+                TextColumn::make('sale_price')->money('SAR'),
                 TextColumn::make('products_count')->counts("products")->searchable(false),
 
 
@@ -199,6 +211,10 @@ class ServiceResource extends Resource {
                                     ->getStateUsing(fn($record) => $record->title)
                                     ->formatStateUsing(fn($record) => $record->price->formatByDecimal())
                                     ->heading(__("forms.fields.price")),
+                                Column::make('sale_price')
+                                    ->getStateUsing(fn($record) => $record->title)
+                                    ->formatStateUsing(fn($record) => $record->sale_price->formatByDecimal())
+                                    ->heading(__("forms.fields.sale_price")),
                                 Column::make('image')
                                     ->heading(__("forms.fields.image"))
                                     ->getStateUsing(fn($record) => $record->title)
@@ -245,6 +261,10 @@ class ServiceResource extends Resource {
                                 Column::make('price')
                                     ->formatStateUsing(fn($record) => $record->price->formatByDecimal())
                                     ->heading(__("forms.fields.price")),
+                                Column::make('sale_price')
+                                    ->formatStateUsing(fn($record) => $record->sale_price->formatByDecimal())
+                                    ->heading(__("forms.fields.sale_price")),
+
 
                                 Column::make('image')
                                     ->heading(__("forms.fields.image"))

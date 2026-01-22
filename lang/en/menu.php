@@ -134,5 +134,7 @@ return [
     'services' => 'Services',
     'service' => 'Service',
     'subscription' => 'Subscription',
+    "withdrawal_requests" => "Wallet Withdrawal Requests",
+    "withdrawalrequest"=>"Wallet Withdrawal Requests",
 
 ];

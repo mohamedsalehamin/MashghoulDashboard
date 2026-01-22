@@ -47,18 +47,6 @@ class Commission extends Model implements HasMedia {
         return $this->belongsTo(Reservation::class, 'reservation_id', 'id');
     }
 
-    public function scopeBelongsToDoctors($builder) {
-        return $builder->whereHas('reservation', function ($query) {
-            $query->where('reservable_type', Doctor::class);
-        });
-    }
-
-    public function scopeBelongsToLabs($builder) {
-        return $builder->whereHas('reservation', function ($query) {
-            $query->where('reservable_type', Lab::class);
-        });
-    }
-
     public function amount(): Attribute {
 
         return Attribute::make(

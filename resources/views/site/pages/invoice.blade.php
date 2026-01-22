@@ -3,6 +3,9 @@
 @php($totals = $reservation->print_cart->formattedTotals())
 @php($totalsWithoutFormat = $reservation->print_cart->totals())
 @php(app()->setLocale('ar'))
+@php($paymentMethod = ($reservation->transaction->meta_data['method'] ?? null) ?: (isset($reservation->transaction->meta_data['gateway']) ? __("panel.gateways." . $reservation->transaction->meta_data['gateway']) : __("panel.enums.cash")))
+@php($paymentDate = isset($reservation->transaction->meta_data['paid_at']) ? \Carbon\Carbon::parse($reservation->transaction->meta_data['paid_at']) : (($reservation->transaction && $reservation->transaction->status === 'paid') ? $reservation->transaction->updated_at : $reservation->created_at))
+
     <!DOCTYPE html>
 <html lang="en" dir="rtl">
 <head>
@@ -370,7 +373,7 @@
                                 <p><strong>رقم الفاتورة:</strong> {{$reservation->reservation_number}}</p>
                                 <p>
                                     <strong>تاريخ إصدار الفاتورة:</strong>
-                                    {{now()->translatedFormat("Y-m-d h:i a")}}
+                                    {{$paymentDate->translatedFormat("Y-m-d h:i a")}}
                                 </p>
                                 <p><strong>حالة الحجز:</strong> {{$reservation->status->getLabel()}}</p>
                             </div>
@@ -390,8 +393,7 @@
                         </div>
                         <div class="col-6">
                             <div class="hold-details">
-                                <p><strong>طريقة الدفع:</strong> {{$reservation->transaction->meta_data['method']??__("panel.enums.cash")}}
-                                </p>
+                                <p><strong>طريقة الدفع:</strong> {{ $paymentMethod }}</p>
                             </div>
                         </div>
                     </div>
@@ -408,16 +410,25 @@
                     <th>#</th>
                     <th colspan="2">اسم الخدمة</th>
                     <th colspan="2">السعر</th>
+                    <th colspan="2">السعر بعد الخصم</th>
                     <th colspan="1">الإجمالي</th>
+                    
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($reservation->itemsLine as $service)
+                    <?php
+
+                    $price = Money::parse($service->price)->format();
+                    $sale_price = Money::parse($service->sale_price)->format();
+                    $total = Money::parse($service->sale_price  > 0 ? $service->sale_price :$service->price)->format();
+                    ?>
                     <tr>
                         <td>{{$loop->iteration}}</td>
                         <td colspan="2" class="product-name"><p class="product-title">{{$service->name}}</p></td>
-                        <td colspan="2">{{\Cknow\Money\Money::parse($service->price)->format()}}</td>
-                        <td colspan="1">{{\Cknow\Money\Money::parse($service->price)->format()}}</td>
+                        <td colspan="2">{{$price}}</td>
+                        <td colspan="2">{{$sale_price}}</td>
+                        <td colspan="1">{{$total }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -440,6 +451,7 @@
                         <th>#</th>
                         <th colspan="2">اسم المنتج</th>
                         <th>السعر</th>
+                        <th>السعر بعد الخصم</th>
                         <th colspan="2">الكمية</th>
                         <th>الإجمالي</th>
                     </tr>
@@ -453,6 +465,8 @@
                                     <?php
                                     $option_name = Utils::getTranslatedField($option['title']);
                                     $price = Money::parse($option['price']['amount'])->format();
+                                    $sale_price = Money::parse($option['sale_price']['amount'])->format();
+                                    $total = Money::parse(($option['sale_price']['amount'] > 0 ? $option['sale_price']['amount']:$option['price']['amount']) * $option['quantity'])->format();
 
                                     ?>
                                 <td>{{$loop->iteration}}</td>
@@ -464,9 +478,9 @@
                                 </td>
 
                                 <td>{{$price}}</td>
-
-                                <td colspan="2">{{$option['price']['quantity']??1}}</td>
-                                <td>{{$price}}</td>
+                                <td>{{$option['sale_price']['amount'] > 0 ?$sale_price:'--'}}</td>
+                                <td colspan="2">{{$option['quantity']??1}}</td>
+                                <td>{{$total}}</td>
                             </tr>
                         @endforeach
                     @endforeach

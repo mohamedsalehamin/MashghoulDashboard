@@ -46,8 +46,8 @@ class LevelResource extends Resource {
                             ->required(),
                         TextInput::make('value')
                             ->label(__('forms.fields.points'))
-                            ->numeric()->required(),
-                        TextInput::make('price')->numeric()->required()->suffix(__('forms.suffixes.sar')),
+                            ->numeric()->minValue(1)->required(),
+                        TextInput::make('price')->minValue(1)->numeric()->required()->suffix(__('forms.suffixes.sar')),
                         TextInput::make('duration')
                             ->label(__('forms.fields.expire_after'))
                             ->numeric()->required()

@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Requests\Api\Provider\Authentication;
 
 use App\DefaultPanel\Rules\FormatPhoneRule;
+use App\DefaultPanel\Rules\IsUserNotCustomer;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest {
@@ -26,7 +27,7 @@ class LoginRequest extends FormRequest {
      */
     public function rules() {
         return [
-            'phone' => ['required', new FormatPhoneRule],
+            'phone' => ['required', new FormatPhoneRule, new IsUserNotCustomer],
             'password' => [
                 'required',
             ],

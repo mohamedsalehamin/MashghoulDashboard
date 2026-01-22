@@ -22,6 +22,13 @@ class CartServiceResource extends JsonResource {
             $title = $title[app()->getLocale()] ?? $title[app()->getLocale() == 'ar' ? 'en' : 'ar'];
         }
         $products=Arr::get($this->attributes, 'products', []);
+        $regularPrice = $this->associatedModel->price->getAmount();
+        $salePrice = $this->associatedModel->sale_price->getAmount();
+
+        $discountPercentage = false;
+        if (!$this->associatedModel->sale_price->isZero() && $regularPrice > 0) {
+            $discountPercentage = round(($regularPrice - $salePrice) / $regularPrice * 100);
+        }
         return [
             'id' => $this->associatedModel->id,
             'image' => $this->associatedModel->getFirstMediaUrl(),
@@ -29,7 +36,9 @@ class CartServiceResource extends JsonResource {
             "quantity" => $this->quantity,
             'products' => CartProductResource::collection($products),
             'service_price'=>$this->associatedModel->price->format(),
-            'products_price'=>Money::parse(collect($products)->reduce(fn($carry, $product) => $carry +($product->price->formatByDecimal() *$product->quantity),0))->format(),
+            'sale_price' => !$this->associatedModel->sale_price->isZero() ? $this->associatedModel->sale_price->format() : false,
+            'discount_percentage' => $discountPercentage,
+            'products_price' => Money::parse(collect($products)->reduce(fn($carry, $product) => $carry + ((!$product->sale_price->isZero() ? $product->sale_price->formatByDecimal() : $product->price->formatByDecimal()) * $product->quantity), 0))->format(),
             'total' => Money::parse($this->getPriceSumWithConditions())->format()
         ];
     }

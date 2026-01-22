@@ -64,8 +64,7 @@ class CustomerPaymentResource extends Resource {
                     ->searchable(false)
                     ->badge()
                     ->formatStateUsing(function ($record) {
-
-                        return $record->meta_data['gateway'];
+                        return __('panel.gateways.' . $record->meta_data['gateway']);
                     }),
                 TextColumn::make('meta_data.paid_at')
                     ->label(__('forms.fields.payment_data_paid_at'))
@@ -76,8 +75,8 @@ class CustomerPaymentResource extends Resource {
                     ->searchable(),
 
                 TextColumn::make('e_invoice_url')
-                    ->state(fn($record) => isset($record->meta_data['invoiceURL']) ? __('forms.fields.show_invoice') : __('forms.fields.no_invoice'))
-                    ->url(fn($record) => isset($record->meta_data['invoiceURL']) ? $record->meta_data['invoiceURL'] : '', true)
+                    ->state(fn($record) => $record->meta_data['gateway'] != 'tabby' && isset($record->meta_data['invoiceURL']) ? __('forms.fields.show_invoice') : __('forms.fields.no_invoice'))
+                    ->url(fn($record) => $record->meta_data['gateway'] != 'tabby' && isset($record->meta_data['invoiceURL']) ? $record->meta_data['invoiceURL'] : '', true)
                     ->searchable(false),
                 TextColumn::make('price')
                     ->formatStateUsing(fn($record) => $record->price->format())

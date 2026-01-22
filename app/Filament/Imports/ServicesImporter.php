@@ -49,6 +49,10 @@ class ServicesImporter extends Importer {
                 ->label(__("forms.fields.price"))
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('sale_price')
+                ->label(__("forms.fields.sale_price"))
+                ->requiredMapping()
+                ->rules(['required', 'max:255']),
             ImportColumn::make('image')
                 ->label(__("forms.fields.image"))
                 ->requiredMapping()
@@ -72,6 +76,7 @@ class ServicesImporter extends Importer {
             ],
             'duration' => data_get($this->getData(), 'duration'),
             'price' => data_get($this->getData(), 'price', 0),
+            'sale_price' => data_get($this->getData(), 'sale_price', 0),
             'meta_data' => [
                 'import_id' => data_get($this->getData(), 'id')
             ],

@@ -22,6 +22,7 @@ class SettingServices {
             'address' => $settings->app_address,
             "phone" => $settings->app_phone,
             "whatsapp" => $settings->app_whatsapp,
+            "enabled_whatsapp_icon" => ($settings->enabled_whatsapp_icon == 1) ? 1 : 0,
             'social_media' => $this->socialMedia($settings->social_links),
             'applications_links' => $settings->applications_links,
             'reservation_fee' => $settings->reservations_fess,

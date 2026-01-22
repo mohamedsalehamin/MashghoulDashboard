@@ -32,7 +32,22 @@ $pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) 
     <style>.iti{    width: 100%;}</style>
     @stack("css")
     @livewireStyles
+    
+    <!-- Snap Pixel Code -->
+<script type='text/javascript'>
+(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+r.src=n;var u=t.getElementsByTagName(s)[0];
+u.parentNode.insertBefore(r,u);})(window,document,
+'https://sc-static.net/scevent.min.js');
 
+snaptr('init', '7a764719-fac8-4705-ad5f-1b4e2ad1936a', {});
+
+snaptr('track', 'PAGE_VIEW');
+
+</script>
+<!-- End Snap Pixel Code -->
 </head>
 <body>
 

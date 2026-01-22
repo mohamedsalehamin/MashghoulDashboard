@@ -52,7 +52,6 @@ class ReservationResource extends Resource {
         return $table
             ->modifyQueryUsing(fn($query) => $query
                 ->where('reservable_id', provider()->id)
-                ->paid()
                 ->latest("id")
             )
             ->columns([
@@ -121,11 +120,11 @@ class ReservationResource extends Resource {
             ->actions([
                 ChangeReservationStatusAction::make()->visible(true),
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
@@ -255,10 +254,7 @@ class ReservationResource extends Resource {
 
 
     public static function getNavigationBadge(): ?string {
-        return static::getModel()::where('reservable_id', provider()->id)
-            ->where('status', ReservationStatus::PENDING)
-            ->paid()
-            ->count();
+        return static::getModel()::where('reservable_id', provider()->id)->count();
 
     }
 

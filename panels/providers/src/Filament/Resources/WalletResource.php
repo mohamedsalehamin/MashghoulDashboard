@@ -74,6 +74,7 @@ class WalletResource extends Resource {
                     ->visible(fn($record) => $record->getFirstMediaUrl())
                     ->url(fn($record) => $record->getFirstMediaUrl(), true)
             ])
+            ->emptyStateHeading(__('panel.messages.no_transactions_wallet'))
             ->striped();
     }
 

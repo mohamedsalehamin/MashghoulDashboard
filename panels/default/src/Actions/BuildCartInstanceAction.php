@@ -11,7 +11,7 @@ use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Exceptions\InvalidConditionException;
 use Lorisleiva\Actions\Concerns\AsAction;
 use App\DefaultPanel\Lib\Cart;
-
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
 
 class BuildCartInstanceAction {
     use AsAction;
@@ -71,8 +71,10 @@ class BuildCartInstanceAction {
                         ->setAttribute('image', $product->getFirstMediaUrl());
                 });
 
-            $price = $service->price->formatByDecimal();
-            $productPrice += $products->sum(fn($product) => $product->price->formatByDecimal() * $product['quantity']);
+            $price = $service->sale_price->formatByDecimal() > 0 ? $service->sale_price->formatByDecimal() : $service->price->formatByDecimal();
+            
+            $productPrice += $products->sum(fn($product): float|int => ($product->sale_price->formatByDecimal() > 0 ? $product->sale_price->formatByDecimal() : $product->price->formatByDecimal()) * $product['quantity']);
+
             $cart->applyItem($service, $price, 1, ['products' => $products]);
         }
         $cart->applyProducts($productPrice);
@@ -82,17 +84,31 @@ class BuildCartInstanceAction {
      * @throws APIException
      */
     public function applyWalletToCart($cart, $request): void {
+        $pendingWithdrawalAmount = auth()->user()->withdrawalRequests()
+        ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
+        ->sum('amount');
 
+        $availableBalance = auth()->user()->balance - $pendingWithdrawalAmount;
         if ($request->filled('wallet') && $cart->getTotal() < $request->get('wallet')) {
             throw new APIException(__("validation.api.overdue_wallet_balance"));
         }
 
-        if ($request->filled('wallet') && auth()->user()->balance < $request->get('wallet')) {
+        if ($request->filled('wallet') && $availableBalance < $request->get('wallet')) {
             throw new APIException(__("validation.api.insufficient_wallet_balance"));
         }
         if ($request->filled('wallet')) {
             $cart->applyWalletDiscount($request->get('wallet'));
         }
+        // if ($request->filled('wallet') && $cart->getTotal() < $request->get('wallet')) {
+        //     throw new APIException(__("validation.api.overdue_wallet_balance"));
+        // }
+
+        // if ($request->filled('wallet') && auth()->user()->balance < $request->get('wallet')) {
+        //     throw new APIException(__("validation.api.insufficient_wallet_balance"));
+        // }
+        // if ($request->filled('wallet')) {
+        //     $cart->applyWalletDiscount($request->get('wallet'));
+        // }
     }
 
     /**

@@ -11,7 +11,11 @@ class RefundTransaction {
     use AsAction;
 
     public function handle(Reservation $reservation) {
-        $amount =$reservation->price->formatByDecimal();
+        if ($reservation->transaction?->meta_data['gateway'] === 'wallet') {
+            $amount = $reservation->transaction->price->formatByDecimal();
+        } else {
+            $amount = $reservation->price->formatByDecimal();
+        }
         $reservation->customer?->deposit($amount, [
             'description' => [
                 'ar' => __("panel.messages.refund_reservation", ['no' => $reservation->id,'amount'=>$amount], 'ar'),

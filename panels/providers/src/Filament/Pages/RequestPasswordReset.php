@@ -131,7 +131,7 @@ class RequestPasswordReset extends SimplePage
         return PhoneInput::make('phone')
             ->required()
             ->live()
-            ->onlyCountries(['SA', 'EG'])
+            ->onlyCountries(['SA'])
             ->validateFor(
                 type: PhoneNumberType::MOBILE,
                 lenient: true

@@ -24,6 +24,7 @@ class GeneralSettings extends Settings {
     public string $app_percentage;
     public string $reservation_flow;
     public string $enabled_free_fees_in_first_reservation;
+    public string $enabled_whatsapp_icon;
     public array $points;
     public string $app_whatsapp;
     public string $app_address;
@@ -54,7 +55,23 @@ class GeneralSettings extends Settings {
     }
 
     public static function getDurations() {
-        return [
+        $all_durations = [
+            // '15' => __("panel.enums.minutes", ['minutes' => 15]),
+            // '30' => __("panel.enums.30_minutes"),
+            // '45' => __("panel.enums.minutes", ["minutes" => 45]),
+            // '60' => __("panel.enums.60_minutes"),
+            // '75' => __("panel.enums.minutes", ["minutes" => 75]),
+            // '90' => __("panel.enums.90_minutes"),
+            // '100' => __("panel.enums.minutes", ["minutes" => 100]),
+            // '120' => __("panel.enums.120_minutes"),
+            // 130 => __("panel.enums.minutes", ["minutes" => 130]),
+            // 140 => __("panel.enums.minutes", ["minutes" => 140]),
+            // 150 => __("panel.enums.minutes", ["minutes" => 150]),
+            // 160 => __("panel.enums.minutes", ["minutes" => 160]),
+            // 180 => __("panel.enums.minutes", ["minutes" => 180]),
+            // 200 => __("panel.enums.minutes", ["minutes" => 200]),
+            // 200 => __("panel.enums.minutes", ["minutes" => 200]),
+
             '15' => __("panel.enums.minutes", ['minutes' => 15]),
             '30' => __("panel.enums.30_minutes"),
             '45' => __("panel.enums.minutes", ["minutes" => 45]),
@@ -69,7 +86,23 @@ class GeneralSettings extends Settings {
             160 => __("panel.enums.minutes", ["minutes" => 160]),
             180 => __("panel.enums.minutes", ["minutes" => 180]),
             200 => __("panel.enums.minutes", ["minutes" => 200]),
+            220 => __("panel.enums.minutes", ["minutes" => 220]),
+            240 => __("panel.enums.minutes", ["minutes" => 240]),
+            260 => __("panel.enums.minutes", ["minutes" => 260]),
+            280 => __("panel.enums.minutes", ["minutes" => 280]),
+            300 => __("panel.enums.minutes", ["minutes" => 300]),
+            320 => __("panel.enums.minutes", ["minutes" => 320]),
+            340 => __("panel.enums.minutes", ["minutes" => 340]),
+            360 => __("panel.enums.minutes", ["minutes" => 360]),
+            380 => __("panel.enums.minutes", ["minutes" => 380]),
+            400 => __("panel.enums.minutes", ["minutes" => 400]),
         ];
+
+        for ($i = 400; $i <= 1440; $i += 20) {
+            $all_durations[(string)$i] = __("panel.enums.minutes", ['minutes' => $i]);
+        }
+
+        return $all_durations;
     }
 
     static public function daysListSchema(): array {
@@ -180,7 +213,7 @@ class GeneralSettings extends Settings {
                     ->seconds(false)
                     ->statePath("$index.from"),
                 TimePicker::make("to")
-                    ->minutesStep(60)
+                    // ->minutesStep(60)
                     ->datalist([
                         "00:00",
                         "00:30",

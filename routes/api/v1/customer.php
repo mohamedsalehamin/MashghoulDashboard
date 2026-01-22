@@ -28,6 +28,8 @@ Route::prefix('v1')->group(function () {
         Route::post('profile/plans/{plan}/exchange', [PointService::class, 'exchange']);
         Route::get('profile/transactions', [ProfileService::class, 'transactions']);
         Route::get('profile/wallet/transactions', [WalletService::class, 'index']);
+        Route::get('profile/wallet/withdrawal-requests', [WalletService::class, 'withdrawalRequests']);
+        Route::post('profile/wallet/withdrawal-requests', [WalletService::class, 'requestWithdrawal']);
         Route::get('profile/favorites', [FavoriteService::class, 'index']);
 
         Route::post('profile', [ProfileService::class, 'update']);
@@ -38,6 +40,9 @@ Route::prefix('v1')->group(function () {
         Route::post('profile/reservations/{reservation}/rate', [ReservationsServices::class, 'rate'])->middleware([
             EnsureThatReservationBelongToAuthUserMiddleware::class,
             EnsureThatReservationNotRatedBeforeMiddleware::class
+        ]);
+        Route::post('profile/reservations/{reservation}/capture-tabby', [ReservationsServices::class, 'captureTabby'])->middleware([
+            EnsureThatReservationBelongToAuthUserMiddleware::class
         ]);
         Route::post('profile/settings', [ProfileService::class, 'settings']);
 

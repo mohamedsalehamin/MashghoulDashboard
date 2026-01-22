@@ -1,0 +1,46 @@
+{
+    "name": "tasawk/api",
+    "description": "Backbone of Tasawk API",
+    "version": "1.0.16",
+    "keywords": [
+        "tasawk",
+        "api"
+    ],
+    "homepage": "https://gitlab.com/tasawk-php-modules/api",
+    "license": "MIT",
+    "require": {
+        "php": "^8"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Tasawk\\Api\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tasawk\\Api\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "psalm": "vendor/bin/psalm",
+        "test": "vendor/bin/phpunit --colors=always",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tasawk\\Api\\ApiServiceProvider"
+            ],
+           "aliases": {
+                "Api": "Tasawk\\Api\\Facade\\Api"
+          }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

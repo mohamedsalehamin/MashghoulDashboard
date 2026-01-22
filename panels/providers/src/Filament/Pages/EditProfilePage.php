@@ -65,7 +65,7 @@ class EditProfilePage extends Page {
 
                         PhoneInput::make('phone')
                             ->required()
-                            ->onlyCountries(['SA', 'EG'])
+                            ->onlyCountries(['SA'])
                             ->validateFor(
                                 type: PhoneNumberType::MOBILE,
                                 lenient: true

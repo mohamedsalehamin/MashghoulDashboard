@@ -1,9 +1,10 @@
 <?php
 return [
     'messages' => [
-        "locate_my_location"=>"Locate my location",
-        'you_are_gain_points_for_reservation'=>'You have gained :points points for reservation',
-        "refund_reservation" => "Reservation no :no has been refunded",
+        "by" => "by",
+        "locate_my_location" => "Locate my location",
+        'you_are_gain_points_for_reservation' => 'You have gained :points points for reservation',
+       "refund_reservation" => "Reservation no :no has been refunded",
         'paid_reservation_no'=>":amount has been paid for reservation no :no",
         'send_sms_description' => 'You can send SMS to your customers',
         'sms_sent_successfully' => 'SMS sent successfully',
@@ -55,6 +56,11 @@ return [
         'address_has_many_order' => 'You cannot delete address for it has orders',
         'address_not_in_branch_boundaries' => 'The address is not within the boundaries of the district',
         'city_has_many_addresses' => 'You cannot delete city for it has addresses',
+        'you_already_have_pending_withdrawal_request' => 'You already have a pending withdrawal request',
+        'insufficient_balance' => 'Insufficient balance',
+        'amount_exceeds_balance' => 'The amount cannot exceed your available balance',
+        'no_transactions_wallet' => 'There are no transactions on the wallet.',
+        'no_products' => 'no products found.',
 
     ],
     'languages' => [
@@ -71,9 +77,11 @@ return [
         'delete' => 'Delete'
     ],
     'enums' => [
-        'transferred'=>'Transferred',
-        "REJECTED"=>'Rejected',
-        "minutes" => ":minutes minutes",
+        'waiting_transfer' => 'Waiting for transfer',
+        'transferred' => 'Transferred',
+        "REJECTED" => 'Rejected',
+        'rejected' => 'Rejected',
+       "minutes" => ":minutes minutes",
         "30_minutes" => "30 minutes",
         "90_minutes" => "90 minutes",
         "120_minutes" => "120 minutes",
@@ -142,6 +150,8 @@ return [
         "IN_ACTIVE" => "Inactive",
         "ACCEPTED" => "Accepted",
         'received' => 'Received',
+        'TRANSFERRED' => 'Transferred',
+        'WAITING_TRANSFER' => 'Waiting for transfer',
     ],
     'notifications' => [
         "customer_registered" => "Customer registered",
@@ -216,6 +226,12 @@ return [
         'doctorreservationscheduledfromdoctornotificationbody' => 'Your request to reschedule your appointment has been sent',
         'providerduesnotification' => 'New Dues Request',
         "providerduesnotificationbody" => "You have a new dues request from provider :name",
+        'withdrawalrequeststatuschangednotification' => 'Withdrawal request status changed',
+        'withdrawalrequeststatuschangednotificationbody' => 'Your withdrawal request no :id status has been changed to :status',
+        'withdrawal_request_status_changed' => 'Withdrawal request status changed to :status',
+        'withdrawal_request_created' => 'Withdrawal request created',
+        'reservationupdatestatusnotification' => 'Update reservation status',
+        'reservationupdatestatusnotificationbody' => 'Please check the reservation status id: and if there is any problem, please contact the administration',
     ],
     'stats' => [
         'reservations_total' => "Reservations total",
@@ -341,5 +357,12 @@ return [
         'branches_in_maintenance_modes' => 'Branches in maintenance modes',
         'contacts' => 'Contacts',
         'orders_group_by_branches' => 'Orders group by branches',
+    ],
+    'gateways' => [
+        'cash' => 'Cash',
+        'card' => 'Card',
+        'wallet' => 'Wallet',
+        'tabby' => 'Tabby',
+        'myfatoorah' => 'Myfatoorah',
     ],
 ];

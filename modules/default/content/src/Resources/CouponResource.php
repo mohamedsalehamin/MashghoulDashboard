@@ -55,7 +55,11 @@ class CouponResource extends Resource implements HasShieldPermissions {
 
                     TextInput::make('discount_value')
                         ->numeric()
-                        ->required(),
+                        ->required()
+                         ->rules([
+                            fn($get) => $get('discount_type') == CouponTypes::FIXED ? 'max:' . $get('meta_data.min_order_value') : '',
+                            fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE ? 'max:100' : '',
+                        ]),
                     Forms\Components\DatePicker::make('start_date')
                         ->date()
                         ->rule(fn($operation) => $operation == 'create' ? 'after_or_equal:' . today()->format('Y-m-d') : ['required'])

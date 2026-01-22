@@ -12,7 +12,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Actions\Action;
-
+use App\DefaultPanel\Enum\ReservationPaymentStatus;
 class ChangeReservationStatusAction {
     static public function make($show = false) {
         $action = $show ? \Filament\Actions\Action::make('changeStatus') : Action::make('changeStatus');
@@ -54,7 +54,18 @@ class ChangeReservationStatusAction {
 //                        $record->commission?->update(['transferred' => true, 'confirmed' => true]);
 //                    }
                 }
-                $record->update(['status' => $data['status'], 'meta_data' => [... $record->meta_data, ...$data['meta_data'] ?? []]]);
+                if ($data['status'] == ReservationStatus::CANCELED->value && 
+                    $record->transaction?->status->value == ReservationPaymentStatus::PENDING->value && 
+                    $record->transaction->meta_data['gateway'] == 'myfatoorah' 
+                    ) {
+                        $record->transaction->update(['status' => ReservationPaymentStatus::CANCELED->value]);
+                }
+
+                $record->update([
+                    'status' => $data['status'], 
+                    'meta_data' => [... $record->meta_data, ...$data['meta_data'] ?? []]
+                ]);
+
                 if (data_get($data, 'refund_customer_balance', false)) {
                     RefundTransaction::run($record);
                 }

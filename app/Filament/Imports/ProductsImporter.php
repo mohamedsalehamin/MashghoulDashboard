@@ -38,6 +38,8 @@ class ProductsImporter extends Importer {
                 ->label(__("forms.fields.price"))
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('sale_price')
+                ->label(__("forms.fields.sale_price")),
             ImportColumn::make('image')
                 ->label(__("forms.fields.image"))
             ,
@@ -56,6 +58,7 @@ class ProductsImporter extends Importer {
                 'en' => data_get($this->getData(), 'name_en'),
             ],
             'price' => data_get($this->getData(), 'price', 0),
+            'sale_price' => data_get($this->getData(), 'sale_price', 0),
 
         ]);
 

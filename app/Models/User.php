@@ -32,6 +32,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Theamostafa\Wallet\Models\Transaction;
 use Theamostafa\Wallet\Traits\HasWallet;
+use App\UsersModule\Models\Users\Customer;
+use App\UsersModule\Models\WithdrawalRequest;
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
 
 class User extends Authenticatable implements HasMedia, FilamentUser, HasLocalePreference {
     use HasApiTokens, HasFactory, Notifiable;
@@ -189,7 +192,8 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     }
 
     public function canAccessPanel(Panel $panel): bool {
-        return !$this->hasRole(['customer']) && $this->active->value == 1;
+        // return !$this->hasRole(['customer']) && $this->active->value == 1;
+        return  $this->active->value == 1;
     }
 
     public function reservations(): HasMany {
@@ -221,5 +225,13 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     public function walletTransactions(): HasMany {
         return $this->hasMany(Transaction::class, 'wallet_id');
     }
+    public function withdrawalRequests(): HasMany {
+        return $this->hasMany(WithdrawalRequest::class, 'user_id');
+    }
 
+    public function hasPendingWithdrawalRequest(): bool {
+        return $this->withdrawalRequests()
+            ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
+            ->exists();
+    }
 }

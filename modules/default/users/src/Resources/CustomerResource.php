@@ -79,9 +79,9 @@ class CustomerResource extends Resource {
 
                     PhoneInput::make('phone')
                         ->required()
-                        ->onlyCountries(array('SA', 'EG'))
+                        ->onlyCountries(array('SA'))
                         ->validateFor(
-                            type: PhoneNumberType::MOBILE,
+                            type: [PhoneNumberType::MOBILE],
                             lenient: true
                         )
                         ->unique(ignoreRecord: true)

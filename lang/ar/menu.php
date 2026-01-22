@@ -129,5 +129,7 @@ return [
     'services' => 'الخدمات',
     'service' => 'خدمة',
     'subscription' => 'اشتراك',
+    "withdrawal_requests" => "طلبات السحب من المحفظة ",
+    'withdrawalrequest'=>'طلب السحب من المحفظة',
 
 ];

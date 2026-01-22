@@ -43,7 +43,8 @@ use App\Policies\RolePolicy;
 use App\Policies\WholesaleRequestPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Spatie\Permission\Models\Role;
-
+use App\Policies\WithdrawalRequestPolicy;
+use App\UsersModule\Models\WithdrawalRequest;
 class AuthServiceProvider extends ServiceProvider {
     /**
      * The model to policy mappings for the application.
@@ -61,8 +62,8 @@ class AuthServiceProvider extends ServiceProvider {
 
         CustomerReview::class => CustomerReviewPolicy::class,
         Reservation::class=>ReservationPolicy::class,
-        JoinRequest::class=>JoinRequestPolicy::class
-
+        JoinRequest::class=>JoinRequestPolicy::class,
+        WithdrawalRequest::class => WithdrawalRequestPolicy::class,
 
 
 

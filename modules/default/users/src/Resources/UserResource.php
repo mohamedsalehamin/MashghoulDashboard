@@ -20,12 +20,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use App\ContentModule\Resources\UserResource\Pages;
+use App\UsersModule\Resources\UserResource\Pages;
 use App\Models\User;
 use libphonenumber\PhoneNumberType;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
-
+use App\UsersModule\Resources\UserResource\Actions\DeleteUserAction;
 class UserResource extends Resource {
     use HasTranslationLabel;
 
@@ -34,32 +34,75 @@ class UserResource extends Resource {
     protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form {
-
         return $form->schema([
+                Select::make('user_type')
+                    ->label(__('forms.fields.user_type'))
+                    ->options([
+                        'new' => __('forms.fields.new_user'),
+                        'existing' => __('forms.fields.existing_customer')
+                    ])
+                    ->default('new')
+                    ->reactive()
+                    ->required()
+                    ->visible(fn($operation) => $operation === 'create'),
+
+                Select::make('existing_user_id')
+                    ->label(__('forms.fields.select_user'))
+                    ->options(function () {
+                        return \App\Models\User::whereHas('roles', fn($q) => $q->where('name', 'customer'))
+                            ->whereDoesntHave('roles', fn($q) => $q->whereNotIn('name', ['customer', 'panel_user']))
+                            ->pluck('name', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn($get) => $get('user_type') === 'existing')
+                    ->required(fn($get) => $get('user_type') === 'existing')
+                    ->afterStateUpdated(function ($state, $set) {
+                        if ($state) {
+                            $user = \App\Models\User::find($state);
+                            // log the user
+                            \Illuminate\Support\Facades\Log::info($user);
+                            if ($user) {
+                                $set('email', $user->email);
+                            }
+                        }
+                    }),
+
                 SpatieMediaLibraryFileUpload::make('avatar')
                     ->columnSpan(['xl' => 2])
-                    ->nullable(),
+                    ->nullable()
+                    ->visible(fn($get) => $get('user_type') === 'new'),
 
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->visible(fn($get) => $get('user_type') === 'new'),
 
                 TextInput::make('email')
                     ->required()
                     ->email()
                     ->autocomplete("off")
                     ->columnSpan(['sm' => 2, 'xl' => 1])
-                    ->unique(ignoreRecord: true),
+                    // if user_type is new or existing and existing_user_id is not null and if exists and have email hide it
+                    ->visible(fn($get) => $get('user_type') === 'new' || ($get('user_type') === 'existing' && $get('existing_user_id') && \App\Models\User::find($get('existing_user_id'))->email)) 
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        if ($get('user_type') === 'existing' && $get('existing_user_id')) {
+                            $user = \App\Models\User::find($get('existing_user_id'));
+                            if ($user) {
+                                $set('email', $user->email);
+                            }
+                        }
+                    }),
 
                 PhoneInput::make('phone')
                     ->required()
-                    ->onlyCountries(['SA', 'EG'])
+                    ->onlyCountries(['SA'])
                     ->validateFor(
                         type: PhoneNumberType::MOBILE,
                         lenient: true
                     )
                     ->unique(ignoreRecord: true)
-                    ->displayNumberFormat(PhoneInputNumberType::E164),
-
+                    ->displayNumberFormat(PhoneInputNumberType::E164)
+                    ->visible(fn($get) => $get('user_type') === 'new'),
 
                 TextInput::make('password')
                     ->password()
@@ -82,9 +125,7 @@ class UserResource extends Resource {
                     ->onColor('success')
                     ->offColor('danger')
             ]
-
         );
-
     }
 
     public static function table(Table $table): Table {
@@ -145,21 +186,18 @@ class UserResource extends Resource {
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                DeleteUserAction::make(),
             ]);
     }
 
     public static function getPages(): array {
         return [
             'index' => ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
         ];
     }
 
+   
 
     public static function getNavigationBadge(): ?string {
         return static::getModel()::whereHas('roles', fn($q) => $q->whereNotIn('name', ['customer', 'provider','patient', 'panel_user', 'super_admin']))->count();

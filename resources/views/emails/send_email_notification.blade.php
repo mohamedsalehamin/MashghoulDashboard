@@ -18,6 +18,10 @@
         .email-body  h2,.email-body p{
             text-align: right;
         }
+        .email-body  img{
+            max-width: 100%;
+            height: auto;
+        }
         .email-container {
             max-width: 600px;
             margin: 20px auto;

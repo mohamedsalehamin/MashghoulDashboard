@@ -18,6 +18,7 @@ Route::group([
     Route::get('/', [SiteController::class, 'index'])->name('site.home');
     Route::get('/register', [SiteController::class, 'register'])->name('site.pages.register');
     Route::get('/{page}', [SiteController::class, 'page'])->name('site.page');
+    Route::get('s/{provider_slug}', [SiteController::class, 'share_provider'])->name('site.share_provider');
 });
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {
 //    return pdf()

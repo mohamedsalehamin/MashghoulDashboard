@@ -11,7 +11,11 @@ class Kernel extends ConsoleKernel {
      */
     protected function schedule(Schedule $schedule): void {
         $schedule->command('app:cancel-unpaid-reservations')->hourly();
+        $schedule->command('app:notify-provider-about-processing-unfinised-reservations')->everySixHours();
         $schedule->command('app:send-gift-for-customer-whose-birthday-today')->daily();
+        
+        // Capture Tabby pending transactions every 30 minutes
+        $schedule->command('app:capture-pending-transactions --hours=2')->everyFourMinutes();
     }
 
     /**

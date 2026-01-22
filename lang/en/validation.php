@@ -13,7 +13,10 @@ return [
     |
     */
     'phone' => 'The phone number is invalid',
-
+    'phone_exists_in_join_requests' => 'This phone number is already registered as a join request.',
+    'phone_exists_in_providers' => 'This phone number is already registered as a provider, please use another phone number.',
+    'phone_exists_in_customers' => 'this phone number is already registered as a customer, please use another phone number.',
+    
     'accepted' => 'The :attribute must be accepted.',
     'active_url' => 'The :attribute is not a valid URL.',
     'after' => 'The :attribute must be a date after :date.',
@@ -191,5 +194,10 @@ return [
     */
 
     'attributes' => [],
-
+    'translatable_required.missing' => 'The :attribute field is required in :locales.',
+    'tabby' => [
+        'not_available'=>'Sorry, Tabby is unable to approve this purchase. Please use an alternative payment method for your order.',
+        'order_amount_too_high'=>'This purchase is above your current spending limit with Tabby, try a smaller cart or use another payment method',
+        'order_amount_too_low'=>'The purchase amount is below the minimum amount required to use Tabby, try adding more items or use another payment method	',
+    ]
 ];

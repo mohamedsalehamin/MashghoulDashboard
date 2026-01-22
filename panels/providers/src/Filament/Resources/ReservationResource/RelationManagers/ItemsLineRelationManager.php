@@ -25,13 +25,14 @@ class ItemsLineRelationManager extends RelationManager {
             ]);
     }
 
-    public function table(Table $table): Table {
+    public function table(Table $table): Table
+    {
         return $table
             ->heading(__('sections.services'))
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('model.id')
-                    ->formatStateUsing(fn( ItemsLine $record) => Service::withoutGlobalScopes()->where("id",$record->model['id'])?->first()->title)
+                    ->formatStateUsing(fn(ItemsLine $record) => Service::withoutGlobalScopes()->where("id", $record->model['id'])?->first()->title)
                     ->label(__('forms.fields.name')),
 
                 Tables\Columns\TextColumn::make('products')
@@ -39,21 +40,35 @@ class ItemsLineRelationManager extends RelationManager {
                         $text = [];
                         foreach ($record['attributes']['products'] ?? [] as $index => $option) {
                             $option_name = Utils::getTranslatedField($option['title']);
-                            $price = Money::parse($option['price']['amount'])->format(style:NumberFormatter::PATTERN_DECIMAL );
-                            $qty =__("forms.fields.quantity").":". $option['quantity'];
+                            $price = Money::parse($option['price']['amount'])->format();
+                            $sale_price = Money::parse($option['sale_price']['amount'])->format();
+                            $price_label = __("forms.fields.price") . " : " . $price;
+                            $sale_price_label = $option['sale_price']['amount'] > 0 ? "<br/><span class='text-gray-500'>" . __("forms.fields.sale_price") . " : " . $sale_price . "</span>" : '';
+                            $qty = __("forms.fields.quantity") . " : " . $option['quantity'];
 
-                            $text[] = "<p>{$option_name}</p> <span class='text-gray-500'> $qty  </span>";
+                            $line = $option['sale_price']['amount'] > 0 ? 'cm-strikethrough' : '';
+                            $total = Money::parse(($option['sale_price']['amount'] > 0 ? $option['sale_price']['amount'] : $option['price']['amount']) * $option['quantity'])->format();
+
+                            $total_label = "<br/><span class='text-gray-500'>" . __("forms.fields.products_total") . " : " . $total . "</span>";
+                            $text[] = "<p>{$option_name}</p> <span class='text-gray-500'> $qty  </span> <br/><span class='text-gray-500 $line'> $price_label  </span> $sale_price_label $total_label";
                         }
                         return (new HtmlString($text))->toHtml();
-
                     })
                     ->html()
                     ->label(__('forms.fields.products')),
 
-                Tables\Columns\TextColumn::make('total')
+                Tables\Columns\TextColumn::make('service_price')
                     ->label(__("forms.fields.service_price"))
                     ->state(function (ItemsLine $record) {
                         $price = Money::parse($record->model['price']['amount'] ?? 0)->formatByDecimal();
+
+                        return Money::parse(($record->quantity * $price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
+                    }),
+                Tables\Columns\TextColumn::make('service_sale_price')
+                    ->label(__("forms.fields.service_sale_price"))
+                    ->state(function (ItemsLine $record) {
+
+                        $price = Money::parse($record->model['sale_price']['amount'] ?? 0)->formatByDecimal();
 
                         return Money::parse(($record->quantity * $price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
                     }),
@@ -71,6 +86,4 @@ class ItemsLineRelationManager extends RelationManager {
                 ]),
             ]);
     }
-
-
 }
