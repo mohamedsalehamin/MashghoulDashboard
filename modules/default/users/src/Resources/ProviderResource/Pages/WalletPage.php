@@ -2,10 +2,6 @@
 
 namespace App\UsersModule\Resources\ProviderResource\Pages;
 
-use App\LabPanel\Filament\Resources\WalletResource\Widgets\WalletSummary;
-use App\Notifications\AdminSendEntitlementsNotification;
-use App\UsersModule\Resources\DoctorResource;
-use App\UsersModule\Resources\LabResource;
 use App\UsersModule\Resources\ProviderResource;
 use App\UsersModule\Resources\ProviderResource\Widgets\WalletStats;
 use Filament\Forms\Components\DatePicker;
@@ -94,7 +90,10 @@ class WalletPage extends Page implements HasTable {
                                 'en' => __('forms.fields.admin_withdraw_balance_from_wallet_text', ['AMOUNT' => $data['amount']], 'en')
                             ]
                         ]);
-                        $operation->addMedia(array_values($data['image'])[0])->toMediaCollection();
+                        // Only add media if the transaction model supports it
+                        if (method_exists($operation, 'addMedia') && !empty($data['image'])) {
+                            $operation->addMedia(array_values($data['image'])[0])->toMediaCollection();
+                        }
                     })
             ])
             ->columns([
@@ -116,8 +115,8 @@ class WalletPage extends Page implements HasTable {
             ->actions([
                 Action::make('receipt')
                     ->label(__("forms.actions.show_receipt"))
-                    ->visible(fn($record) => $record?->getFirstMediaUrl())
-                    ->url(fn($record) => $record?->getFirstMediaUrl(), true)
+                    ->visible(fn($record) => method_exists($record, 'getFirstMediaUrl') && $record->getFirstMediaUrl())
+                    ->url(fn($record) => method_exists($record, 'getFirstMediaUrl') ? $record->getFirstMediaUrl() : null, true)
             ])
             ->striped();
 

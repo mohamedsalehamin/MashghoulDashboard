@@ -13,7 +13,7 @@ use App\DefaultPanel\Requests\Api\Customer\Profile\VerifyAltPhoneRequest;
 use App\DefaultPanel\Resources\Api\Customer\MyPointResource;
 use App\DefaultPanel\Resources\Api\Customer\CustomerResource;
 use App\DefaultPanel\Resources\Api\Customer\WalletTransactionResource;
-use App\DefaultPanel\Resources\Api\Provider\User\TransactionResources;
+use App\DefaultPanel\Resources\Api\Customer\User\TransactionResources;
 
 use App\Models\PointsExchange;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;

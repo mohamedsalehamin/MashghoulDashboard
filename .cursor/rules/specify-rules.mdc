@@ -1,0 +1,29 @@
+# mashghoul Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-01-22
+
+## Active Technologies
+
+- PHP 8.1+, Laravel 10.1+ (001-filament-v5-upgrade)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+# Add commands for PHP 8.1+, Laravel 10.1+
+
+## Code Style
+
+PHP 8.1+, Laravel 10.1+: Follow standard conventions
+
+## Recent Changes
+
+- 001-filament-v5-upgrade: Added PHP 8.1+, Laravel 10.1+
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

@@ -38,6 +38,19 @@ class Provider extends Model implements HasMedia {
 //        'bio'=>'array',
     ];
 
+    /**
+     * Override bootHasWallet to prevent wallet creation during pluck operations
+     * when the model doesn't have an ID yet.
+     */
+    protected static function bootHasWallet() {
+        static::retrieved(function ($model) {
+            // Only create wallet if model has an ID and wallet doesn't exist
+            if ($model->id && !$model->wallet()->exists()) {
+                $model->wallet()->create(['balance' => 0, 'name' => 'Default Wallet']);
+            }
+        });
+    }
+
     public function scopeEnabled($builder) {
         return $builder->whereHas("user", fn($q) => $q->where('active', 1));
     }

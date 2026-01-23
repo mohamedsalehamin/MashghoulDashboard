@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DefaultPanel\Resources\Api\Provider\User;
+namespace App\DefaultPanel\Resources\Api\Customer\User;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;

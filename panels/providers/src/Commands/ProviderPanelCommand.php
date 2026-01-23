@@ -4,9 +4,9 @@ namespace App\ProviderPanel\Commands;
 
 use Illuminate\Console\Command;
 
-class LabPanelCommand extends Command
+class ProviderPanelCommand extends Command
 {
-    public $signature = 'labpanel';
+    public $signature = 'providerpanel';
 
     public $description = 'My command';
 
