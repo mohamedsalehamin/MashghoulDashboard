@@ -2,20 +2,23 @@
 
 namespace App\UtilitiesModule\Pages\Settings;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Group;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Forms\Components\SelectFontAwesomeIcon;
@@ -24,15 +27,15 @@ use App\DefaultPanel\Settings\GeneralSettings;
 class ManageGeneral extends SettingsPage {
     use HasPageShield;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static string $settings = GeneralSettings::class;
     protected static ?string $slug = 'settings/general';
     protected static ?int $navigationSort = 1;
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
-                Forms\Components\Section::make("General")->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                Section::make("General")->schema([
                     FileUpload::make('app_logo'),
                     TextInput::make('app_name')
                         ->required(),
@@ -71,14 +74,14 @@ class ManageGeneral extends SettingsPage {
                         ->step(0.01)
                         ->required(),
 
-                    Forms\Components\Toggle::make('enabled_free_fees_in_first_reservation'),
-                    Forms\Components\Toggle::make('enabled_whatsapp_icon'),
+                    Toggle::make('enabled_free_fees_in_first_reservation'),
+                    Toggle::make('enabled_whatsapp_icon'),
 
                 ]),
 
-                Forms\Components\Section::make("applications_links")->schema([
+                Section::make("applications_links")->schema([
 
-                    Forms\Components\Fieldset::make()->label(__("forms.fields.client_app"))->schema([
+                    Fieldset::make()->label(__("forms.fields.client_app"))->schema([
                         TextInput::make('applications_links.client.google_play_link')
                             ->label(__('forms.fields.google_play_link'))
                             ->url()
@@ -88,7 +91,7 @@ class ManageGeneral extends SettingsPage {
                             ->url()
                             ->required(),
                     ]),
-                    Forms\Components\Fieldset::make()->label(__("forms.fields.provider_app"))->schema([
+                    Fieldset::make()->label(__("forms.fields.provider_app"))->schema([
                         TextInput::make('applications_links.provider.google_play_link')
                             ->label(__('forms.fields.google_play_link'))
                             ->url()
@@ -99,8 +102,8 @@ class ManageGeneral extends SettingsPage {
                             ->required(),
                     ])
                 ])->columns(1),
-                Forms\Components\Section::make("app_pages")->schema([
-                    Forms\Components\Fieldset::make(__("sections.app_pages"))
+                Section::make("app_pages")->schema([
+                    Fieldset::make(__("sections.app_pages"))
                         ->schema([
                             Select::make('app_pages.about_us')
                                 ->label(__('forms.fields.about_us'))
@@ -117,7 +120,7 @@ class ManageGeneral extends SettingsPage {
                                 ->options(Page::pluck('title', 'id')->toArray())
                                 ->label(__('forms.fields.return_policy')),
                         ]),
-                    Forms\Components\Fieldset::make(__("sections.labs_pages"))
+                    Fieldset::make(__("sections.labs_pages"))
                         ->schema([
                             Select::make('about_us')
                                 ->label(__('forms.fields.about_us'))
@@ -135,7 +138,7 @@ class ManageGeneral extends SettingsPage {
                 ])
                     ->columns(1)
                     ->collapsible(),
-                Forms\Components\Section::make("points")->schema([
+                Section::make("points")->schema([
 
                     TextInput::make('points.customer_reserve_action')
                         ->label(__('forms.fields.points_count_when_customer_reserve'))
@@ -153,7 +156,7 @@ class ManageGeneral extends SettingsPage {
                         ->required(),
 
                 ]),
-                Forms\Components\Section::make("social_links")->schema([
+                Section::make("social_links")->schema([
 
                     Repeater::make("social_links")
                         ->label('')

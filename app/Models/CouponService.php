@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
 use App\UsersModule\Models\Provider;
@@ -19,7 +20,7 @@ class CouponService extends Model {
     public function service() {
         return $this->belongsTo(Service::class);
 }
-    public function products(): \Illuminate\Database\Eloquent\Relations\BelongsToMany {
+    public function products(): BelongsToMany {
         return $this->belongsToMany(Product::class, 'coupon_service_product', 'coupon_service_id', 'product_id');
     }
 }

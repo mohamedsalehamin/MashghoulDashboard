@@ -2,6 +2,14 @@
 
 namespace App\ProviderPanel\Filament\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Fieldset;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
 use App\DefaultPanel\Actions\GetRefundTransactionStatusAction;
@@ -13,14 +21,7 @@ use App\ProviderPanel\Filament\Resources\ReservationResource\Pages\ViewReservati
 use App\ProviderPanel\Filament\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
 use App\UsersModule\Models\Lab;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Fieldset;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -29,22 +30,22 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use JaOcero\ActivityTimeline\Components\ActivityDate;
-use JaOcero\ActivityTimeline\Components\ActivityIcon;
-use JaOcero\ActivityTimeline\Components\ActivitySection;
-use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use LaraZeus\ActivityTimeline\Components\ActivityDate;
+use LaraZeus\ActivityTimeline\Components\ActivityIcon;
+use LaraZeus\ActivityTimeline\Components\ActivitySection;
+use LaraZeus\ActivityTimeline\Components\ActivityTitle;
 
 class ReservationResource extends Resource {
     use HasTranslationLabel, Translatable;
 
     protected static ?string $model = Reservation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form;
+        return $schema;
     }
 
     public static function table(Table $table): Table {
@@ -96,7 +97,7 @@ class ReservationResource extends Resource {
                 SelectFilter::make('status')
                     ->options(ReservationStatus::class),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('date_from'),
                         DatePicker::make('date_to'),
                     ])
@@ -117,13 +118,13 @@ class ReservationResource extends Resource {
                     ->options(ReservationPaymentStatus::class),
 
             ])
-            ->actions([
+            ->recordActions([
                 ChangeReservationStatusAction::make()->visible(true),
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 // Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
@@ -137,9 +138,9 @@ class ReservationResource extends Resource {
         return true;
     }
 
-    static public function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    static public function infolist(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Grid::make()->schema([
                     Group::make([
                         Section::make("basic_information")
@@ -258,11 +259,7 @@ class ReservationResource extends Resource {
 
     }
 
-    public static function getWidgets(): array {
-        return [
-//            CalendarWidget::make(),
-        ];
-    }
+   
 
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
@@ -280,8 +277,5 @@ class ReservationResource extends Resource {
         return __('menu.reservations');
     }
 
-    public static function can(string $action, ?Model $record = null): bool {
-        return true;
-    }
 
 }

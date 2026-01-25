@@ -2,11 +2,11 @@
 
 namespace App\ProviderPanel\Filament\Resources;
 
+use Filament\Schemas\Schema;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\RateResource\Pages\ListRates;
 use App\ProviderPanel\Filament\Resources\RateResource\Widgets\RateSummary;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
@@ -17,12 +17,12 @@ class RateResource extends Resource {
     use HasTranslationLabel;
 
     protected static ?string $model = Rate::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form;
+        return $schema;
 
     }
 

@@ -17,7 +17,7 @@ trait FilterScope {
         }
     }
 
-    function scopeFiltered(): Builder|\App\DefaultPanel\Lib\Filters\FilterBaseAbstract {
+    function scopeFiltered(): Builder|FilterBaseAbstract {
         return $this->filter(request(),$this->filterClass);
     }
 }

@@ -2,6 +2,16 @@
 
 namespace App\ProviderPanel\Filament\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -13,22 +23,17 @@ use App\ProviderPanel\Filament\Resources\ServiceResource\Pages\ViewService;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -41,12 +46,12 @@ class ServiceResource extends Resource {
 
     protected static ?string $model = Service::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make('basic_information')->schema([
 
                     Hidden::make('provider_id')->default(\provider()->id),
@@ -140,29 +145,29 @@ class ServiceResource extends Resource {
             ->filters([
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
 
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     // ExportBulkAction::make(),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->striped();
     }
 
-    static public function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    static public function infolist(Schema $schema): Schema {
+        return $schema
+            ->components([
                 TextEntry::make('id'),
 
 
@@ -197,11 +202,6 @@ class ServiceResource extends Resource {
 
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
-    }
-
-    public static function can(string $action, ?Model $record = null): bool {
-
-        return true;
     }
 
 

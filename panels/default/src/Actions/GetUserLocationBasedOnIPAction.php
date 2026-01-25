@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Actions;
 
+use Http;
 use App\UsersModule\Models\Lab\Service;
 use Darryldecode\Cart\Exceptions\InvalidConditionException;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -18,7 +19,7 @@ class GetUserLocationBasedOnIPAction {
     use AsAction;
 
     public function handle($ip) {
-        return \Http::get("http://ip-api.com/json/$ip")->collect()->only('lat', 'lon')->values();
+        return Http::get("http://ip-api.com/json/$ip")->collect()->only('lat', 'lon')->values();
     }
 
 }

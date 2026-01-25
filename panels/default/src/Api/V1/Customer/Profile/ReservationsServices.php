@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Api\V1\Customer\Profile;
 
 
+use Exception;
 use Api;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Requests\Api\Customer\Order\ReservationRateRequest;
@@ -87,7 +88,7 @@ class ReservationsServices {
             // Proceed with capture
             return CaptureTabbyPayment::run($transaction);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby capture error: ' . $e->getMessage(), [
                 'reservation_id' => $reservation->id,
                 'user_id' => auth()->id(),

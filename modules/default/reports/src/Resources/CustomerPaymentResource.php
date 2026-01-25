@@ -2,13 +2,18 @@
 
 namespace App\ReportsModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Maatwebsite\Excel\Excel;
+use App\ReportsModule\Resources\CustomerPaymentResource\Pages\ListCustomerPayments;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\ReportsModule\Filters\CustomerPaymentsLocationFilter;
 use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -26,11 +31,11 @@ class CustomerPaymentResource extends Resource {
 
     protected static ?string $model = CustomersPayment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-bar';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-presentation-chart-bar';
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -80,7 +85,7 @@ class CustomerPaymentResource extends Resource {
                     ->searchable(false),
                 TextColumn::make('price')
                     ->formatStateUsing(fn($record) => $record->price->format())
-                    ->summarize(Tables\Columns\Summarizers\Sum::make()->money('SAR')),
+                    ->summarize(Sum::make()->money('SAR')),
                 TextColumn::make('created_at')
                     ->formatStateUsing(fn($record) => $record->created_at->format('Y-m-d'))
                     ->searchable(),
@@ -90,7 +95,7 @@ class CustomerPaymentResource extends Resource {
 
                 CustomerPaymentsLocationFilter::make(),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         Select::make('provider_id')
                             ->options(Provider::pluck('name', 'id'))
                             ->label(__('forms.fields.provider'))
@@ -112,19 +117,19 @@ class CustomerPaymentResource extends Resource {
                             );
                     })
             ])
-            ->actions([
-                Tables\Actions\Action::make('download')
+            ->recordActions([
+                Action::make('download')
                     ->label(__("site.fields.download_invoice"))
                     ->action(fn($record) => redirect()->route('reservations.invoice', $record->transactionable_id))
             ])
-            ->bulkActions([
+            ->toolbarActions([
 
-                Tables\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
                     ExportBulkAction::make()->exports([
                         ExcelExport::make("CSV")
                             ->fromTable()
                             ->withFilename(fn() => static::getPluralLabel() . '-' . now()->format('Y-m-d'))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                            ->withWriterType(Excel::XLSX),
 
 
                     ]),
@@ -140,7 +145,7 @@ class CustomerPaymentResource extends Resource {
 
     public static function getPages(): array {
         return [
-            'index' => \App\ReportsModule\Resources\CustomerPaymentResource\Pages\ListCustomerPayments::route('/'),
+            'index' => ListCustomerPayments::route('/'),
         ];
     }
 

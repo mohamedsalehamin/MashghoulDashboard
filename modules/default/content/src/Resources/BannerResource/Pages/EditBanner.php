@@ -2,11 +2,12 @@
 
 namespace App\ContentModule\Resources\BannerResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 use App\ContentModule\Resources\BannerResource;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBanner extends EditRecord {
-    use EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = BannerResource::class;
 

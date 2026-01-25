@@ -1,6 +1,7 @@
 <?php
 
 
+use Carbon\Carbon;
 use App\DefaultPanel\Lib\Breadcrumbs;
 use App\UsersModule\Models\Provider;
 
@@ -45,14 +46,14 @@ function site(): object {
                 }
 
                 public function formattedDate(): string {
-                    return \Carbon\Carbon::parse($this->date())->translatedFormat("D d M Y");
+                    return Carbon::parse($this->date())->translatedFormat("D d M Y");
                 }
 
                 public function date() {
 
                     $slot = explode(' - ', $this->slot())[0];
                     $slot = !$slot ? '00:00' : $slot;
-                    return \Carbon\Carbon::parse(session()->get('reservation_data')['date'])->setTimeFromTimeString($slot);
+                    return Carbon::parse(session()->get('reservation_data')['date'])->setTimeFromTimeString($slot);
                 }
 
                 public function slot() {

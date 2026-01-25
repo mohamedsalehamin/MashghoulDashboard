@@ -2,15 +2,17 @@
 
 namespace App\UtilitiesModule\Pages\Auth;
 
+use Filament\Pages\Concerns\HasRoutes;
+use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns;
 use Filament\Pages\Page;
@@ -27,18 +29,18 @@ use Illuminate\Validation\Rules\Password;
 use App\Filament\Pages\Auth\view;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
 class EditProfile extends Page {
-    use Concerns\HasRoutes;
-    use Concerns\InteractsWithFormActions;
+    use HasRoutes;
+    use InteractsWithFormActions;
     use HasPageShield;
 
     protected static bool $shouldRegisterNavigation = false;
     /**
      * @var view-string
      */
-    protected static string $view = 'filament.pages.auth.edit-profile';
+    protected string $view = 'filament.pages.auth.edit-profile';
 
     /**
      * @var array<string, mixed> | null
@@ -212,18 +214,18 @@ class EditProfile extends Page {
             ->dehydrated(false);
     }
 
-    public function form(Form $form): Form {
-        return $form;
+    public function form(Schema $schema): Schema {
+        return $schema;
     }
 
     /**
-     * @return array<int | string, string | Form>
+     * @return array<int|string, string|\Filament\Schemas\Schema>
      */
     protected function getForms(): array {
         return [
             'form' => $this->form(
                 $this->makeForm()
-                    ->schema([
+                    ->components([
                         $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
                         $this->getPasswordFormComponent(),
@@ -269,7 +271,7 @@ class EditProfile extends Page {
         return static::getLabel();
     }
 
-    public static function getSlug(): string {
+    public static function getSlug(?Panel $panel = null): string {
         return static::$slug ?? 'profile';
     }
 

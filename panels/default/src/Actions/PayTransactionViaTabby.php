@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Actions;
 
+use Exception;
 use App\CatalogModule\Models\Transaction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -391,7 +392,7 @@ class PayTransactionViaTabby
                 )
             ], $tabbyException->getCode() ?? 400);
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // General exception handling (not TabbyApiException)
             Log::error('Tabby payment error', [
                 'transaction_id' => $transaction->id,

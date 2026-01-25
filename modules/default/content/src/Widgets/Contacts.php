@@ -1,6 +1,9 @@
 <?php
 
 namespace App\ContentModule\Widgets;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 use App\ContentModule\Models\Contact;
 use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Filters\DateFilter;
@@ -10,7 +13,6 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -28,7 +30,7 @@ class Contacts extends BaseWidget {
                 Contact::where('seen', 0)->orderBy('created_at', 'desc')->limit(10)
             )
             ->filters([
-                Tables\Filters\SelectFilter::make('contact_type_id')
+                SelectFilter::make('contact_type_id')
                     ->label(__('forms.fields.message_type'))
                     ->searchable()
                     ->options(ContactType::pluck('name', 'id')),
@@ -55,15 +57,15 @@ class Contacts extends BaseWidget {
                     ->copyMessageDuration(1500),
 
 
-            ])->actions([
+            ])->recordActions([
                 Action::make('seen')
                     ->visible(fn(Model $record) => !$record->seen)
                     ->label(__('forms.fields.mark_as_seen'))
                     ->action(fn(Model $record) => $record->update(['seen' => 1])),
 
-                Tables\Actions\ViewAction::make()
+                ViewAction::make()
                     ->modalHeading(__('menu.contact'))
-                    ->form([
+                    ->schema([
                             TextInput::make('title')
                                 ->required()
                                 ->autocomplete("off"),

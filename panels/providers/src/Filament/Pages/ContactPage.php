@@ -2,6 +2,7 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Contact;
 use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Enum\ContactSourceEnum;
@@ -10,53 +11,66 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Livewire\Attributes\Validate;
+use Filament\Schemas\Schema;
+use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Actions\Action;
 
 class ContactPage extends Page {
-    #[Validate('required')]
-    public $name;
-    #[Validate('required')]
-    public $phone;
-    #[Validate('required')]
-    public $email;
-    #[Validate('required')]
-    public $contact_type_id;
-    #[Validate('required')]
-    public $subject;
-    #[Validate('required')]
-    public $message;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    use InteractsWithFormActions;
 
-    protected static string $view = 'filament.pages.content.contact';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected function getFormSchema(): array {
+    protected string $view = 'filament.pages.content.contact';
+
+    public function defaultForm(Schema $schema): Schema
+    {
+        return $schema
+            ->statePath('data');
+    }
+
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->required(),
+
+                TextInput::make('email')
+                    ->required(),
+
+                TextInput::make('phone')
+                    ->required(),
+                Select::make('contact_type_id')
+                    ->options(ContactType::enabled()->pluck('name', 'id'))
+                    ->label(__("forms.fields.message_type")),
+                TextInput::make('subject')
+                    ->required(),
+
+                Textarea::make('message')
+                    ->required(),
+            ]);
+    }
+
+    protected function getFormActions(): array
+    {
         return [
-
-
-            TextInput::make('name')
-                ->required(),
-
-            TextInput::make('email')
-                ->required(),
-
-            TextInput::make('phone')
-                ->required(),
-            Select::make('contact_type_id')
-                ->options(ContactType::enabled()->pluck('name', 'id'))
-                ->label(__("forms.fields.message_type")),
-            TextInput::make('subject')
-                ->required(),
-
-            Textarea::make('message')
-                ->required(),
-
+            Action::make('submit')
+                ->label(__('forms.actions.send'))
+                ->submit('submit'),
         ];
     }
 
     public function submit() {
-        $this->validate();
-        Contact::create([...$this->except(''), 'title' => $this->subject, 'source' => ContactSourceEnum::PROVIDER]);
-        $this->reset();
+        $data = $this->form->getState();
+        Contact::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'contact_type_id' => $data['contact_type_id'],
+            'title' => $data['subject'],
+            'message' => $data['message'],
+            'source' => ContactSourceEnum::PROVIDER
+        ]);
+        $this->form->fill();
         Notification::make()
             ->title(__('panel.messages.success'))
             ->success()
@@ -67,7 +81,7 @@ class ContactPage extends Page {
         return __('menu.contact_us');
     }
 
-    public function get(): \Illuminate\Contracts\Support\Htmlable|string {
+    public function get(): Htmlable|string {
         return __('menu.contact_us');
     }
 

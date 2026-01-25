@@ -2,6 +2,8 @@
 
 namespace App\UsersModule\Resources\ProviderResource\Pages;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\Action;
 use App\UsersModule\Resources\ProviderResource;
 use App\UsersModule\Resources\ProviderResource\Widgets\WalletStats;
 use Filament\Forms\Components\DatePicker;
@@ -11,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Concerns\HasTabs;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -30,10 +31,10 @@ class WalletPage extends Page implements HasTable {
     use InteractsWithTable;
 
 //    public ?array $tableFilters = null;
-    public string|int|null|\Illuminate\Database\Eloquent\Model $record;
+    public string|int|null|Model $record;
 
 
-    protected static string $view = 'filament-panels::resources.pages.list-records';
+    protected string $view = 'filament-panels::resources.pages.list-records';
 
     protected static string $resource = ProviderResource::class;
 
@@ -51,7 +52,7 @@ class WalletPage extends Page implements HasTable {
                         'withdraw' => __('panel.enums.withdraw'),
                     ]),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('date_from'),
                         DatePicker::make('date_to'),
                     ])
@@ -73,7 +74,7 @@ class WalletPage extends Page implements HasTable {
                     ->label(__('forms.actions.reduction'))
                     ->model($this->record->provider?->wallet)
                     ->record($this->record->provider)
-                    ->form([
+                    ->schema([
                         TextInput::make('amount')
                             ->rules(['lte:' . $this->record->provider?->wallet?->balance])
                             ->label(__('forms.fields.amount'))
@@ -112,7 +113,7 @@ class WalletPage extends Page implements HasTable {
                     ->date()
                     ->searchable(false)
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('receipt')
                     ->label(__("forms.actions.show_receipt"))
                     ->visible(fn($record) => method_exists($record, 'getFirstMediaUrl') && $record->getFirstMediaUrl())

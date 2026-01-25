@@ -2,24 +2,24 @@
 
 namespace App\UtilitiesModule\Pages\Settings;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
 use Illuminate\Contracts\Support\Htmlable;
 use App\DefaultPanel\Settings\ThirdPartySettings;
 
 class ManageThirdParty extends SettingsPage {
     use HasPageShield;
-    protected static ?string $navigationIcon = 'heroicon-o-link';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-link';
     protected static string $settings = ThirdPartySettings::class;
     protected static ?string $slug = 'settings/third-party';
     protected static ?int $navigationSort = 2;
     protected static bool $shouldRegisterNavigation=false;
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make("General")->schema([
 
                     TextInput::make('firebase_server_key')

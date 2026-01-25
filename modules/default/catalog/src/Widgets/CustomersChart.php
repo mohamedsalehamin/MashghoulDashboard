@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Widgets;
 
+use Illuminate\Contracts\Support\Htmlable;
 use App\UsersModule\Models\Users\Customer;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
@@ -49,7 +50,7 @@ class CustomersChart extends ChartWidget {
         return 'line';
     }
 
-    public function getHeading(): \Illuminate\Contracts\Support\Htmlable|string|null {
+    public function getHeading(): Htmlable|string|null {
         return __('panel.stats.customers');
     }
 

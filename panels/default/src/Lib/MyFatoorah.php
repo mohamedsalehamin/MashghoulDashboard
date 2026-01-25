@@ -2,6 +2,8 @@
 
 namespace App\DefaultPanel\Lib;
 
+use Exception;
+use Illuminate\Http\Response;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 
 class MyFatoorah {
@@ -18,7 +20,7 @@ class MyFatoorah {
     /**
      * Create MyFatoorah invoice
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index() {
         try {
@@ -26,7 +28,7 @@ class MyFatoorah {
             $data = $this->mfObj->getInvoiceURL($this->getPayLoadData(), $paymentMethodId);
 
             return response()->json(['IsSuccess' => 'true', 'Message' => 'Invoice created successfully.', 'Data' => $data]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['IsSuccess' => 'false', 'Message' => $e->getMessage()]);
         }
     }
@@ -57,7 +59,7 @@ class MyFatoorah {
     /**
      * Get MyFatoorah payment information
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function callback() {
         try {
@@ -72,7 +74,7 @@ class MyFatoorah {
             }
 
             return response()->json(['IsSuccess' => 'true', 'Message' => $msg, 'Data' => $data]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['IsSuccess' => 'false', 'Message' => $e->getMessage()]);
         }
     }

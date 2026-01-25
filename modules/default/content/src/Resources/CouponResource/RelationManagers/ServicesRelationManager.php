@@ -2,6 +2,10 @@
 
 namespace App\ContentModule\Resources\CouponResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
 use App\UsersModule\Models\Provider;
@@ -9,20 +13,16 @@ use App\UsersModule\Resources\CustomerResource;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class ServicesRelationManager extends RelationManager {
     protected static string $relationship = 'services';
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
 
                 Select::make('provider_id')
                     ->label(__("forms.fields.provider_name"))
@@ -61,11 +61,11 @@ class ServicesRelationManager extends RelationManager {
             ->headerActions([
                 CreateAction::make()
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
             ])
-            ->bulkActions([
+            ->toolbarActions([
             ]);
     }
 

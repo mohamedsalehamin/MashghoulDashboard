@@ -2,19 +2,21 @@
 
 namespace App\ContentModule\Resources\FaqResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use App\ContentModule\Resources\FaqResource;
 
 class EditFaq extends EditRecord
 {
-    use EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = FaqResource::class;
 
     protected function getHeaderActions(): array {
         return [
-            Actions\LocaleSwitcher::make(),
+            LocaleSwitcher::make(),
         ];
     }
     protected function getRedirectUrl(): string {

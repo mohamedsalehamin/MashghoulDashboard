@@ -2,21 +2,22 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Illuminate\Contracts\Support\Htmlable;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use Filament\Pages\Page;
 
 class AboutUsPage extends Page {
     public $page;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.pages.content.page';
+    protected string $view = 'filament.pages.content.page';
 
     public function getTitle(): string {
         return __('menu.about_us');
     }
 
-    public function get(): \Illuminate\Contracts\Support\Htmlable|string {
+    public function get(): Htmlable|string {
         return __('menu.about_us');
     }
     public static function getNavigationGroup(): ?string {

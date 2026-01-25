@@ -13,139 +13,139 @@ class CityPolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_city');
+        return $user->can('ViewAny:City');
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function view(User $user, City $city): bool
     {
-        return $user->can('view_city');
+        return $user->can('View:City');
     }
 
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('create_city');
+        return $user->can('Create:City');
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function update(User $user, City $city): bool
     {
-        return $user->can('update_city');
+        return $user->can('Update:City');
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function delete(User $user, City $city): bool
     {
-        return $user->can('delete_city');
+        return $user->can('Delete:City');
     }
 
     /**
      * Determine whether the user can bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_city');
+        return $user->can('DeleteAny:City');
     }
 
     /**
      * Determine whether the user can permanently delete.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function forceDelete(User $user, City $city): bool
     {
-        return $user->can('force_delete_city');
+        return $user->can('ForceDelete:City');
     }
 
     /**
      * Determine whether the user can permanently bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_city');
+        return $user->can('ForceDeleteAny:City');
     }
 
     /**
      * Determine whether the user can restore.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function restore(User $user, City $city): bool
     {
-        return $user->can('restore_city');
+        return $user->can('Restore:City');
     }
 
     /**
      * Determine whether the user can bulk restore.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_city');
+        return $user->can('RestoreAny:City');
     }
 
     /**
      * Determine whether the user can replicate.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\City  $city
+     * @param User $user
+     * @param City $city
      * @return bool
      */
     public function replicate(User $user, City $city): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('Replicate:City');
     }
 
     /**
      * Determine whether the user can reorder.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('Reorder:City');
     }
 
 }

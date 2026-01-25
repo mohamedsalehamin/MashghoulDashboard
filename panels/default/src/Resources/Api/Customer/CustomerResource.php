@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Customer;
 
+use Illuminate\Http\Request;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\WalletWithdrawEnum;
 use App\Models\PointsExchange;
@@ -12,10 +13,9 @@ class CustomerResource extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
-
     public function toArray($request) {
         $pendingWithdrawalAmount = $this->withdrawalRequests() 
         ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])

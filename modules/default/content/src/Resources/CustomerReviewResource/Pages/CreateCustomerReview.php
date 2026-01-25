@@ -2,14 +2,15 @@
 
 namespace App\ContentModule\Resources\CustomerReviewResource\Pages;
 
-use Filament\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\CreateRecord;
 use App\ContentModule\Resources\CustomerReviewResource;
 
 class CreateCustomerReview extends CreateRecord
 {
     protected static string $resource = CustomerReviewResource::class;
-    use CreateRecord\Concerns\Translatable;
+    use Translatable;
 
     protected function getHeaderActions(): array {
         return [

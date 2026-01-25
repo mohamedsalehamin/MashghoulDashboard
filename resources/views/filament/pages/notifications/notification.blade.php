@@ -1,110 +1,110 @@
 @php
-    use Filament\Support\Enums\Alignment;
-    use Filament\Support\Enums\VerticalAlignment;
+    use Filament\Support\Icons\Heroicon;
+    use Filament\Notifications\View\NotificationsIconAlias;
+    use Filament\Notifications\View\Components\NotificationComponent;
+    use Filament\Notifications\View\Components\NotificationComponent\IconComponent;
+    use Illuminate\Support\Js;
+    use Illuminate\View\ComponentAttributeBag;
 
+    $status = $getStatus();
     $color = $getColor() ?? 'gray';
     $isInline = $isInline();
+    $title = $getTitle();
+    $hasTitle = filled($title);
+    $date = $getDate();
+    $hasDate = filled($date);
+    $body = $getBody();
+    $hasBody = filled($body);
 
-$mapper =fn($entityType,$entityID)=> match ($entityType) {
-    'reservation' => provider()?->id?\App\ProviderPanel\Filament\Resources\ReservationResource::getUrl('view',[$entityID]):\App\CatalogModule\Resources\ReservationResource::getUrl('view',[$entityID]),
-    'branch' => route('filament.admin.resources.catalog.branches.edit',$entityID),
-    'product' => route('filament.admin.resources.catalog.products.edit',$entityID),
-    'customer' => route('filament.admin.resources.customers.edit',$entityID),
-    default => null,
-};
+    $getRouteSafely = function($routeName, $params) {
+        try {
+            return route($routeName, $params);
+        } catch (\Exception $e) {
+            return null;
+        }
+    };
 
+    $mapper = fn($entityType, $entityID) => match ($entityType) {
+        'reservation' => provider()?->id ? \App\ProviderPanel\Filament\Resources\ReservationResource::getUrl('view', [$entityID]) : \App\CatalogModule\Resources\ReservationResource::getUrl('view', [$entityID]),
+        'customer' => \App\UsersModule\Resources\CustomerResource::getUrl('edit', [$entityID]),
+        'branch' => $getRouteSafely('filament.admin.resources.catalog.branches.edit', $entityID),
+        'product' => $getRouteSafely('filament.admin.resources.catalog.products.edit', $entityID),
+        default => null,
+    };
+
+    $attributes = (new ComponentAttributeBag)
+        ->merge([
+            'wire:key' => "{$getId()}.notifications.{$getId()}",
+            'x-on:close-notification.window' => "if (\$event.detail.id == '{$getId()}') close()",
+        ], escape: false)
+        ->color(NotificationComponent::class, $color)
+        ->class([
+            'fi-no-notification',
+            'fi-inline' => $isInline,
+            "fi-status-{$status}" => $status,
+        ]);
+
+    if (isset($getViewData()['entity_type'], $getViewData()['entity_id'])) {
+        $entityUrl = $mapper($getViewData()['entity_type'], $getViewData()['entity_id']);
+        if ($entityUrl) {
+            $attributes->merge(['onclick' => "location.href='{$entityUrl}'"], escape: false);
+        }
+    }
 @endphp
-<x-filament-notifications::notification
-    :notification="$notification"
-    :x-transition:enter-start="
-        \Illuminate\Support\Arr::toCssClasses([
-            'opacity-0',
-            ($this instanceof \Filament\Notifications\Livewire\Notifications)
-            ? match (static::$alignment) {
-                Alignment::Start, Alignment::Left => '-translate-x-12',
-                Alignment::End, Alignment::Right => 'translate-x-12',
-                Alignment::Center => match (static::$verticalAlignment) {
-                    VerticalAlignment::Start => '-translate-y-12',
-                    VerticalAlignment::End => 'translate-y-12',
-                    default => null,
-                },
-            }
-            : null,
-        ])
-    "
-    :x-transition:leave-end="
-        \Illuminate\Support\Arr::toCssClasses([
-            'opacity-0',
-            'scale-95' => ! $isInline,
-        ])
-    "
-    @class([
-        'fi-no-notification w-full overflow-hidden transition duration-300',
-        ...match ($isInline) {
-            true => [
-                'fi-inline',
-            ],
-            false => [
-                'max-w-sm rounded-xl bg-white shadow-lg ring-1 dark:bg-gray-900',
-                match ($color) {
-                    'gray' => 'fi-color-gray ring-gray-950/5 dark:ring-white/10',
-                    default => 'fi-color-custom ring-custom-600/20 dark:ring-custom-400/30',
-                },
-            ],
-        },
-    ])
-    @style([
-        \Filament\Support\get_color_css_variables(
-            $color,
-            shades: [50, 400, 600],
-        ) => ! ($isInline || $color === 'gray'),
-    ])
+
+<div
+    x-data="notificationComponent({ notification: {{ Js::from($toArray()) }} })"
+    x-transition:enter-start="fi-transition-enter-start"
+    x-transition:enter-end="fi-transition-enter-end"
+    x-transition:leave-start="fi-transition-leave-start"
+    x-transition:leave-end="fi-transition-leave-end"
+    {!! $attributes !!}
 >
-    <div
-        @isset($getViewData()['entity_type'],$getViewData()['entity_id']) onclick="location.href='{{$mapper($getViewData()['entity_type'],$getViewData()['entity_id'])}}'" @endisset
-        @class([
-            'flex w-full gap-3 p-4',
-            match ($color) {
-                'gray' => null,
-                default => 'bg-custom-50 dark:bg-custom-400/10',
-            },
-        ])
-    >
-        @if ($icon = $getIcon())
-            <x-filament-notifications::icon
-                :color="$getIconColor()"
-                :icon="$icon"
-                :size="$getIconSize()"
-            />
+    @if ($icon = $getIcon())
+        {!! \Filament\Support\generate_icon_html(
+            $icon,
+            attributes: (new ComponentAttributeBag)->color(IconComponent::class, $getIconColor())->class(['fi-no-notification-icon']),
+            size: $getIconSize(),
+        )?->toHtml() !!}
+    @endif
+
+    <div class="fi-no-notification-main">
+        @if ($hasTitle || $hasDate || $hasBody)
+            <div class="fi-no-notification-text">
+                @if ($hasTitle)
+                    <h3 class="fi-no-notification-title">
+                        {!! str($title)->sanitizeHtml() !!}
+                    </h3>
+                @endif
+
+                @if ($hasDate)
+                    <time class="fi-no-notification-date">
+                        {{ $date }}
+                    </time>
+                @endif
+
+                @if ($hasBody)
+                    <div class="fi-no-notification-body">
+                        {!! str($body)->sanitizeHtml() !!}
+                    </div>
+                @endif
+            </div>
         @endif
 
-        <div class="mt-0.5 grid flex-1">
-            @if (filled($title = $getTitle()))
-                <x-filament-notifications::title>
-                    {{ str($title)->sanitizeHtml()->toHtmlString() }}
-                </x-filament-notifications::title>
-            @endif
-
-
-
-            @if (filled($body = $getBody()))
-                <x-filament-notifications::body class="mt-1">
-                    {{ str($body)->sanitizeHtml()->toHtmlString() }}
-                </x-filament-notifications::body>
-            @endif
-            @if (filled($date = $getDate()))
-                <x-filament-notifications::date class="mt-2">
-                    {{ $date }}
-                </x-filament-notifications::date>
-            @endif
-            @if ($actions = $getActions())
-                <x-filament-notifications::actions
-                    :actions="$actions"
-                    class="mt-3"
-                />
-            @endif
-        </div>
-
-        <x-filament-notifications::close-button/>
+        @if ($actions = $getActions())
+            <div class="fi-ac fi-no-notification-actions">
+                @foreach ($actions as $action)
+                    {!! $action->toHtml() !!}
+                @endforeach
+            </div>
+        @endif
     </div>
-</x-filament-notifications::notification>
+
+    <button
+        type="button"
+        x-on:click="close"
+        class="fi-icon-btn fi-no-notification-close-btn"
+    >
+        {!! \Filament\Support\generate_icon_html(Heroicon::XMark, alias: NotificationsIconAlias::NOTIFICATION_CLOSE_BUTTON)->toHtml() !!}
+    </button>
+</div>

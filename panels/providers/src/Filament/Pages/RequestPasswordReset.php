@@ -2,16 +2,16 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Filament\Auth\Notifications\ResetPassword;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Component;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Notifications\Auth\ResetPassword as ResetPasswordNotification;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\SimplePage;
@@ -24,7 +24,7 @@ use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
 class RequestPasswordReset extends SimplePage
 {
@@ -34,7 +34,7 @@ class RequestPasswordReset extends SimplePage
     /**
      * @var view-string
      */
-    protected static string $view = 'filament-panels::pages.auth.password-reset.request-password-reset';
+    protected string $view = 'filament-panels::pages.auth.password-reset.request-password-reset';
 
     /**
      * @var array<string, mixed> | null
@@ -81,7 +81,7 @@ class RequestPasswordReset extends SimplePage
                     throw new Exception("Model [{$userClass}] does not have a [notify()] method.");
                 }
 
-                $notification = new ResetPasswordNotification($token);
+                $notification = new ResetPassword($token);
                 $notification->url = Filament::getResetPasswordUrl($token, $user);
 
                 $user->notify($notification);
@@ -105,20 +105,20 @@ class RequestPasswordReset extends SimplePage
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form;
+        return $schema;
     }
 
     /**
-     * @return array<int | string, string | Form>
+     * @return array<int|string, string|\Filament\Schemas\Schema>
      */
     protected function getForms(): array
     {
         return [
             'form' => $this->form(
                 $this->makeForm()
-                    ->schema([
+                    ->components([
                         $this->getEmailFormComponent(),
                     ])
                     ->statePath('data'),

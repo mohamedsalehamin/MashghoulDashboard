@@ -2,15 +2,15 @@
 
 namespace App\ProviderPanel\Filament\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Actions\Action;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 
 use App\ProviderPanel\Filament\Resources\WalletResource\Pages\ListWalletTransactions;
 use App\ProviderPanel\Filament\Resources\WalletResource\Widgets\WalletSummary;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -24,11 +24,11 @@ class WalletResource extends Resource {
 
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-wallet';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wallet';
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form {
-        return $form;
+    public static function form(Schema $schema): Schema {
+        return $schema;
     }
 
     public static function table(Table $table): Table {
@@ -37,7 +37,7 @@ class WalletResource extends Resource {
             ->modifyQueryUsing(fn($query) => $query->whereHas('wallet', fn($query) => $query->where('holder_id', provider()->id)))
             ->filters([
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('date_from'),
                         DatePicker::make('date_to'),
                     ])
@@ -68,7 +68,7 @@ class WalletResource extends Resource {
                 TextColumn::make('created_at')
                     ->date()
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('receipt')
                     ->label(__("forms.actions.show_receipt"))
                     ->visible(fn($record) => $record->getFirstMediaUrl())

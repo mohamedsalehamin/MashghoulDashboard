@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Schemas\Components\Section;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Banner;
 use App\ContentModule\Models\Category;
@@ -10,10 +11,9 @@ use App\ContentModule\Models\Page;
 use App\ContentModule\Models\Slider;
 use App\DefaultPanel\Settings\LandingSettings;
 use App\UsersModule\Models\Users\Customer;
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Cache;
 use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification as BaseNotification;
 use Filament\Support\Assets\Css;
@@ -79,6 +79,17 @@ class AppServiceProvider extends ServiceProvider {
         view()->share('settings', new GeneralSettings());
 //        config()->set("app.debug", $settings->debug_mode);
 
+        // Register themes views manually
+        $themesViewsPath = base_path('vendor/hasnayeen/themes/resources/views');
+        if (file_exists($themesViewsPath)) {
+            view()->addNamespace('themes', $themesViewsPath);
+        }
+
+        // Register filament-panels views namespace for custom views
+        $filamentPanelsViewsPath = resource_path('views/filament-panels');
+        if (file_exists($filamentPanelsViewsPath)) {
+            view()->addNamespace('filament-panels', $filamentPanelsViewsPath);
+        }
 
         FilamentView::registerRenderHook(
             'panels::scripts.after',
@@ -127,16 +138,16 @@ class AppServiceProvider extends ServiceProvider {
                 ->hintIcon('heroicon-m-language');
         });
 
-        Table::configureUsing(function (Table $table): void {
-            $table->modifyQueryUsing(function (Builder $query): void {
+        // Table::configureUsing(function (Table $table): void {
+        //     $table->modifyQueryUsing(function (Builder $query): void {
 
-                if ($query->getColumns()->getModel()->getCreatedAtColumn() && !in_array(get_class($query->getColumns()->getModel()),[Reservation::class,Category::class,Banner::class,Slider::class,Faq::class,Customer::class]) ) {
+        //         if ($query->getColumns()->getModel()->getCreatedAtColumn() && !in_array(get_class($query->getColumns()->getModel()),[Reservation::class,Category::class,Banner::class,Slider::class,Faq::class,Customer::class]) ) {
 
-                    $query->latest($query->getColumns()->getModel()->getTable() . ".created_at");
-                }
+        //             $query->latest($query->getColumns()->getModel()->getTable() . ".created_at");
+        //         }
 
-            });
-        });
+        //     });
+        // });
 
         TextEntry::configureUsing(function (TextEntry $field): void {
             $field->label(__('forms.fields.' . Str::replace('.', '_', $field->getName())));
@@ -154,7 +165,7 @@ class AppServiceProvider extends ServiceProvider {
                 ->toggleable();
         });
 
-        \Filament\Infolists\Components\Section::configureUsing(function (\Filament\Infolists\Components\Section $section): void {
+        Section::configureUsing(function (Section $section): void {
             $section->collapsible()->heading(__('sections.' . Str::lower($section->getHeading())));
         });
 

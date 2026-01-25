@@ -2,8 +2,8 @@
 
 namespace App\ContentModule\Resources\CouponResource\RelationManagers;
 
+use Filament\Schemas\Schema;
 use App\UsersModule\Resources\CustomerResource;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -11,9 +11,9 @@ use Filament\Tables\Table;
 class UsersRelationManager extends RelationManager {
     protected static string $relationship = 'users';
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
 
             ]);
     }
@@ -44,9 +44,9 @@ class UsersRelationManager extends RelationManager {
             ])
             ->headerActions([
             ])
-            ->actions([
+            ->recordActions([
             ])
-            ->bulkActions([
+            ->toolbarActions([
             ]);
     }
 

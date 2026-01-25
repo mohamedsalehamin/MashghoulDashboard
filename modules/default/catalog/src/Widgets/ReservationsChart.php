@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Widgets;
 
+use Illuminate\Contracts\Support\Htmlable;
 use App\CatalogModule\Models\Reservation;
 use App\UsersModule\Models\Users\Customer;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
@@ -51,7 +52,7 @@ class ReservationsChart extends ChartWidget {
         return 'line';
     }
 
-    public function getHeading(): \Illuminate\Contracts\Support\Htmlable|string|null {
+    public function getHeading(): Htmlable|string|null {
         return __('panel.stats.reservations_count');
     }
 

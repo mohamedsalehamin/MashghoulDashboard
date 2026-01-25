@@ -3,6 +3,7 @@
 namespace App\UsersModule\Models;
 
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Models\Seat;
@@ -83,7 +84,7 @@ class Provider extends Model implements HasMedia {
         return $this->hasManyThrough(Rate::class, Reservation::class, 'reservable_id', 'reservation_id');
     }
 
-    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+    public function category(): BelongsTo {
         return $this->belongsTo(Category::class);
     }
 

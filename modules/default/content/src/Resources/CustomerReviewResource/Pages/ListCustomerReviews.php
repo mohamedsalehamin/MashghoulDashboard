@@ -2,6 +2,7 @@
 
 namespace App\ContentModule\Resources\CustomerReviewResource\Pages;
 
+use Filament\Actions\CreateAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\ContentModule\Resources\CustomerReviewResource;
@@ -13,7 +14,7 @@ class ListCustomerReviews extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

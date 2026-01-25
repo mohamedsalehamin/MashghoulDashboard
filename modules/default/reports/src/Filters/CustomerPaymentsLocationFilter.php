@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 class CustomerPaymentsLocationFilter {
     public static function make() {
         return Filter::make('locations')
-            ->form([
+            ->schema([
                 Select::make('country_id')
                     ->searchable()
                     ->afterStateUpdated(function ($set) {

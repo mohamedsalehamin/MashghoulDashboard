@@ -2,6 +2,16 @@
 
 namespace App\UsersModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
@@ -19,19 +29,14 @@ use App\UsersModule\Resources\ProviderResource\Pages\EditProvider;
 use App\UsersModule\Resources\ProviderResource\Pages\ListProviders;
 use App\UsersModule\Resources\ProviderResource\Pages\WalletPage;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
@@ -49,14 +54,14 @@ class ProviderResource extends Resource {
     use HasTranslationLabel;
 
     protected static ?string $model = Provider::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form->schema([
+        return $schema->components([
             Tabs::make('')->schema([
-                Tabs\Tab::make(__("sections.basic_information"))->schema([
+                Tab::make(__("sections.basic_information"))->schema([
                     SpatieMediaLibraryFileUpload::make('avatar')
                         ->nullable(),
 
@@ -111,11 +116,11 @@ class ProviderResource extends Resource {
 
 
                 ]),
-                Tabs\Tab::make(__("sections.provider_information"))->schema([
+                Tab::make(__("sections.provider_information"))->schema([
                     Group::make()->schema([
                         Tabs::make('Label')
                             ->tabs([
-                                Tabs\Tab::make(__('panel.languages.arabic'))
+                                Tab::make(__('panel.languages.arabic'))
                                     ->schema([
                                         TextInput::make('name.ar')
                                             ->label(__('forms.fields.provider_name'))
@@ -124,7 +129,7 @@ class ProviderResource extends Resource {
                                             ->label(__('forms.fields.bio'))
                                             ->required(),
                                     ]),
-                                Tabs\Tab::make(__('panel.languages.english'))
+                                Tab::make(__('panel.languages.english'))
                                     ->schema([
                                         TextInput::make('name.en')
                                             ->label(__('forms.fields.provider_name'))
@@ -198,7 +203,7 @@ class ProviderResource extends Resource {
                         ->relationship('provider')
 
                 ]),
-                Tabs\Tab::make(__("sections.bank_account_information"))->schema([
+                Tab::make(__("sections.bank_account_information"))->schema([
                     Group::make()->schema([
                         TextInput::make('bank_name'),
                         TextInput::make('account_name'),
@@ -207,14 +212,14 @@ class ProviderResource extends Resource {
                     ])->relationship('bankAccount'),
 
                 ]),
-                Tabs\Tab::make(__("sections.settings"))->schema([
+                Tab::make(__("sections.settings"))->schema([
                     Group::make()->schema([
                         Tabs::make('tabs')
                             ->schema([
-                                Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                Tab::make(__("panel.languages.arabic"))->schema([
                                     Textarea::make('ar.text_when_order_completed')
                                 ]),
-                                Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                Tab::make(__("panel.languages.english"))->schema([
                                     Textarea::make('en.text_when_order_completed')
                                 ])
                             ])->statePath('texts'),
@@ -275,7 +280,7 @@ class ProviderResource extends Resource {
             ])
             ->filters([
                 Filter::make('ID')
-                    ->form([TextInput::make('id'),])
+                    ->schema([TextInput::make('id'),])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when($data['id'], fn(Builder $query, $date): Builder => $query->where('id', $data['id']));
                     })
@@ -295,18 +300,18 @@ class ProviderResource extends Resource {
                     ->options(ModelStatus::class),
                 DateFilter::make()
             ])
-            ->actions([
+            ->recordActions([
                 Action::make("wallet")
                     ->icon('heroicon-o-wallet')
                     ->url(fn($record) => static::getUrl('wallet', ['record' => $record->id]))
                     ->label(__('menu.wallet')),
 
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     ExportBulkAction::make(),
                 ]),
             ]);

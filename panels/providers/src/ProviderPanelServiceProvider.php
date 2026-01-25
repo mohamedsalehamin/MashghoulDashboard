@@ -2,6 +2,8 @@
 
 namespace App\ProviderPanel;
 
+use App\ProviderPanel\Filament\Pages\EditProfilePage;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\ProviderPanel\Filament\Pages\AboutUsPage;
 use App\ProviderPanel\Filament\Pages\ContactPage;
@@ -31,7 +33,6 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\SpatieLaravelTranslatablePlugin;
 use Hasnayeen\Themes\Http\Middleware\SetTheme;
 use Hasnayeen\Themes\ThemesPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -41,9 +42,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Storage;
-
+use App\DefaultPanel\CustomNordThemePlugin;
 class ProviderPanelServiceProvider extends PanelProvider
 {
     public function boot(): void
@@ -75,7 +75,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 PrivacyAndPolicyPage::class,
                 FaqsPage::class,
                 ContactPage::class,
-                Filament\Pages\EditProfilePage::class
+                EditProfilePage::class
             ])
             ->brandLogo(function (GeneralSettings $settings) {
                 return Storage::disk('public')->exists($settings->app_logo ?? 'null') ? asset("storage/$settings->app_logo") : '';
@@ -83,16 +83,12 @@ class ProviderPanelServiceProvider extends PanelProvider
             })
             ->brandName('Mashghoul')
             ->plugins([
-                FilamentFullCalendarPlugin::make()
-                    ->selectable(false)
-                    ->editable(false)
-                    ->locale(app()->getLocale()),
 
-
+                    CustomNordThemePlugin::make(),
 //                FilamentShieldPlugin::make(),
-                SpatieLaravelTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
+                SpatieTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
 
-                ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
+                // ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
 
             ])
             ->databaseNotifications(true)
@@ -108,7 +104,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetTheme::class,
+                // SetTheme::class,
             ])
             ->widgets([
                 ReservationStats::class,
@@ -124,7 +120,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 NotificationResource::class,
                 WalletResource::class,
             ])
-            ->darkMode(false)
+            ->darkMode(true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

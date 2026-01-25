@@ -13,139 +13,139 @@ class LevelPolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_level');
+        return $user->can('ViewAny:Level');
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function view(User $user, Level $level): bool
     {
-        return $user->can('view_level');
+        return $user->can('View:Level');
     }
 
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('create_level');
+        return $user->can('Create:Level');
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function update(User $user, Level $level): bool
     {
-        return $user->can('update_level');
+        return $user->can('Update:Level');
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function delete(User $user, Level $level): bool
     {
-        return $user->can('delete_level');
+        return $user->can('Delete:Level');
     }
 
     /**
      * Determine whether the user can bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_level');
+        return $user->can('DeleteAny:Level');
     }
 
     /**
      * Determine whether the user can permanently delete.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function forceDelete(User $user, Level $level): bool
     {
-        return $user->can('force_delete_level');
+        return $user->can('ForceDelete:Level');
     }
 
     /**
      * Determine whether the user can permanently bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_level');
+        return $user->can('ForceDeleteAny:Level');
     }
 
     /**
      * Determine whether the user can restore.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function restore(User $user, Level $level): bool
     {
-        return $user->can('restore_level');
+        return $user->can('Restore:Level');
     }
 
     /**
      * Determine whether the user can bulk restore.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_level');
+        return $user->can('RestoreAny:Level');
     }
 
     /**
      * Determine whether the user can replicate.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\ContentModule\Models\Level  $level
+     * @param User $user
+     * @param Level $level
      * @return bool
      */
     public function replicate(User $user, Level $level): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('Replicate:Level');
     }
 
     /**
      * Determine whether the user can reorder.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('Reorder:Level');
     }
 
 }

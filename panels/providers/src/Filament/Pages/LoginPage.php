@@ -2,6 +2,12 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Form;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Actions;
 use App\UsersModule\Models\Users\Provider;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
@@ -9,10 +15,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
@@ -26,7 +29,7 @@ use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 /**
- * @property Form $form
+ * @property \Filament\Schemas\Schema $form
  */
 class LoginPage extends SimplePage {
     use InteractsWithFormActions;
@@ -35,7 +38,7 @@ class LoginPage extends SimplePage {
     /**
      * @var view-string
      */
-    protected static string $view = 'filament-panels::pages.auth.login';
+    protected string $view = 'filament-panels::pages.auth.login';
 
     /**
      * @var array<string, mixed> | null
@@ -89,7 +92,7 @@ class LoginPage extends SimplePage {
 
         if (
             ($user instanceof FilamentUser) &&
-            (!$user->canAccessPanel(Filament::getCurrentPanel()))
+            (!$user->canAccessPanel(Filament::getCurrentOrDefaultPanel()))
         ) {
             Filament::auth()->logout();
 
@@ -113,26 +116,21 @@ class LoginPage extends SimplePage {
         ]);
     }
 
-    public function form(Form $form): Form {
-        return $form;
+    public function defaultForm(Schema $schema): Schema
+    {
+        return $schema
+            ->statePath('data');
     }
 
-    /**
-     * @return array<int | string, string | Form>
-     */
-    protected function getForms(): array {
-        return [
-            'form' => $this->form(
-                $this->makeForm()
-                    ->schema([
-                        $this->getEmailFormComponent(),
-                        $this->getPasswordFormComponent(),
-                        $this->getRememberFormComponent(),
-                    ])
-                    ->statePath('data'),
-            ),
-        ];
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                $this->getEmailFormComponent(),
+                $this->getPasswordFormComponent(),
+                $this->getRememberFormComponent(),
+            ]);
     }
+
 
     protected function getEmailFormComponent(): Component {
         return PhoneInput::make('phone')
@@ -205,5 +203,25 @@ class LoginPage extends SimplePage {
             'phone' => $data['phone'],
             'password' => $data['password'],
         ];
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                $this->getFormContentComponent(),
+            ]);
+    }
+
+    public function getFormContentComponent(): Component
+    {
+        return Form::make([EmbeddedSchema::make('form')])
+            ->id('form')
+            ->livewireSubmitHandler('authenticate')
+            ->footer([
+                Actions::make($this->getFormActions())
+                    ->fullWidth($this->hasFullWidthFormActions())
+                    ->key('form-actions'),
+            ]);
     }
 }

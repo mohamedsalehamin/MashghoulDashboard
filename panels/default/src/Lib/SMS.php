@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Lib;
 
+use Log;
 use Illuminate\Support\Facades\Http;
 use Iterator;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -23,7 +24,7 @@ class SMS {
             'body' => $this->message
         ])->post('https://api.taqnyat.sa/v1/messages')
             ->json();
-        \Log::info("send sms to {$this->phone}", $response);
+        Log::info("send sms to {$this->phone}", $response);
         return $response;
     }
 }

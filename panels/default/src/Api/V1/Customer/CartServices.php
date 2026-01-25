@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Api\V1\Customer;
 
+use Illuminate\Http\JsonResponse;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\BuildCartInstanceAction;
@@ -62,7 +63,7 @@ class CartServices {
             $paymentResponse = $reservation->pay($total, $paymentMethod ?? 'myfatoorah');
 
             // Handle payment response
-            if ($paymentResponse instanceof \Illuminate\Http\JsonResponse) {
+            if ($paymentResponse instanceof JsonResponse) {
                 $responseData = json_decode($paymentResponse->getContent(), true);
                 
                 // If payment failed (including Tabby rejections)

@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Provider;
 
+use Illuminate\Http\Request;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Resources\Api\Customer\CityResource;
 use App\DefaultPanel\Resources\Api\Customer\CountryResource;
@@ -13,10 +14,9 @@ class CustomerResource extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
-
     public function toArray($request) {
         return [
             'id' => $this->id,

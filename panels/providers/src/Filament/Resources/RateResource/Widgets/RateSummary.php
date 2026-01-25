@@ -5,7 +5,7 @@ namespace App\ProviderPanel\Filament\Resources\RateResource\Widgets;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class RateSummary extends BaseWidget {
-    protected static string $view = 'filament-widgets::stats-overview-widget';
+    protected string $view = 'filament-widgets::stats-overview-widget';
     protected function getStats(): array {
 
         return [

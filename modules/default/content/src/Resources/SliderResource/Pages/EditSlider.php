@@ -1,12 +1,13 @@
 <?php
 
 namespace App\ContentModule\Resources\SliderResource\Pages;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 use App\ContentModule\Resources\BannerResource;
 use App\ContentModule\Resources\SliderResource;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSlider extends EditRecord {
-    use EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = SliderResource::class;
 

@@ -2,13 +2,17 @@
 
 namespace App\ProviderPanel\Filament\Resources\ReservationResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\CatalogModule\Models\Reservation\ItemsLine;
 use App\CatalogModule\Models\Service;
 use App\DefaultPanel\Lib\Utils;
 use App\Notifications\LabReservationResultsAddedNotification;
 use Cknow\Money\Money;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,9 +22,9 @@ use NumberFormatter;
 class ItemsLineRelationManager extends RelationManager {
     protected static string $relationship = 'itemsLine';
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
 
             ]);
     }
@@ -31,11 +35,11 @@ class ItemsLineRelationManager extends RelationManager {
             ->heading(__('sections.services'))
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('model.id')
+                TextColumn::make('model.id')
                     ->formatStateUsing(fn(ItemsLine $record) => Service::withoutGlobalScopes()->where("id", $record->model['id'])?->first()->title)
                     ->label(__('forms.fields.name')),
 
-                Tables\Columns\TextColumn::make('products')
+                TextColumn::make('products')
                     ->state(function ($record) {
                         $text = [];
                         foreach ($record['attributes']['products'] ?? [] as $index => $option) {
@@ -57,14 +61,14 @@ class ItemsLineRelationManager extends RelationManager {
                     ->html()
                     ->label(__('forms.fields.products')),
 
-                Tables\Columns\TextColumn::make('service_price')
+                TextColumn::make('service_price')
                     ->label(__("forms.fields.service_price"))
                     ->state(function (ItemsLine $record) {
                         $price = Money::parse($record->model['price']['amount'] ?? 0)->formatByDecimal();
 
                         return Money::parse(($record->quantity * $price) + ($record->quantity * collect($record->conditions)->sum('value')))->format();
                     }),
-                Tables\Columns\TextColumn::make('service_sale_price')
+                TextColumn::make('service_sale_price')
                     ->label(__("forms.fields.service_sale_price"))
                     ->state(function (ItemsLine $record) {
 
@@ -78,11 +82,11 @@ class ItemsLineRelationManager extends RelationManager {
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

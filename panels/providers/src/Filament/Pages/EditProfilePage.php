@@ -2,6 +2,11 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
@@ -10,16 +15,12 @@ use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 use App\UsersModule\Models\Users\Provider;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\Page;
@@ -35,17 +36,17 @@ class EditProfilePage extends Page {
     public $record;
 
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.pages.edit-profile';
+    protected string $view = 'filament.pages.edit-profile';
 
-    public function form(Form $form): Form {
-        return $form
+    public function form(Schema $schema): Schema {
+        return $schema
             ->statePath('record')
             ->model(provider()->user)
-            ->schema([
+            ->components([
                 Tabs::make('')->schema([
-                    Tabs\Tab::make(__("sections.basic_information"))->schema([
+                    Tab::make(__("sections.basic_information"))->schema([
                         SpatieMediaLibraryFileUpload::make('avatar')
                             ->nullable(),
 
@@ -100,11 +101,11 @@ class EditProfilePage extends Page {
 
 
                     ]),
-                    Tabs\Tab::make(__("sections.provider_information"))->schema([
+                    Tab::make(__("sections.provider_information"))->schema([
                         Group::make()->schema([
                             Tabs::make('Label')
                                 ->tabs([
-                                    Tabs\Tab::make(__('panel.languages.arabic'))
+                                    Tab::make(__('panel.languages.arabic'))
                                         ->schema([
                                             TextInput::make('name.ar')
                                                 ->label(__('forms.fields.provider_name'))
@@ -113,7 +114,7 @@ class EditProfilePage extends Page {
                                                 ->label(__('forms.fields.bio'))
                                                 ->required(),
                                         ]),
-                                    Tabs\Tab::make(__('panel.languages.english'))
+                                    Tab::make(__('panel.languages.english'))
                                         ->schema([
                                             TextInput::make('name.en')
                                                 ->label(__('forms.fields.provider_name'))
@@ -184,7 +185,7 @@ class EditProfilePage extends Page {
                             ->relationship('provider')
 
                     ]),
-                    Tabs\Tab::make(__("sections.bank_account_information"))->schema([
+                    Tab::make(__("sections.bank_account_information"))->schema([
                         Group::make()->schema([
                             TextInput::make('bank_name'),
                             TextInput::make('account_name'),
@@ -193,14 +194,14 @@ class EditProfilePage extends Page {
                         ])->relationship('bankAccount'),
 
                     ]),
-                    Tabs\Tab::make(__("sections.settings"))->schema([
+                    Tab::make(__("sections.settings"))->schema([
                         Group::make()->schema([
                             Tabs::make('tabs')
                                 ->schema([
-                                    Tabs\Tab::make(__("panel.languages.arabic"))->schema([
+                                    Tab::make(__("panel.languages.arabic"))->schema([
                                         Textarea::make('ar.text_when_order_completed')
                                     ]),
-                                    Tabs\Tab::make(__("panel.languages.english"))->schema([
+                                    Tab::make(__("panel.languages.english"))->schema([
                                         Textarea::make('en.text_when_order_completed')
                                     ])
                                 ])->statePath('texts'),

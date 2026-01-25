@@ -3,6 +3,7 @@
 namespace App\DefaultPanel\Resources\Api\Provider;
 
 
+use Illuminate\Http\Request;
 use App\DefaultPanel\Resources\Api\Customer\CityResource;
 use App\DefaultPanel\Resources\Api\Customer\CountryResource;
 use App\DefaultPanel\Resources\Api\Customer\StateResource;
@@ -15,7 +16,7 @@ class ProviderResources extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request) {

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Log;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -38,7 +39,7 @@ class CancelUnPaidReservations extends Command {
             $i++;
             $reservation->update(['status' => ReservationStatus::CANCELED]);
         }
-        \Log::info("CancelUnPaidReservations $i");
+        Log::info("CancelUnPaidReservations $i");
         $this->info("CancelUnPaidReservations $i");
     }
 }

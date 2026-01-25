@@ -2,9 +2,7 @@
       integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
       crossorigin="anonymous" referrerpolicy="no-referrer"/>
 <style>
-    body {
-        overflow: hidden!important;
-    }
+   
     .fi-timeline-item-heading{
         justify-content: space-between!important;
     }

@@ -6,7 +6,7 @@ use Filament\Widgets\Widget;
 
 class ProfileUrlWidget extends Widget
 {
-    protected static string $view = 'provider-panel::widgets.profile-url-widget';
+    protected string $view = 'provider-panel::widgets.profile-url-widget';
 
     public function getProfileUrl(): string
     {

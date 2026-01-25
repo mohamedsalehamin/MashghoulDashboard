@@ -2,12 +2,13 @@
 
 namespace App\ContentModule\Resources\StateResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\ContentModule\Resources\StateResource;
-use Filament\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateState extends CreateRecord {
-    use CreateRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = StateResource::class;
 

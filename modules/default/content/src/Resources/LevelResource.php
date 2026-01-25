@@ -2,6 +2,15 @@
 
 namespace App\ContentModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
 use App\ContentModule\Models\Level;
 use App\ContentModule\Resources\LevelResource\Pages\CreateLevel;
 use App\ContentModule\Resources\LevelResource\Pages\EditLevel;
@@ -12,11 +21,8 @@ use App\ContentModule\Resources\PageResource\Pages\ListPages;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -33,13 +39,13 @@ class LevelResource extends Resource {
 
     protected static ?string $model = Level::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard';
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
-                Forms\Components\Section::make("basic_information")
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                Section::make("basic_information")
                     ->schema([
                         TextInput::make('title')
                             ->label(__('forms.fields.slide_name'))
@@ -88,18 +94,18 @@ class LevelResource extends Resource {
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
 
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ]);
     }
 

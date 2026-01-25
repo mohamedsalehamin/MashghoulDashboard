@@ -3,6 +3,8 @@
 namespace App\UsersModule\Models\Users;
 
 
+use App\Notifications\WiningGiftSuccessfullyNotification;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -21,7 +23,7 @@ class Customer extends User {
                 'ar' => __("panel.messages.gift_for_register", [], 'ar'),
                 'en' => __("panel.messages.gift_for_register", [], 'en')
             ]]);
-            $customer->notify(new \App\Notifications\WiningGiftSuccessfullyNotification([
+            $customer->notify(new WiningGiftSuccessfullyNotification([
                 'ar' => __("panel.messages.you_have_gain_points_due_to_register", ['points' => GeneralSettings::getPointsOnAction('register')], 'ar'),
                 'en' => __("panel.messages.you_have_gain_points_due_to_register", ['points' => GeneralSettings::getPointsOnAction('register')], 'en'),
             ]));
@@ -34,7 +36,7 @@ class Customer extends User {
         return User::class;
     }
 
-    public function completedReservations(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function completedReservations(): HasMany {
         return $this->reservations()->where('status', ReservationStatus::COMPLETED);
     }
 }

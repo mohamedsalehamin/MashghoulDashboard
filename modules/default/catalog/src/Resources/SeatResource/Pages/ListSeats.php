@@ -3,6 +3,7 @@
 namespace App\CatalogModule\Resources\SeatResource\Pages;
 
 
+use Filament\Actions\CreateAction;
 use App\CatalogModule\Resources\SeatResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -14,7 +15,7 @@ class ListSeats extends ListRecords {
 
     protected function getHeaderActions(): array {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
         ];
     }
 

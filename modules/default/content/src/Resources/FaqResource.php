@@ -2,18 +2,25 @@
 
 namespace App\ContentModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\ContentModule\Resources\FaqResource\Pages\ListFaq;
+use App\ContentModule\Resources\FaqResource\Pages\CreateFaq;
+use App\ContentModule\Resources\FaqResource\Pages\EditFaq;
 use App\DefaultPanel\Enum\FaqLocationEnum;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,12 +36,12 @@ class FaqResource extends Resource implements HasShieldPermissions {
 
     protected static ?string $model = Faq::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make("basic_information")
                     ->schema([
                         TextInput::make('question')
@@ -75,13 +82,13 @@ class FaqResource extends Resource implements HasShieldPermissions {
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -94,9 +101,9 @@ class FaqResource extends Resource implements HasShieldPermissions {
 
     public static function getPages(): array {
         return [
-            'index' => \App\ContentModule\Resources\FaqResource\Pages\ListFaq::route('/'),
-            'create' => \App\ContentModule\Resources\FaqResource\Pages\CreateFaq::route('/create'),
-            'edit' => \App\ContentModule\Resources\FaqResource\Pages\EditFaq::route('/{record}/edit'),
+            'index' => ListFaq::route('/'),
+            'create' => CreateFaq::route('/create'),
+            'edit' => EditFaq::route('/{record}/edit'),
         ];
     }
 

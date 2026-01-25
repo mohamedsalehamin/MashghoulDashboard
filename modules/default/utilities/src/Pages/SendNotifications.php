@@ -2,12 +2,13 @@
 
 namespace App\UtilitiesModule\Pages;
 
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use App\DefaultPanel\Notifications\SendAdminMessagesNotification;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -19,9 +20,9 @@ use Illuminate\Support\Facades\Notification;
 class SendNotifications extends Page implements HasForms {
     use InteractsWithForms, HasPageShield, HasTranslationLabel, NotificationChannels;
 
-    protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-paper-airplane';
     protected static ?int $navigationSort = 2;
-    protected static string $view = 'filament.pages.send-notifications';
+    protected string $view = 'filament.pages.send-notifications';
 //    protected static bool $shouldRegisterNavigation = false;
     public array $notification_title = [];
     public array $notification_body = [];
@@ -36,7 +37,7 @@ class SendNotifications extends Page implements HasForms {
                 ->schema([
                     Tabs::make('Label')
                         ->tabs([
-                            Tabs\Tab::make(__('panel.languages.arabic'))
+                            Tab::make(__('panel.languages.arabic'))
                                 ->schema([
                                     TextInput::make('notification_title.ar')
                                         ->label(__('forms.fields.message_title'))
@@ -47,7 +48,7 @@ class SendNotifications extends Page implements HasForms {
                                         ->rows(10)
                                         ->translateLabel(),
                                 ]),
-                            Tabs\Tab::make(__('panel.languages.english'))
+                            Tab::make(__('panel.languages.english'))
                                 ->schema([
                                     TextInput::make('notification_title.en')
                                         ->label(__('forms.fields.message_title'))

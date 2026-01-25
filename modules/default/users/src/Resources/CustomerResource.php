@@ -2,6 +2,15 @@
 
 namespace App\UsersModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
@@ -19,18 +28,13 @@ use App\UsersModule\Resources\CustomerResource\Pages\ViewCustomer;
 use App\UsersModule\Resources\CustomerResource\Pages\WalletPage;
 use App\UsersModule\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
@@ -49,12 +53,12 @@ class CustomerResource extends Resource {
     use HasTranslationLabel;
 
     protected static ?string $model = Customer::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form->schema([
+        return $schema->components([
             Group::make([
                 Section::make("basic_information")->schema(array(
                     SpatieMediaLibraryFileUpload::make('avatar')
@@ -188,7 +192,7 @@ class CustomerResource extends Resource {
             ])
             ->filters([
                 Filter::make('ID')
-                    ->form([TextInput::make('id'),])
+                    ->schema([TextInput::make('id'),])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when($data['id'], fn(Builder $query, $date): Builder => $query->where('id', $data['id']));
                     })
@@ -208,20 +212,20 @@ class CustomerResource extends Resource {
                     ->options(ModelStatus::class),
                 DateFilter::make(),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make("wallet")
                     ->icon('heroicon-o-wallet')
                     ->url(fn($record) => static::getUrl('wallet', ['record' => $record->id]))
                     ->label(__('menu.wallet')),
 
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     ExportBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
 
                 ]),
             ]);
@@ -252,8 +256,8 @@ class CustomerResource extends Resource {
         return __('menu.crew');
     }
 
-    public static function infolist(Infolist $infolist): Infolist {
-        return $infolist->schema([
+    public static function infolist(Schema $schema): Schema {
+        return $schema->components([
             TextEntry::make("id"),
             TextEntry::make("data.first_name")->label(__('forms.fields.first_name')),
             TextEntry::make("data.last_name")->label(__('forms.fields.last_name')),

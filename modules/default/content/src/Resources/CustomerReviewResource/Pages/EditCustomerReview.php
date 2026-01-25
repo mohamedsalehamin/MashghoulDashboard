@@ -2,7 +2,8 @@
 
 namespace App\ContentModule\Resources\CustomerReviewResource\Pages;
 
-use Filament\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\EditRecord;
 use App\ContentModule\Resources\CustomerReviewResource;
 
@@ -10,7 +11,7 @@ class EditCustomerReview extends EditRecord
 {
     protected static string $resource = CustomerReviewResource::class;
 
-    use EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected function getHeaderActions(): array {
         return [

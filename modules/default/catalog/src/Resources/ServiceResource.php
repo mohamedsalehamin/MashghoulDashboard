@@ -2,6 +2,21 @@
 
 namespace App\CatalogModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Livewire\Component;
+use Filament\Actions\ImportAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
@@ -16,22 +31,16 @@ use App\Filament\Imports\ProductsImporter;
 use App\Filament\Imports\ServicesImporter;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ImportAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -47,12 +56,12 @@ class ServiceResource extends Resource {
 
     protected static ?string $model = Service::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make('basic_information')->schema([
 
                     Select::make('provider_id')
@@ -148,22 +157,22 @@ class ServiceResource extends Resource {
 
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('provider_id')
+                TrashedFilter::make(),
+                SelectFilter::make('provider_id')
                     ->options(fn() => Provider::pluck('name', 'id'))
                     ->label(__('forms.fields.provider_name'))
                     ->searchable(),
             ])
-            ->actions([
+            ->recordActions([
 
                 Action::make('activities')
                     ->label(__("forms.actions.activities"))
                     ->url(fn($record) => static::getUrl('activities', ['record' => $record])),
 
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                RestoreAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
 
             ])
             ->headerActions([
@@ -175,7 +184,7 @@ class ServiceResource extends Resource {
 
                         ExcelExport::make("export_services")
                             ->label(__("forms.fields.export_services"))
-                            ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
+                            ->modifyQueryUsing(function ($query, Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
 
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;
@@ -235,7 +244,7 @@ class ServiceResource extends Resource {
                         ExcelExport::make("export_products")
                             ->label(__("forms.fields.export_products"))
 
-                            ->modifyQueryUsing(function ($query, \Livewire\Component $livewire) {
+                            ->modifyQueryUsing(function ($query, Component $livewire) {
                                 $filters = $livewire->getTable()->getFilters();
                                 $provider_id = $filters['provider_id']->getState()['value'] ?? null;
                                 return Product::query()->whereHas('service')->whereHas('service',fn($query2)=>$query2->when($provider_id, fn($q) => $q->where('provider_id', $provider_id)));
@@ -282,23 +291,23 @@ class ServiceResource extends Resource {
                     ->visible(true)
                     ->importer(ProductsImporter::class),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
 
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->striped();
     }
 
-    static public function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    static public function infolist(Schema $schema): Schema {
+        return $schema
+            ->components([
                 TextEntry::make('id'),
 
 

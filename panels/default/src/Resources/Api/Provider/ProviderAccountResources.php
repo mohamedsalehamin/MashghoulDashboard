@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Provider;
 
+use Illuminate\Http\Request;
 use App\DefaultPanel\Enum\GenderEnum;
 
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,7 +13,7 @@ class ProviderAccountResources extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request) {

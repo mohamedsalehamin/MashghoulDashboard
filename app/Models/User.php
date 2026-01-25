@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\UsersModule\Models\Provider;
+use Str;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\BanksAccount;
 use App\ContentModule\Models\City;
@@ -114,7 +116,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     }
 
     public function provider(): HasOne {
-        return $this->hasOne(\App\UsersModule\Models\Provider::class, "user_id");
+        return $this->hasOne(Provider::class, "user_id");
     }
 
     public function supplier() {
@@ -126,7 +128,7 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     }
 
     public function setPhoneAttribute($value): void {
-        $this->attributes['phone'] = \Str::replace(' ', '', $value);
+        $this->attributes['phone'] = Str::replace(' ', '', $value);
     }
 
     public function getStatusAttribute($value) {

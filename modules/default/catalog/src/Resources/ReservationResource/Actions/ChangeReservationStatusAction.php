@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Resources\ReservationResource\Actions;
 
+use Filament\Actions\Action;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
 use App\DefaultPanel\Actions\RefundTransaction;
@@ -11,11 +12,10 @@ use App\Notifications\AdminSendEntitlementsNotification;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Actions\Action;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 class ChangeReservationStatusAction {
     static public function make($show = false) {
-        $action = $show ? \Filament\Actions\Action::make('changeStatus') : Action::make('changeStatus');
+        $action = $show ? Action::make('changeStatus') : Action::make('changeStatus');
         return $action
             ->label(__('panel.actions.change_status'))
             ->icon('heroicon-o-bolt')

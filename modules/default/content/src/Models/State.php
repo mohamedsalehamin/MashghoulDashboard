@@ -2,6 +2,7 @@
 
 namespace App\ContentModule\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\UsersModule\Models\Clinic;
 use App\UsersModule\Models\Lab;
 use App\UsersModule\Models\Provider;
@@ -33,7 +34,7 @@ class State extends Model {
         return $this->belongsTo(Country::class);
     }
 
-    public function providers(): \Illuminate\Database\Eloquent\Relations\HasManyThrough {
+    public function providers(): HasManyThrough {
         return $this->hasManyThrough(Provider::class, City::class, 'state_id', 'city_id', 'id', 'id');
 }
     public function cities(): HasMany {

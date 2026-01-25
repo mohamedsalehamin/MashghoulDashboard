@@ -2,6 +2,8 @@
 
 namespace App\CatalogModule\Models;
 
+use Exception;
+use Str;
 use App\CatalogModule\Filters\ReservationFilter;
 use App\CatalogModule\Models\Reservation\Cancellation;
 use App\CatalogModule\Models\Reservation\Condition;
@@ -147,7 +149,7 @@ class Reservation extends Model {
             $startDate = $this->date->setTimeFromTimeString(explode(' - ', $this->period)[0]);
             $endDate = $this->date->setTimeFromTimeString(explode(' - ', $this->period)[1]);
             return $startDate <= now() && $endDate >= now();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -177,7 +179,7 @@ class Reservation extends Model {
     public function getAsCartAttribute() {
         $eventsClass = config('shopping_cart.events');
         $events = $eventsClass ? new $eventsClass() : app('events');
-        $session_key = md5($this->cart_id . \Str::random());
+        $session_key = md5($this->cart_id . Str::random());
         $instanceName = $session_key . 'back_end_order_cart';
         $cart = new CoreCart(
             new ArrayStorage,
@@ -213,7 +215,7 @@ class Reservation extends Model {
         $totalProducts = 0;
         $eventsClass = config('shopping_cart.events');
         $events = $eventsClass ? new $eventsClass() : app('events');
-        $session_key = md5($this->cart_id . \Str::random());
+        $session_key = md5($this->cart_id . Str::random());
         $instanceName = $session_key . 'back_end_order_cart';
         $cart = new CoreCart(
             new ArrayStorage,

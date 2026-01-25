@@ -2,13 +2,16 @@
 
 namespace App\CatalogModule\Resources\ServiceResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\CatalogModule\Models\Reservation\ItemsLine;
 use App\CatalogModule\Models\Service;
 use App\DefaultPanel\Lib\Utils;
 use App\Notifications\LabReservationResultsAddedNotification;
 use Cknow\Money\Money;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -21,9 +24,9 @@ use pxlrbt\FilamentExcel\Exports\ExcelExport;
 class ProductsRelationManager extends RelationManager {
     protected static string $relationship = 'products';
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
 
             ]);
     }
@@ -34,12 +37,12 @@ class ProductsRelationManager extends RelationManager {
             ->recordTitleAttribute('name')
             ->columns([
 
-                Tables\Columns\TextColumn::make('id'),
+                TextColumn::make('id'),
                 SpatieMediaLibraryImageColumn::make('avatar'),
 
-                Tables\Columns\TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
-                Tables\Columns\TextColumn::make('price'),
-                Tables\Columns\TextColumn::make('sale_price'),
+                TextColumn::make('title')->formatStateUsing(fn($record)=>$record->title[app()->getLocale()]??''),
+                TextColumn::make('price'),
+                TextColumn::make('sale_price'),
 
             ])
             ->filters([
@@ -49,11 +52,11 @@ class ProductsRelationManager extends RelationManager {
 //                Tables\Actions\CreateAction::make(),
 //            ])
             ->emptyStateHeading(__('panel.messages.no_products'))
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     // ExportBulkAction::make(),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

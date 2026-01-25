@@ -1,7 +1,17 @@
 {
-  "resources/js/index.jsx": {
-    "file": "assets/index-8b4a212e.js",
+  "resources/css/app.css": {
+    "file": "assets/app-4ed993c7.js",
     "isEntry": true,
-    "src": "resources/js/index.jsx"
+    "src": "resources/css/app.css"
+  },
+  "resources/css/filament/admin/custom-sunset-theme.css": {
+    "file": "assets/custom-sunset-theme-1b0b18eb.css",
+    "isEntry": true,
+    "src": "resources/css/filament/admin/custom-sunset-theme.css"
+  },
+  "vendor/andreia/filament-nord-theme/resources/css/theme.css": {
+    "file": "assets/theme-d72df3f0.css",
+    "isEntry": true,
+    "src": "vendor/andreia/filament-nord-theme/resources/css/theme.css"
   }
 }

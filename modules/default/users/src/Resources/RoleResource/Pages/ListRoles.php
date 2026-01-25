@@ -2,18 +2,23 @@
 
 namespace App\UsersModule\Resources\RoleResource\Pages;
 
-use App\UsersModule\Resources\RoleResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use BezhanSalleh\FilamentShield\Resources\Roles\Pages\ListRoles as ShieldListRoles;
+use Filament\Actions\CreateAction;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
-class ListRoles extends ListRecords
+class ListRoles extends ShieldListRoles
 {
-    protected static string $resource = RoleResource::class;
-
-    protected function getActions(): array
+    public function table(Table $table): Table
     {
-        return [
-            Actions\CreateAction::make(),
-        ];
+        $table = parent::table($table);
+        
+        // Hide specific roles from the list
+        $excludedRoles = ['panel_user', 'customer', 'provider'];
+        
+        return $table->modifyQueryUsing(function (Builder $query) use ($excludedRoles) {
+            $query->whereNotIn('name', $excludedRoles);
+        });
     }
 }
+

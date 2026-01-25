@@ -2,6 +2,13 @@
 
 namespace App\ContentModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Maatwebsite\Excel\Excel;
+use Filament\Schemas\Components\Section;
+use App\ContentModule\Resources\JoinRequestResource\Pages\ListJoinRequests;
 use App\ContentModule\Models\JoinRequest;
 use App\ContentModule\Resources\JoinRequestResource\Pages;
 use App\DefaultPanel\Enum\JoinRequestEnum;
@@ -12,10 +19,8 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -35,11 +40,11 @@ class JoinRequestResource extends Resource {
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bars-arrow-up';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bars-arrow-up';
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 SpatieMediaLibraryFileUpload::make('avatar')
                     ->columnSpan(2)
                     ->nullable(),
@@ -112,10 +117,10 @@ class JoinRequestResource extends Resource {
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\Action::make('accept')
+            ->recordActions([
+                Action::make('accept')
                     ->visible(fn($record) => $record->status === JoinRequestEnum::PENDING)
-                    ->form([
+                    ->schema([
                         TextInput::make('data.first_name')
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn($set, $get) => $set('name', $get('data.first_name') . ' ' . $get('data.last_name')))
@@ -198,7 +203,7 @@ class JoinRequestResource extends Resource {
                         // $designer->addMediaFromUrl($record->getFirstMediaUrl())->toMediaCollection();
 
                     }),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->visible(fn($record) => $record->status === JoinRequestEnum::PENDING)
                     ->requiresConfirmation()
                     ->label(__('forms.actions.reject'))
@@ -207,22 +212,22 @@ class JoinRequestResource extends Resource {
                     ->action(fn($record) => $record->update(['status' => JoinRequestEnum::REJECTED])),
 
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     ExportBulkAction::make()->exports([
                         ExcelExport::make('CSV')
                             ->fromTable()
                             ->withFilename(fn() => static::getPluralLabel() . '-' . now()->format('Y-m-d'))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                            ->withWriterType(Excel::XLSX),
                     ]),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist {
-        return $infolist->schema([
-            \Filament\Infolists\Components\Section::make('basic_data')->schema([
+    public static function infolist(Schema $schema): Schema {
+        return $schema->components([
+            Section::make('basic_data')->schema([
                 TextEntry::make('first_name'),
                 TextEntry::make('last_name'),
                 TextEntry::make('phone'),
@@ -242,7 +247,7 @@ class JoinRequestResource extends Resource {
 
     public static function getPages(): array {
         return [
-            'index' => Pages\ListJoinRequests::route('/'),
+            'index' => ListJoinRequests::route('/'),
             //            'create' => Pages\CreateJoinRequest::route('/create'),
             //            'edit' => Pages\EditJoinRequest::route('/{record}/edit'),
         ];

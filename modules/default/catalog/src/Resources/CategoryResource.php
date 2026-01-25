@@ -2,6 +2,20 @@
 
 namespace App\CatalogModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Actions\Action;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
 use App\CatalogModule\Resources\CategoryResource\Pages\CreateCategory;
 use App\CatalogModule\Resources\CategoryResource\Pages\EditCategory;
 use App\CatalogModule\Resources\CategoryResource\Pages\ListCategories;
@@ -12,18 +26,12 @@ use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -39,11 +47,11 @@ class CategoryResource extends Resource implements HasShieldPermissions {
     protected static ?string $model = Category::class;
 //    protected static string $view = 'filament.pages.listing.categories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 3;
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make("basic_information")
                     ->schema([
                         TextInput::make('name')
@@ -52,7 +60,7 @@ class CategoryResource extends Resource implements HasShieldPermissions {
                         SpatieMediaLibraryFileUpload::make('image_ar')->collection('ar')->image()->required(),
                         SpatieMediaLibraryFileUpload::make('image_en')->collection('en')->image()->required(),
 
-                        Forms\Components\Select::make("parent_id")
+                        Select::make("parent_id")
                             ->label(__('forms.fields.category_parent_id'))
                             ->options(fn(Get $get): Collection => Category::where('id', "!=", $get('id'))
                                 ->pluck('name', 'id')),
@@ -86,28 +94,28 @@ class CategoryResource extends Resource implements HasShieldPermissions {
                     ),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])
-            ->actions([
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+            ->recordActions([
+                RestoreAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ]);
     }
 
-    static public function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    static public function infolist(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Section::make()
                     ->schema([
                         TextEntry::make('name'),

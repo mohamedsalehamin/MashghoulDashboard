@@ -2,6 +2,7 @@
 
 namespace App\ContentModule\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\DefaultPanel\Enum\CouponTypes;
 use App\DefaultPanel\Traits\Publishable;
 use App\Models\CouponProduct;
@@ -49,7 +50,7 @@ class Coupon extends Model {
         $this->users()->attach($user->id);
     }
 
-    public function services(): \Illuminate\Database\Eloquent\Relations\HasMany {
+    public function services(): HasMany {
         return $this->hasMany(CouponService::class);
     }
 

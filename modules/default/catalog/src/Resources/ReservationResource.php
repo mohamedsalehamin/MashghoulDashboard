@@ -2,6 +2,16 @@
 
 namespace App\CatalogModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Fieldset;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
 use App\CatalogModule\Resources\ReservationResource\RelationManagers\ItemsLineRelationManager;
@@ -15,22 +25,14 @@ use App\DefaultPanel\Enum\TimesTypeEnum;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\CatalogModule\Resources\ReservationResource\Pages\ListReservations;
 use App\CatalogModule\Resources\ReservationResource\Pages\ViewReservation;
-use App\CatalogModule\Resources\ReservationResource\Widgets\CalendarWidget;
 use App\UsersModule\Models\Doctor;
 use App\UsersModule\Models\Lab;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Fieldset;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -42,10 +44,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use JaOcero\ActivityTimeline\Components\ActivityDate;
-use JaOcero\ActivityTimeline\Components\ActivityIcon;
-use JaOcero\ActivityTimeline\Components\ActivitySection;
-use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use LaraZeus\ActivityTimeline\Components\ActivityDate;
+use LaraZeus\ActivityTimeline\Components\ActivityIcon;
+use LaraZeus\ActivityTimeline\Components\ActivitySection;
+use LaraZeus\ActivityTimeline\Components\ActivityTitle;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ReservationResource extends Resource {
@@ -53,12 +55,12 @@ class ReservationResource extends Resource {
 
     protected static ?string $model = Reservation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form;
+        return $schema;
     }
 
     public static function table(Table $table): Table {
@@ -105,7 +107,7 @@ class ReservationResource extends Resource {
                     ->query(fn(Builder $query): Builder => $query->today())
                     ->default(),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         Select::make('state_id')
                             ->live()
                             ->searchable()
@@ -157,16 +159,16 @@ class ReservationResource extends Resource {
 
             ])
 
-            ->actions([
+            ->recordActions([
 
                 ChangeReservationStatusAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     ExportBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())
@@ -176,9 +178,9 @@ class ReservationResource extends Resource {
     }
 
 
-    static public function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    static public function infolist(Schema $schema): Schema {
+        return $schema
+            ->components([
                 Grid::make()->schema([
                     Group::make([
                         Section::make("basic_information")

@@ -3,11 +3,11 @@
 namespace App\CatalogModule\Resources\ReservationResource\Pages;
 
 
+use Filament\Schemas\Components\Tabs\Tab;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource;
 use App\DefaultPanel\Enum\ReservationStatus;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ListRecords\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 

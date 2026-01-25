@@ -2,6 +2,14 @@
 
 namespace App\ContentModule\Resources;
 
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use Filament\Schemas\Schema;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\CreateAction;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\Slider;
 use App\ContentModule\Resources\BannerResource\Pages\ListBanners;
@@ -14,8 +22,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -36,11 +42,11 @@ class SliderResource extends Resource implements HasShieldPermissions {
 
     protected static ?string $model = Slider::class;
     protected static ?int $navigationSort = 1;
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-photo';
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form->schema([
+        return $schema->components([
 
             SpatieMediaLibraryFileUpload::make('image_ar')
                 ->label(__('forms.fields.image_en'))
@@ -93,7 +99,7 @@ class SliderResource extends Resource implements HasShieldPermissions {
                 IconColumn::make('status')
                     ->boolean()
                     ->action(
-                        \Filament\Tables\Actions\Action::make('Active')
+                        Action::make('Active')
                             ->label(fn(Slider $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
                             ->disabled(fn(Model $record): bool => !filament()->auth()->user()->can('update', $record))
                             ->requiresConfirmation()
@@ -107,17 +113,17 @@ class SliderResource extends Resource implements HasShieldPermissions {
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ]);
     }
 

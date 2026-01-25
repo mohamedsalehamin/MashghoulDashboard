@@ -2,6 +2,7 @@
 
 namespace App\CatalogModule\Models;
 
+use Str;
 use App\DefaultPanel\Enum\TimesTypeEnum;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Publishable;
@@ -83,7 +84,7 @@ class Seat extends Model {
 
               return   $slot->filter(function ($period) {
 
-                    $from = \Str::before($period, " -");
+                    $from = Str::before($period, " -");
 
                     return Carbon::today()->setTimeFromTimeString($from)->isFuture();
                 });
@@ -103,8 +104,8 @@ class Seat extends Model {
                 return collect($slot)
                     ->map(function ($slot) {
                         return [
-                            'from' => \Str::before($slot, " -"),
-                            'to' => \Str::after($slot, " - "),
+                            'from' => Str::before($slot, " -"),
+                            'to' => Str::after($slot, " - "),
                             'reserved' => false
                         ];
                     })->map(function ($slot) use ($reservations) {

@@ -2,10 +2,21 @@
 
 namespace App\UsersModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Schemas\Components\Fieldset;
+use App\UsersModule\Resources\WithdrawalRequestResource\Pages\ListWithdrawalRequests;
+use App\UsersModule\Resources\WithdrawalRequestResource\Pages\ViewWithdrawalRequest;
 use App\UsersModule\Models\WithdrawalRequest;
 use App\UsersModule\Resources\WithdrawalRequestResource\Pages;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,21 +30,19 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Fieldset;
-use Filament\Infolists\Infolist;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use JaOcero\ActivityTimeline\Components\ActivityDate;
-use JaOcero\ActivityTimeline\Components\ActivityIcon;
-use JaOcero\ActivityTimeline\Components\ActivitySection;
-use JaOcero\ActivityTimeline\Components\ActivityTitle;
+use LaraZeus\ActivityTimeline\Components\ActivityDate;
+use LaraZeus\ActivityTimeline\Components\ActivityIcon;
+use LaraZeus\ActivityTimeline\Components\ActivitySection;
+use LaraZeus\ActivityTimeline\Components\ActivityTitle;
 use App\DefaultPanel\Filters\DateFilter;
 class WithdrawalRequestResource extends Resource
 {
     use HasTranslationLabel;
     protected static ?string $model = WithdrawalRequest::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
 
 
 
@@ -63,10 +72,10 @@ class WithdrawalRequestResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
             ]);
     }
 
@@ -74,36 +83,36 @@ class WithdrawalRequestResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(false),
-                Tables\Columns\TextColumn::make('user.name'),
-                Tables\Columns\TextColumn::make('user.phone')
+                TextColumn::make('user.name'),
+                TextColumn::make('user.phone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('amount')
+                TextColumn::make('amount')
                     ->money('SAR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('transfer_amount')
+                TextColumn::make('transfer_amount')
                     ->money('SAR')
                     ->sortable(),
                 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                 ->color(fn($record) => $record?->status?->getColor())
                 ->badge(),
                 
             ])
             ->filters([
                 DateFilter::make(),
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options(WalletWithdrawEnum::toArray())
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('accept')
+            ->recordActions([
+                ViewAction::make(),
+                Action::make('accept')
                     ->icon('heroicon-o-check')
                     ->visible(fn($record) => $record->status == WalletWithdrawEnum::PENDING)
                     ->requiresConfirmation()
@@ -111,18 +120,18 @@ class WithdrawalRequestResource extends Resource
                         $record->update(['status' => WalletWithdrawEnum::WAITING_TRANSFER]);
                     })
                     ->label(__('forms.actions.accept')),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->icon('heroicon-o-x-mark')
                     ->visible(fn($record) => $record->status != WalletWithdrawEnum::TRANSFERRED  && $record->status != WalletWithdrawEnum::WAITING_TRANSFER && $record->status != WalletWithdrawEnum::REJECTED)
                     ->requiresConfirmation()
-                    ->form([
-                        Forms\Components\Textarea::make('rejection_reason.ar')
+                    ->schema([
+                        Textarea::make('rejection_reason.ar')
                             ->label(__("forms.fields.reason_ar"))
                             ->required()
                             ->rows(5)
                             ->maxLength(150)
                             ->minLength(10),
-                        Forms\Components\Textarea::make('rejection_reason.en')
+                        Textarea::make('rejection_reason.en')
                             ->label(__("forms.fields.reason_en"))
                             ->required()
                             ->rows(5)
@@ -140,23 +149,23 @@ class WithdrawalRequestResource extends Resource
 
                     })
                     ->label(__('forms.actions.reject')),
-                Tables\Actions\Action::make('transfer')
+                Action::make('transfer')
                     ->icon('heroicon-o-currency-dollar')
                     ->visible(fn($record) => $record->status == WalletWithdrawEnum::WAITING_TRANSFER)
-                    ->form([
-                        Forms\Components\TextInput::make('transfer_amount')
+                    ->schema([
+                        TextInput::make('transfer_amount')
                             ->live(onBlur: true)
                             ->numeric()
                             ->minValue(1)
                             ->maxValue(fn ($record) => $record->user->wallet->balance)
                             ->required(),
                         
-                        Forms\Components\Textarea::make('notes.ar')
+                        Textarea::make('notes.ar')
                             ->label(__("forms.fields.reason_ar"))
                             ->rows(5)
                             ->maxLength(150)
                             ->minLength(10),
-                        Forms\Components\Textarea::make('notes.en')
+                        Textarea::make('notes.en')
                             ->label(__("forms.fields.reason_en"))
                             ->rows(5)
                             ->maxLength(150)
@@ -195,16 +204,16 @@ class WithdrawalRequestResource extends Resource
                     })
                     ->label(__('forms.actions.transfer'))
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
-    static public function infolist(Infolist $infolist): Infolist
+    static public function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 TextEntry::make('id'),
                 TextEntry::make('created_at'),
                 TextEntry::make('user.name')->label(__('forms.fields.name')),
@@ -252,8 +261,8 @@ class WithdrawalRequestResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWithdrawalRequests::route('/'),
-            'view' => Pages\ViewWithdrawalRequest::route('/{record}'),
+            'index' => ListWithdrawalRequests::route('/'),
+            'view' => ViewWithdrawalRequest::route('/{record}'),
         ];
     }
 

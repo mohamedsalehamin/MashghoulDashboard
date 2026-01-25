@@ -2,10 +2,10 @@
 
 namespace App\ContentModule\Resources\SliderResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 use App\ContentModule\Resources\BannerResource;
 use App\ContentModule\Resources\SliderResource;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\CreateRecord\Concerns\Translatable;
 
 class CreateSlier extends CreateRecord {
     use Translatable;

@@ -2,12 +2,13 @@
 
 namespace App\ContentModule\Resources\CityResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\ContentModule\Resources\CityResource;
-use Filament\Actions\LocaleSwitcher;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCity extends CreateRecord {
-    use CreateRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = CityResource::class;
 

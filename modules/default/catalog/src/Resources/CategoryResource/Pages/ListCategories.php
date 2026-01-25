@@ -2,6 +2,8 @@
 
 namespace App\CatalogModule\Resources\CategoryResource\Pages;
 
+use Filament\Actions\CreateAction;
+use Illuminate\Database\Eloquent\Builder;
 use App\CatalogModule\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -10,17 +12,17 @@ class ListCategories extends ListRecords {
 
     protected static string $resource = CategoryResource::class;
 
-    protected static string $view = 'filament.pages.listing.categories';
+    protected string $view = 'filament.pages.listing.categories';
 
     protected function getHeaderActions(): array {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
 //            Actions\LocaleSwitcher::make(),
         ];
     }
 
 
-    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder {
+    protected function getTableQuery(): Builder {
         return parent::getTableQuery()->parent();
     }
 

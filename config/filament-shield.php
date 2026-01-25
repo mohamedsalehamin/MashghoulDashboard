@@ -2,80 +2,97 @@
 
 return [
     'shield_resource' => [
-        'should_register_navigation' => false,
         'slug' => 'shield/roles',
-        'navigation_sort' => 1000,
-        'navigation_badge' => true,
-        'navigation_group' => true,
-        'is_globally_searchable' => false,
         'show_model_path' => true,
+        'cluster' => null,
+        'tabs' => [
+            'pages' => true,
+            'widgets' => true,
+            'resources' => true,
+            'custom_permissions' => false,
+        ],
     ],
 
-    'auth_provider_model' => [
-        'fqcn' => 'App\\Models\\User',
-    ],
+    'tenant_model' => null,
+
+    'auth_provider_model' => 'App\\Models\\User',
 
     'super_admin' => [
         'enabled' => true,
         'name' => 'super_admin',
         'define_via_gate' => false,
-        'intercept_gate' => 'before', // after
+        'intercept_gate' => 'before',
     ],
 
-    'filament_user' => [
+    'panel_user' => [
         'enabled' => false,
-        'name' => 'filament_user',
+        'name' => 'panel_user',
     ],
 
-    'permission_prefixes' => [
-        'resource' => [
-            'view_any',
-            'view',
+    'permissions' => [
+        'separator' => ':',
+        'case' => 'pascal',
+        'generate' => true,
+    ],
+
+    'policies' => [
+        'path' => app_path('Policies'),
+        'merge' => true,
+        'generate' => true,
+        'methods' => [
+            'viewAny', 'view', 'create', 'update', 'delete', 'restore',
+            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+        ],
+        'single_parameter_methods' => [
+            'viewAny',
             'create',
-            'update',
-            'restore',
-            'restore_any',
-//            'replicate',
-//            'reorder',
-            'delete',
-            'delete_any',
-            'force_delete',
-            'force_delete_any',
-        ],
-
-        'page' => 'page',
-        'widget' => 'widget',
-    ],
-
-    'entities' => [
-        'pages' => true,
-        'widgets' => true,
-        'resources' => true,
-        'custom_permissions' => false,
-    ],
-
-    'generator' => [
-        'option' => 'policies_and_permissions',
-    ],
-
-    'exclude' => [
-        'enabled' => true,
-
-        'pages' => [
-            'Dashboard',
-        ],
-
-        'widgets' => [
-            'AccountWidget', 'FilamentInfoWidget',
-        ],
-
-        'resources' => [
-
+            'deleteAny',
+            'forceDeleteAny',
+            'restoreAny',
+            'reorder',
         ],
     ],
 
-    'register_role_policy' => [
-        'enabled' => true,
+    'localization' => [
+        'enabled' => false,
+        'key' => 'filament-shield::filament-shield.resource_permission_prefixes_labels',
     ],
+
+    'resources' => [
+        'subject' => 'model',
+        'manage' => [
+            //
+        ],
+        'exclude' => [
+            //
+        ],
+    ],
+
+    'pages' => [
+        'subject' => 'class',
+        'prefix' => 'view',
+        'exclude' => [
+            \Filament\Pages\Dashboard::class,
+        ],
+    ],
+
+    'widgets' => [
+        'subject' => 'class',
+        'prefix' => 'view',
+        'exclude' => [
+            \Filament\Widgets\AccountWidget::class,
+            \Filament\Widgets\FilamentInfoWidget::class,
+        ],
+    ],
+
+    'custom_permissions' => [],
+
+    'discovery' => [
+        'discover_all_resources' => false,
+        'discover_all_widgets' => false,
+        'discover_all_pages' => false,
+    ],
+
+    'register_role_policy' => true,
 
 ];

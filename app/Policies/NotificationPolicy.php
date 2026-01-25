@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Notification;
+use App\UsersModule\Models\Users\Provider;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class NotificationPolicy
@@ -13,139 +14,199 @@ class NotificationPolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_notification');
+        // For provider panel, allow if user is provider (can view their own notifications)
+        if ($user->hasRole(Provider::ROLE)) {
+            return true;
+        }
+        
+        return $user->can('ViewAny:Notification');
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function view(User $user, Notification $notification): bool
     {
-        return $user->can('view_notification');
+        // For provider panel, allow if user is provider and notification belongs to them
+        if ($user->hasRole(Provider::ROLE)) {
+            return $notification->notifiable_id === $user->id;
+        }
+        
+        return $user->can('View:Notification');
     }
 
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('{{ Create }}');
+        // Notifications are created by system, not by users
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('Create:Notification');
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function update(User $user, Notification $notification): bool
     {
-        return $user->can('{{ Update }}');
+        // Notifications can't be updated
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('Update:Notification');
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function delete(User $user, Notification $notification): bool
     {
-        return $user->can('delete_notification');
+        // For provider panel, allow if user is provider and notification belongs to them
+        if ($user->hasRole(Provider::ROLE)) {
+            return $notification->notifiable_id === $user->id;
+        }
+        
+        return $user->can('Delete:Notification');
     }
 
     /**
      * Determine whether the user can bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_notification');
+        // For provider panel, allow if user is provider (can delete their own notifications)
+        if ($user->hasRole(Provider::ROLE)) {
+            return true;
+        }
+        
+        return $user->can('DeleteAny:Notification');
     }
 
     /**
      * Determine whether the user can permanently delete.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function forceDelete(User $user, Notification $notification): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        // Providers shouldn't force delete notifications
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('ForceDelete:Notification');
     }
 
     /**
      * Determine whether the user can permanently bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        // Providers shouldn't force delete notifications
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('ForceDeleteAny:Notification');
     }
 
     /**
      * Determine whether the user can restore.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function restore(User $user, Notification $notification): bool
     {
-        return $user->can('{{ Restore }}');
+        // Notifications can't be restored
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('Restore:Notification');
     }
 
     /**
      * Determine whether the user can bulk restore.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        // Notifications can't be restored
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('RestoreAny:Notification');
     }
 
     /**
      * Determine whether the user can replicate.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Notification  $notification
+     * @param User $user
+     * @param Notification $notification
      * @return bool
      */
     public function replicate(User $user, Notification $notification): bool
     {
-        return $user->can('{{ Replicate }}');
+        // Notifications can't be replicated
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('Replicate:Notification');
     }
 
     /**
      * Determine whether the user can reorder.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        // Notifications can't be reordered
+        if ($user->hasRole(Provider::ROLE)) {
+            return false;
+        }
+        
+        return $user->can('Reorder:Notification');
     }
 
 }

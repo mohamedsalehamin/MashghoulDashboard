@@ -2,6 +2,8 @@
 
 namespace App\UsersModule\Resources\ProviderResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
 use App\DefaultPanel\Enum\ServicesTypeEnum;
 use App\UsersModule\Models\Doctor;
 use Cknow\Money\Money;
@@ -10,7 +12,6 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -23,9 +24,9 @@ class ReservationsRelationManager extends RelationManager {
     protected static string $relationship = 'reservations';
     protected static bool $shouldSkipAuthorization = true;
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
 
                 TextInput::make('name')->required(),
                 SpatieMediaLibraryFileUpload::make('image'),
@@ -65,8 +66,8 @@ class ReservationsRelationManager extends RelationManager {
                 TextColumn::make('price'),
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()->url(fn(Model $record) => route('filament.doctor-panel.resources.reservations.view', $record->id)),
+            ->recordActions([
+                ViewAction::make()->url(fn(Model $record) => route('filament.doctor-panel.resources.reservations.view', $record->id)),
             ]);
     }
 

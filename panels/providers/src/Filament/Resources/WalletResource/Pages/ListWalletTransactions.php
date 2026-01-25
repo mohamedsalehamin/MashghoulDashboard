@@ -2,6 +2,7 @@
 
 namespace App\ProviderPanel\Filament\Resources\WalletResource\Pages;
 
+use Filament\Schemas\Components\Tabs\Tab;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Lib\Utils;
 use App\Notifications\ProviderDuesNotification;
@@ -10,7 +11,6 @@ use App\ProviderPanel\Filament\Resources\WalletResource\Widgets\WalletSummary;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ListRecords\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 

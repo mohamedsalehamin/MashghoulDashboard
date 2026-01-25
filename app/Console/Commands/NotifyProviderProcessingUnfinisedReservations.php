@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Log;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\AddPointToCustomerAction;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -37,7 +38,7 @@ class NotifyProviderProcessingUnfinisedReservations extends Command {
             $i++;
             $reservation->reservable->user->notify->notify(new ReservationProcessingUnfinisedNotification($reservation));
         }
-        \Log::info("NotifyProviderProcessingUnfinisedReservations $i");
+        Log::info("NotifyProviderProcessingUnfinisedReservations $i");
         $this->info("NotifyProviderProcessingUnfinisedReservations $i");
     }
 }

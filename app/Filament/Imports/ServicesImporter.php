@@ -2,6 +2,7 @@
 
 namespace App\Filament\Imports;
 
+use Exception;
 use App\CatalogModule\Models\Service;
 use App\Models\Services;
 use App\UsersModule\Models\Provider;
@@ -110,7 +111,7 @@ class ServicesImporter extends Importer {
             try {
                 $this->record->addMediaFromUrl($this->data['image'])->toMediaCollection();
 
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
 
             }
         }

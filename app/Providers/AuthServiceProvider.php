@@ -19,7 +19,7 @@ use App\ContentModule\Models\Page;
 use App\ContentModule\Models\WholesaleRequest;
 use App\CrmModule\Models\AddressBook;
 use App\CrmModule\Models\Coupon;
-use App\CrmModule\Models\Customer;
+use App\CrmModule\Models\Customer as CrmCustomer;
 use App\Policies\AddressBookPolicy;
 use App\Policies\BannerPolicy;
 use App\Policies\BranchPolicy;
@@ -44,7 +44,14 @@ use App\Policies\WholesaleRequestPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Spatie\Permission\Models\Role;
 use App\Policies\WithdrawalRequestPolicy;
+use App\Policies\ServicePolicy;
+use App\Policies\SeatPolicy;
+use App\Policies\NotificationPolicy;
 use App\UsersModule\Models\WithdrawalRequest;
+use App\CatalogModule\Models\Service;
+use App\CatalogModule\Models\Seat;
+use App\UsersModule\Models\Users\Customer;
+use App\Models\Notification;
 class AuthServiceProvider extends ServiceProvider {
     /**
      * The model to policy mappings for the application.
@@ -64,6 +71,11 @@ class AuthServiceProvider extends ServiceProvider {
         Reservation::class=>ReservationPolicy::class,
         JoinRequest::class=>JoinRequestPolicy::class,
         WithdrawalRequest::class => WithdrawalRequestPolicy::class,
+        
+        Service::class => ServicePolicy::class,
+        Seat::class => SeatPolicy::class,
+        Customer::class => CustomerPolicy::class,
+        Notification::class => NotificationPolicy::class,
 
 
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 class DateFilter {
     public static function make() {
         return Filter::make('created_at')
-            ->form([
+            ->schema([
                 DatePicker::make('date_from'),
                 DatePicker::make('date_until'),
             ])

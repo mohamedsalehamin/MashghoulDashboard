@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Customer\User;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use function App\Http\Resources\Api\Customer\User\setting_user;
 use function App\Http\Resources\Api\Customer\User\upload_storage_url;
@@ -11,7 +12,7 @@ class UserResources extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request) {

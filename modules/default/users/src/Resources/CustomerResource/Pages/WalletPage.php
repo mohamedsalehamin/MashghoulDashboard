@@ -2,6 +2,8 @@
 
 namespace App\UsersModule\Resources\CustomerResource\Pages;
 
+use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\Action;
 use App\UsersModule\Resources\CustomerResource;
 use App\UsersModule\Resources\CustomerResource\Widgets\WalletStats;
 use Filament\Forms\Components\DatePicker;
@@ -17,7 +19,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Theamostafa\Wallet\Models\Transaction;
-use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 class WalletPage extends Page implements HasTable {
@@ -26,10 +27,10 @@ class WalletPage extends Page implements HasTable {
     use InteractsWithTable;
 
 //    public ?array $tableFilters = null;
-    public string|int|null|\Illuminate\Database\Eloquent\Model $record;
+    public string|int|null|Model $record;
 
 
-    protected static string $view = 'filament-panels::resources.pages.list-records';
+    protected string $view = 'filament-panels::resources.pages.list-records';
 
     protected static string $resource = CustomerResource::class;
 
@@ -47,7 +48,7 @@ class WalletPage extends Page implements HasTable {
                         'withdraw' => __('panel.enums.withdraw'),
                     ]),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('date_from'),
                         DatePicker::make('date_to'),
                     ])
@@ -67,7 +68,7 @@ class WalletPage extends Page implements HasTable {
                 Action::make('pay')
                     ->visible(fn() => $this->record->wallet->balance > 0)
                     ->label(__('panel.enums.withdraw'))
-                    ->form([
+                    ->schema([
                         TextInput::make('amount')
                             // ->rules(['lte:' . $this->record->wallet->balance])
                             ->label(__('forms.fields.amount'))

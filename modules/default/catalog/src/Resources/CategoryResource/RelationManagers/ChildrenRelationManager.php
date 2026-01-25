@@ -2,13 +2,15 @@
 
 namespace App\CatalogModule\Resources\CategoryResource\RelationManagers;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
 use App\ContentModule\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -16,13 +18,13 @@ use Illuminate\Database\Eloquent\Model;
 class ChildrenRelationManager extends RelationManager {
     protected static string $relationship = 'children';
 
-    public function form(Form $form): Form {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('id')
+    public function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                TextInput::make('id')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -33,8 +35,8 @@ class ChildrenRelationManager extends RelationManager {
             ->recordTitleAttribute('id')
             ->heading(__('menu.categories'))
             ->columns([
-                Tables\Columns\TextColumn::make('id')->toggleable(false),
-                Tables\Columns\TextColumn::make('name')->toggleable(false),
+                TextColumn::make('id')->toggleable(false),
+                TextColumn::make('name')->toggleable(false),
                 IconColumn::make('status')
                     ->boolean()
                     ->action(
@@ -51,12 +53,12 @@ class ChildrenRelationManager extends RelationManager {
             ])
             ->headerActions([
             ])
-            ->actions([
+            ->recordActions([
 
-                Tables\Actions\Action::make('edit')
+                Action::make('edit')
                     ->label(__('forms.fields.edit'))
                     ->url(fn(Category $record): string => route('filament.admin.resources.categories.edit', $record->id)),
-                Tables\Actions\Action::make('delete')
+                Action::make('delete')
                     ->label(__('panel.actions.delete'))
                     ->color('danger')
                     ->before(function ($action, Category $category) {
@@ -72,7 +74,7 @@ class ChildrenRelationManager extends RelationManager {
                     })
                     ->action(fn(Category $record) => $record->delete()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
 
             ])
             ->emptyStateActions([

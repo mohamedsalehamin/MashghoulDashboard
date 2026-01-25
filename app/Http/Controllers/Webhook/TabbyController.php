@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Webhook;
 
+use Exception;
 use App\CatalogModule\Models\Transaction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -147,7 +148,7 @@ class TabbyController extends Controller
                     'message' => $e->getMessage()
                 ], 500);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby webhook error: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
@@ -189,7 +190,7 @@ class TabbyController extends Controller
             // Proceed with capture (verification already done in success method)
             return CaptureTabbyPayment::run($transaction);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby capture webhook error: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
@@ -224,7 +225,7 @@ class TabbyController extends Controller
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby cancel webhook error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }
@@ -256,7 +257,7 @@ class TabbyController extends Controller
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby failure webhook error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }

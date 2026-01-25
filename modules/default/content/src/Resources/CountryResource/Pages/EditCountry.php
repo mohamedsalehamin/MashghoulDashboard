@@ -2,18 +2,20 @@
 
 namespace App\ContentModule\Resources\CountryResource\Pages;
 
+use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\ContentModule\Resources\CountryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCountry extends EditRecord {
-    use EditRecord\Concerns\Translatable;
+    use Translatable;
 
     protected static string $resource = CountryResource::class;
 
     protected function getHeaderActions(): array {
         return [
-            Actions\LocaleSwitcher::make(),
+            LocaleSwitcher::make(),
         ];
     }
 

@@ -1,11 +1,13 @@
 <?php
 namespace App\UtilitiesModule\Pages;
+use Filament\Schemas\Components\Section;
+use Exception;
+use Filament\Notifications\Notification;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\Mail\SendEmailNotification;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,8 +21,8 @@ use Illuminate\Support\Facades\Log;
 class SendEmail extends Page implements HasForms {
     use HasPageShield, HasTranslationLabel, InteractsWithForms, NotificationChannels;
     protected static ?int $navigationSort = 3;
-    protected static ?string $navigationIcon = 'heroicon-o-at-symbol';
-    protected static string $view = 'filament.pages.send-email';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-at-symbol';
+    protected string $view = 'filament.pages.send-email';
     public string $titlee = '';
     public string $messagee = '';
     public array $notifiable = [];
@@ -81,7 +83,7 @@ class SendEmail extends Page implements HasForms {
                 Log::info('✓ Email sent successfully to: ' . $user->email);
                 $successCount++;
                 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('✗ Failed to send email to: ' . $user->email);
                 Log::error('Error: ' . $e->getMessage());
                 Log::error('Stack trace: ' . $e->getTraceAsString());
@@ -93,7 +95,7 @@ class SendEmail extends Page implements HasForms {
         Log::info("Success: $successCount, Failed: $failCount");
         
         $this->resetExcept('');
-        \Filament\Notifications\Notification::make()->title(__('panel.messages.success'))
+        Notification::make()->title(__('panel.messages.success'))
             ->body(__('panel.messages.sms_email_successfully'))
             ->success()
             ->send();

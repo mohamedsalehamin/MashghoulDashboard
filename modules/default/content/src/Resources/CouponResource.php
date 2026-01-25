@@ -2,6 +2,19 @@
 
 namespace App\ContentModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Hidden;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\ContentModule\Resources\CouponResource\Pages\ListCoupons;
+use App\ContentModule\Resources\CouponResource\Pages\CreateCoupon;
+use App\ContentModule\Resources\CouponResource\Pages\EditCoupon;
+use App\ContentModule\Resources\CouponResource\Pages\ViewCoupon;
 use App\ContentModule\Models\Coupon;
 use App\ContentModule\Resources;
 use App\ContentModule\Resources\CouponResource\RelationManagers\ServicesRelationManager;
@@ -16,14 +29,10 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -36,19 +45,19 @@ class CouponResource extends Resource implements HasShieldPermissions {
 
     protected static ?int $navigationSort = 3;
     protected static ?string $model = Coupon::class;
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
-                Forms\Components\Section::make("general")->schema([
-                    Forms\Components\Hidden::make('name')->default('name'),
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
+                Section::make("general")->schema([
+                    Hidden::make('name')->default('name'),
 
                     TextInput::make('code')
                         ->label(__('forms.fields.coupon_code'))
                         ->required(),
 
-                    Forms\Components\Select::make('discount_type')
+                    Select::make('discount_type')
                         ->live()
                         ->options(CouponTypes::class)
                         ->default(CouponTypes::FIXED),
@@ -60,12 +69,12 @@ class CouponResource extends Resource implements HasShieldPermissions {
                             fn($get) => $get('discount_type') == CouponTypes::FIXED ? 'max:' . $get('meta_data.min_order_value') : '',
                             fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE ? 'max:100' : '',
                         ]),
-                    Forms\Components\DatePicker::make('start_date')
+                    DatePicker::make('start_date')
                         ->date()
                         ->rule(fn($operation) => $operation == 'create' ? 'after_or_equal:' . today()->format('Y-m-d') : ['required'])
                         ->required(),
 
-                    Forms\Components\DatePicker::make('end_date')
+                    DatePicker::make('end_date')
                         ->rules(['after:start_date'])
                         ->required(),
 
@@ -74,16 +83,16 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->minLength(1)
                         ->required(),
 
-                    Forms\Components\TextInput::make('usage_per_user')
+                    TextInput::make('usage_per_user')
                         ->numeric()
                         ->required()
                         ->default(1),
-                    Forms\Components\TextInput::make('meta_data.min_order_value')
+                    TextInput::make('meta_data.min_order_value')
                         ->label(__('forms.fields.min_order_value'))
                         ->numeric()
                         ->required()
                         ->default(1),
-                    Forms\Components\TextInput::make('meta_data.max_discount')
+                    TextInput::make('meta_data.max_discount')
                         ->label(__('forms.fields.max_discount'))
                         ->visible(fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE)
                         ->numeric()
@@ -133,7 +142,7 @@ class CouponResource extends Resource implements HasShieldPermissions {
                 SelectFilter::make('status')
                     ->options(ModelStatus::class),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('start_date'),
                         DatePicker::make('end_date'),
                     ])
@@ -150,20 +159,20 @@ class CouponResource extends Resource implements HasShieldPermissions {
                     })
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist {
-        return $infolist->schema([
+    public static function infolist(Schema $schema): Schema {
+        return $schema->components([
             Section::make('basic_data')->schema([
                 TextEntry::make('id'),
                 TextEntry::make('code')->label(__("forms.fields.coupon_code")),
@@ -198,10 +207,10 @@ class CouponResource extends Resource implements HasShieldPermissions {
 
     public static function getPages(): array {
         return [
-            'index' => Resources\CouponResource\Pages\ListCoupons::route('/'),
-            'create' => Resources\CouponResource\Pages\CreateCoupon::route('/create'),
-            'edit' => Resources\CouponResource\Pages\EditCoupon::route('/{record}/edit'),
-            'view' => Resources\CouponResource\Pages\ViewCoupon::route('/{record}/view'),
+            'index' => ListCoupons::route('/'),
+            'create' => CreateCoupon::route('/create'),
+            'edit' => EditCoupon::route('/{record}/edit'),
+            'view' => ViewCoupon::route('/{record}/view'),
         ];
     }
 

@@ -3,6 +3,15 @@
 namespace App\ContentModule\Resources;
 
 
+use Filament\Schemas\Schema;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Maatwebsite\Excel\Excel;
+use Filament\Actions\DeleteBulkAction;
+use App\ContentModule\Resources\ContactResource\Pages\ListContacts;
 use App\ContentModule\Models\ContactType;
 use App\DefaultPanel\Enum\ContactSourceEnum;
 use App\DefaultPanel\Filters\DateFilter;
@@ -11,10 +20,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,12 +36,12 @@ class ContactResource extends Resource implements HasShieldPermissions {
 
     protected static ?string $model = Contact::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 TextInput::make('title')
                     ->required()
                     ->autocomplete("off"),
@@ -103,37 +110,37 @@ class ContactResource extends Resource implements HasShieldPermissions {
 
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('contact_type_id')
+                SelectFilter::make('contact_type_id')
                     ->label(__('forms.fields.message_type'))
                     ->searchable()
                     ->options(ContactType::pluck('name', 'id')),
                 DateFilter::make()
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('seen')
                     ->visible(fn(Model $record) => !$record->seen)
                     ->label(__('forms.fields.mark_as_seen'))
                     ->hidden(fn(Model $record): bool => !auth()->user()->can('update', $record))
                     ->action(fn(Model $record) => $record->update(['seen' => 1])),
 
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                DeleteAction::make(),
 
 
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     ExportBulkAction::make()->exports([
                         ExcelExport::make("CSV")
                             ->fromTable()
                             ->withFilename(fn() => static::getPluralLabel() . '-' . now()->format('Y-m-d'))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                            ->withWriterType(Excel::XLSX),
 
 
                     ]),
 
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
 
 
                 ]),
@@ -152,7 +159,7 @@ class ContactResource extends Resource implements HasShieldPermissions {
 
     public static function getPages(): array {
         return [
-            'index' => \App\ContentModule\Resources\ContactResource\Pages\ListContacts::route('/'),
+            'index' => ListContacts::route('/'),
         ];
     }
 

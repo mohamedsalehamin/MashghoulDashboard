@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Requests\Api\Customer\Profile;
 
+use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileRequest extends FormRequest {
@@ -28,10 +29,10 @@ class ProfileRequest extends FormRequest {
             $return['name'] = 'required';
         }
         if(request()->has('email')) {
-            $return['email'] = 'required|email|unique:users,email,'.\Auth::user()->id;
+            $return['email'] = 'required|email|unique:users,email,'.Auth::user()->id;
         }
         if(request()->has('phone')) {
-            $return['phone'] = 'required|unique:users,phone,'.\Auth::user()->id;
+            $return['phone'] = 'required|unique:users,phone,'.Auth::user()->id;
         }
         if (request()->has('password')){
             $return['password'] =  'required|confirmed|min:6';

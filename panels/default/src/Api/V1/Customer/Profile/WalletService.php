@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Api\V1\Customer\Profile;
 
+use Exception;
 use App\ContentModule\Models\Point;
 use App\DefaultPanel\Actions\Shared\Authentication\ChangeUserPhone;
 use App\DefaultPanel\Actions\Shared\Authentication\RemoveVerficationCodes;
@@ -95,7 +96,7 @@ class WalletService {
 
             return Api::isOk(__('Withdrawal request created successfully'))
                 ->setData(new WithdrawalRequestResource($withdrawalRequest));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Api::isError(__('Failed to create withdrawal request'));
         }
     }

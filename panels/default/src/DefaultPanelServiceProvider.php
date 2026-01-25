@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel;
 
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use App\CatalogModule\CatalogPlugin;
 use App\CatalogModule\Resources\ConsultingReservationResource\Widgets\DoctorReservationsChart;
 use App\CatalogModule\Resources\ConsultingReservationResource\Widgets\DoctorReservationsCountChart;
@@ -33,10 +34,7 @@ use Filament\Notifications\Notification as BaseNotification;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
-use Hasnayeen\Themes\Http\Middleware\SetTheme;
-use Hasnayeen\Themes\ThemesPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -46,6 +44,11 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Models\Role;
 use Storage;
+use Juniyasyos\DashStackTheme\DashStackThemePlugin;
+use KSeven\FilamentSevenTheme\FilamentSevenTheme;
+use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
+use App\DefaultPanel\CustomNordThemePlugin;
+
 
 class DefaultPanelServiceProvider extends PanelProvider {
 
@@ -91,7 +94,19 @@ class DefaultPanelServiceProvider extends PanelProvider {
 
             ])
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => [
+                50 => '#FFF7ED',  // rgb(255, 247, 237)
+                100 => '#FFEDD5', // rgb(255, 237, 213)
+                200 => '#FED7AA', // rgb(254, 215, 170)
+                300 => '#FDB874', // rgb(253, 186, 116)
+                400 => '#FB923C', // rgb(251, 146, 60)
+                500 => '#F97316', // rgb(249, 115, 22)
+                600 => '#EA580C', // rgb(234, 88, 12)
+                700 => '#C2410C', // rgb(194, 65, 12)
+                800 => '#9A3412', // rgb(154, 52, 18)
+                900 => '#7C2D12', // rgb(124, 45, 18)
+                950 => '#431407', // rgb(67, 20, 7)
+            ],
                 'danger' => Color::Red,
                 'gray' => Color::Gray,
                 'info' => Color::Blue,
@@ -109,11 +124,12 @@ class DefaultPanelServiceProvider extends PanelProvider {
             })
             ->brandName(env("app_name"))
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->plugins([
-                FilamentShieldPlugin::make(),
-                SpatieLaravelTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
 
-                ThemesPlugin::make()->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
+            ->plugins([
+                FilamentShieldPlugin::make()->registerNavigation(false),
+                SpatieTranslatablePlugin::make()->defaultLocales(['en', 'ar']),
+                CustomNordThemePlugin::make(),
+                // ThemesPlugin::make(),//->canViewThemesPage(fn() => auth()?->user()?->email === 'ahmed.mostafa.dev.eg@gmail.com'),
                 CatalogPlugin::make(),
                 ContentPlugin::make(),
                 ReportsPlugin::make(),
@@ -142,7 +158,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetTheme::class,
+                // SetTheme::class,
             ])
             ->widgets([
                 CustomersChart::class,
@@ -151,7 +167,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
 //                Contacts::class
 
             ])
-            ->darkMode(false)
+            ->darkMode(true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

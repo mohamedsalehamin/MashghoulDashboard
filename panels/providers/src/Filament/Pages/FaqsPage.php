@@ -2,6 +2,7 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Faq;
 use App\DefaultPanel\Enum\FaqLocationEnum;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -10,15 +11,15 @@ use Filament\Pages\Page;
 
 class FaqsPage extends Page {
     public $faqs;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.pages.content.faqs';
+    protected string $view = 'filament.pages.content.faqs';
 
     public function getTitle(): string {
         return __('menu.faqs');
     }
 
-    public function get(): \Illuminate\Contracts\Support\Htmlable|string {
+    public function get(): Htmlable|string {
         return __('menu.faqs');
     }
     public static function getNavigationGroup(): ?string {

@@ -6,9 +6,12 @@ export default defineConfig({
     plugins: [
         react(),
         laravel({
-            input: ['resources/js/index.jsx'],
+            input: [
+                'resources/css/app.css',
+                'vendor/andreia/filament-nord-theme/resources/css/theme.css',
+                'resources/css/filament/admin/custom-sunset-theme.css',
+            ],
             refresh: true,
         }),
-
     ],
 });

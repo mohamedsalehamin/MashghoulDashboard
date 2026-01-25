@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Actions;
 
+use Exception;
 use App\CatalogModule\Models\Transaction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -94,7 +95,7 @@ class CaptureTabbyPayment
                 'message' => $e->getMessage()
             ], 500);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Tabby capture error', [
                 'transaction_id' => $transaction->id,
                 'error' => $e->getMessage(),

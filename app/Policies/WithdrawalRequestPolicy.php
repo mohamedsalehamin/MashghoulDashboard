@@ -13,26 +13,26 @@ class WithdrawalRequestPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_withdrawal::request');
+        return $user->can('ViewAny:WithdrawalRequest');
     }
 
     public function view(User $user, WithdrawalRequest $withdrawalRequest): bool
     {
-        return $user->can('view_withdrawal::request') || $user->id === $withdrawalRequest->user_id;
+        return $user->can('View:WithdrawalRequest') || $user->id === $withdrawalRequest->user_id;
     }
 
     public function create(User $user): bool
     {
-        return $user->can('create_withdrawal::request') && !$user->hasPendingWithdrawalRequest();
+        return $user->can('Create:WithdrawalRequest') && !$user->hasPendingWithdrawalRequest();
     }
 
     public function update(User $user, WithdrawalRequest $withdrawalRequest): bool
     {
-        return $user->can('update_withdrawal::request');
+        return $user->can('Update:WithdrawalRequest');
     }
 
     public function delete(User $user, WithdrawalRequest $withdrawalRequest): bool
     {
-        return $user->can('delete_withdrawal::request');
+        return $user->can('Delete:WithdrawalRequest');
     }
 } 

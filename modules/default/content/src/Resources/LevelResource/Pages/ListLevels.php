@@ -2,6 +2,7 @@
 
 namespace App\ContentModule\Resources\LevelResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\ContentModule\Resources\LevelResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -13,7 +14,7 @@ class ListLevels extends ListRecords {
 
     protected function getHeaderActions(): array {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
 //            Actions\LocaleSwitcher::make(),
         ];
     }

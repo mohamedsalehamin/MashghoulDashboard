@@ -2,11 +2,12 @@
 
 namespace App\UtilitiesModule\Pages;
 
+use Filament\Schemas\Components\Section;
+use Filament\Notifications\Notification;
 use App\DefaultPanel\Lib\SMS;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -20,9 +21,9 @@ class SendSMS extends Page implements HasForms {
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    protected static string $view = 'filament.pages.send-sms';
+    protected string $view = 'filament.pages.send-sms';
 
     public string $sms_body;
 
@@ -61,7 +62,7 @@ class SendSMS extends Page implements HasForms {
         // $this->reset($this->except(''));
         $this->resetExcept('');
 
-        \Filament\Notifications\Notification::make()->title(__('panel.messages.success'))
+        Notification::make()->title(__('panel.messages.success'))
             ->body(__('panel.messages.sms_sent_successfully'))
             ->success()
             ->send();

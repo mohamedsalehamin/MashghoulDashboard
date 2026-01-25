@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use App\CatalogModule\Models\Transaction;
 use App\CatalogModule\Models\Reservation;
 use App\DefaultPanel\Actions\CaptureTabbyPayment;
@@ -104,7 +105,7 @@ class CaptureTabbyPendingTransactions extends Command
                     ]);
                 }
                 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error("  - Exception capturing transaction ID: {$transaction->id} - {$e->getMessage()}");
                 $failedCount++;
                 

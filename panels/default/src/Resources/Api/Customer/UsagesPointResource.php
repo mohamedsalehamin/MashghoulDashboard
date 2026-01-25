@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Customer;
 
+use Illuminate\Http\Request;
 use App\ContentModule\Resources\LevelResource;
 use App\DefaultPanel\Lib\Utils;
 use App\DefaultPanel\Resources\Api\Provider\LightReservationResource;
@@ -12,10 +13,9 @@ class UsagesPointResource extends JsonResource {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return array
      */
-
     public function toArray($request) {
         return [
             'id' => $this->id,

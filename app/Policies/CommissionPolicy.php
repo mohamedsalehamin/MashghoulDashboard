@@ -13,139 +13,139 @@ class CommissionPolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_reservation::commission');
+        return $user->can('ViewAny:Commission');
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function view(User $user, Commission $commission): bool
     {
-        return $user->can('view_reservation::commission');
+        return $user->can('View:Commission');
     }
 
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function create(User $user): bool
     {
-        return $user->can('create_reservation::commission');
+        return $user->can('Create:Commission');
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function update(User $user, Commission $commission): bool
     {
-        return $user->can('update_reservation::commission');
+        return $user->can('Update:Commission');
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function delete(User $user, Commission $commission): bool
     {
-        return $user->can('delete_reservation::commission');
+        return $user->can('Delete:Commission');
     }
 
     /**
      * Determine whether the user can bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_reservation::commission');
+        return $user->can('DeleteAny:Commission');
     }
 
     /**
      * Determine whether the user can permanently delete.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function forceDelete(User $user, Commission $commission): bool
     {
-        return $user->can('force_delete_reservation::commission');
+        return $user->can('ForceDelete:Commission');
     }
 
     /**
      * Determine whether the user can permanently bulk delete.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_reservation::commission');
+        return $user->can('ForceDeleteAny:Commission');
     }
 
     /**
      * Determine whether the user can restore.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function restore(User $user, Commission $commission): bool
     {
-        return $user->can('restore_reservation::commission');
+        return $user->can('Restore:Commission');
     }
 
     /**
      * Determine whether the user can bulk restore.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_reservation::commission');
+        return $user->can('RestoreAny:Commission');
     }
 
     /**
      * Determine whether the user can replicate.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\CatalogModule\Models\Commission  $commission
+     * @param User $user
+     * @param Commission $commission
      * @return bool
      */
     public function replicate(User $user, Commission $commission): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('Replicate:Commission');
     }
 
     /**
      * Determine whether the user can reorder.
      *
-     * @param  \App\Models\User  $user
+     * @param User $user
      * @return bool
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('Reorder:Commission');
     }
 
 }

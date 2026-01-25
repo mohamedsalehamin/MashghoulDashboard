@@ -2,6 +2,10 @@
 
 namespace App\ReportsModule\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Maatwebsite\Excel\Excel;
 use App\CatalogModule\Models\Commission;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Filters\CommissionLocationFilter;
@@ -14,7 +18,6 @@ use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -30,11 +33,11 @@ class ReservationCommissionResource extends Resource {
 
     protected static ?string $model = Commission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-bar';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-presentation-chart-bar';
 
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema
+            ->components([
                 //
             ]);
     }
@@ -96,7 +99,7 @@ class ReservationCommissionResource extends Resource {
             ->filters([
                 CommissionLocationFilter::make(),
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         Select::make('provider_id')
                             ->options(Provider::pluck('name', 'id'))
                             ->label(__('forms.fields.provider'))
@@ -115,8 +118,8 @@ class ReservationCommissionResource extends Resource {
                             );
                     })
             ])
-            ->actions([
-                Tables\Actions\Action::make('transfer')
+            ->recordActions([
+                Action::make('transfer')
                     ->icon('heroicon-o-currency-dollar')
                     ->hidden(fn($record) => $record->transferred)
                     ->requiresConfirmation()
@@ -136,13 +139,13 @@ class ReservationCommissionResource extends Resource {
                     })
                     ->label(__('forms.actions.transfer'))
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+            ->toolbarActions([
+                BulkActionGroup::make([
                     ExportBulkAction::make()->exports([
                         ExcelExport::make("CSV")
                             ->fromTable()
                             ->withFilename(fn() => static::getPluralLabel() . '-' . now()->format('Y-m-d'))
-                            ->withWriterType(\Maatwebsite\Excel\Excel::XLSX),
+                            ->withWriterType(Excel::XLSX),
 
 
                     ]),

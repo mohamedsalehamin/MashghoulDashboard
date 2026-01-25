@@ -2,15 +2,18 @@
 
 namespace App\UsersModule\Resources;
 
+use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Log;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use App\UsersModule\Resources\UserResource\Pages\CreateUser;
 use App\UsersModule\Resources\UserResource\Pages\ListUsers;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -30,11 +33,11 @@ class UserResource extends Resource {
     use HasTranslationLabel;
 
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 4;
 
-    public static function form(Form $form): Form {
-        return $form->schema([
+    public static function form(Schema $schema): Schema {
+        return $schema->components([
                 Select::make('user_type')
                     ->label(__('forms.fields.user_type'))
                     ->options([
@@ -49,7 +52,7 @@ class UserResource extends Resource {
                 Select::make('existing_user_id')
                     ->label(__('forms.fields.select_user'))
                     ->options(function () {
-                        return \App\Models\User::whereHas('roles', fn($q) => $q->where('name', 'customer'))
+                        return User::whereHas('roles', fn($q) => $q->where('name', 'customer'))
                             ->whereDoesntHave('roles', fn($q) => $q->whereNotIn('name', ['customer', 'panel_user']))
                             ->pluck('name', 'id');
                     })
@@ -59,9 +62,9 @@ class UserResource extends Resource {
                     ->required(fn($get) => $get('user_type') === 'existing')
                     ->afterStateUpdated(function ($state, $set) {
                         if ($state) {
-                            $user = \App\Models\User::find($state);
+                            $user = User::find($state);
                             // log the user
-                            \Illuminate\Support\Facades\Log::info($user);
+                            Log::info($user);
                             if ($user) {
                                 $set('email', $user->email);
                             }
@@ -83,10 +86,10 @@ class UserResource extends Resource {
                     ->autocomplete("off")
                     ->columnSpan(['sm' => 2, 'xl' => 1])
                     // if user_type is new or existing and existing_user_id is not null and if exists and have email hide it
-                    ->visible(fn($get) => $get('user_type') === 'new' || ($get('user_type') === 'existing' && $get('existing_user_id') && \App\Models\User::find($get('existing_user_id'))->email)) 
+                    ->visible(fn($get) => $get('user_type') === 'new' || ($get('user_type') === 'existing' && $get('existing_user_id') && User::find($get('existing_user_id'))->email)) 
                     ->afterStateUpdated(function ($state, $set, $get) {
                         if ($get('user_type') === 'existing' && $get('existing_user_id')) {
-                            $user = \App\Models\User::find($get('existing_user_id'));
+                            $user = User::find($get('existing_user_id'));
                             if ($user) {
                                 $set('email', $user->email);
                             }
@@ -168,7 +171,7 @@ class UserResource extends Resource {
             ])
             ->filters([
                 Filter::make('ID')
-                    ->form([
+                    ->schema([
                         TextInput::make('id'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -184,8 +187,8 @@ class UserResource extends Resource {
                 SelectFilter::make('active')
                     ->options(ModelStatus::class)
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
                 DeleteUserAction::make(),
             ]);
     }
@@ -193,7 +196,7 @@ class UserResource extends Resource {
     public static function getPages(): array {
         return [
             'index' => ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
+            'create' => CreateUser::route('/create'),
         ];
     }
 

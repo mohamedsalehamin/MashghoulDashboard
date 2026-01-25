@@ -2,6 +2,8 @@
 
 namespace App\ProviderPanel\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\ModelStatus;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
@@ -10,11 +12,8 @@ use App\ProviderPanel\Filament\Resources\CustomerResource\Pages\ViewCustomer;
 use App\ProviderPanel\Filament\Resources\CustomerResource\RelationManagers\ReservationsRelationManager;
 use App\UsersModule\Models\Users\Customer;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -27,12 +26,12 @@ class CustomerResource extends Resource {
     use HasTranslationLabel;
 
     protected static ?string $model = Customer::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form {
+    public static function form(Schema $schema): Schema {
 
-        return $form;
+        return $schema;
 
     }
 
@@ -52,15 +51,15 @@ class CustomerResource extends Resource {
 
 
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make()
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 ExportBulkAction::make(),
             ])
             ->filters([
                 Filter::make('ID')
-                    ->form([TextInput::make('id'),])
+                    ->schema([TextInput::make('id'),])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when($data['id'], fn(Builder $query, $date): Builder => $query->where('id', $data['id']));
                     })
@@ -87,8 +86,8 @@ class CustomerResource extends Resource {
 
         ];
     }
-    public static function infolist(Infolist $infolist): Infolist {
-        return $infolist->schema([
+    public static function infolist(Schema $schema): Schema {
+        return $schema->components([
             TextEntry::make("id"),
             TextEntry::make("data.first_name")->label(__('forms.fields.first_name')),
             TextEntry::make("data.last_name")->label(__('forms.fields.last_name')),
@@ -114,8 +113,5 @@ class CustomerResource extends Resource {
         return static::getModel()::whereHas('reservations', fn($q) => $q->where("reservable_id", provider()->id))->count();
     }
 
-    public static function can(string $action, ?Model $record = null): bool {
-        return true;
-    }
 
 }
