@@ -16,23 +16,9 @@ The Laravel 12 upgrade has been completed. This report identifies unused files, 
 
 ### 1. Old Project Backup (HIGH PRIORITY)
 
-| Path | Size | Action |
-|------|------|--------|
-| `old/` | **724 MB** | Delete entire folder - contains complete backup of old project |
 
-```bash
-rm -rf old/
-```
 
 ### 2. Backup/Temporary Files
-
-| File | Reason |
-|------|--------|
-| `app/Providers/AppServiceProvider.php.save` | Editor backup file |
-
-```bash
-rm app/Providers/AppServiceProvider.php.save
-```
 
 ### 3. Tenancy Leftover Files
 
@@ -46,13 +32,7 @@ rm -rf storage/tenant_*/
 
 ### 4. Old Route File
 
-| File | Reason |
-|------|--------|
-| `routes/app_old.php` | Unused old route file |
 
-```bash
-rm routes/app_old.php
-```
 
 ---
 

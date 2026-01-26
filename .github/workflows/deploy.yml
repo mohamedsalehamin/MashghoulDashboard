@@ -1,0 +1,155 @@
+name: Deploy to cPanel Server
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build assets for production
+        run: npm run build
+
+      - name: Copy built assets to production server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "public/build"
+          target: "${{ secrets.SSH_PROJECT_PATH }}/public"
+          strip_components: 1
+
+      - name: Deploy to cPanel server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            # Debug: Show where we are
+            echo "=== Starting Deployment ==="
+            echo "Current directory: $(pwd)"
+            echo "User: $(whoami)"
+
+            # Set project path
+            PROJECT_PATH="${{ secrets.SSH_PROJECT_PATH }}"
+            PROJECT_PATH="${PROJECT_PATH%/}"  # Remove trailing slash
+
+            # Check if project path is set
+            if [ -z "$PROJECT_PATH" ] || [ "$PROJECT_PATH" = "" ]; then
+              echo "❌ ERROR: SSH_PROJECT_PATH secret is not set!"
+              exit 1
+            fi
+
+            # Check if directory exists
+            if [ ! -d "$PROJECT_PATH" ]; then
+              echo "❌ ERROR: Project directory does not exist: $PROJECT_PATH"
+              exit 1
+            fi
+
+            echo "✅ Project directory exists: $PROJECT_PATH"
+
+            # Navigate to project directory
+            cd "$PROJECT_PATH" || exit 1
+            echo "Working in: $(pwd)"
+
+            # Verify it's a git repository
+            if [ ! -d ".git" ]; then
+              echo "❌ ERROR: Not a git repository"
+              exit 1
+            fi
+
+            # Set PHP path for cPanel (adjust based on your server's PHP version)
+            # Common cPanel PHP paths:
+            # /usr/local/bin/php
+            # /opt/cpanel/ea-php82/root/usr/bin/php
+            # /opt/cpanel/ea-php83/root/usr/bin/php
+            # /opt/cpanel/ea-php84/root/usr/bin/php
+            PHP_BIN="${{ secrets.PHP_PATH }}"
+            if [ -z "$PHP_BIN" ]; then
+              PHP_BIN="/usr/local/bin/php"
+            fi
+
+            COMPOSER_BIN="${{ secrets.COMPOSER_PATH }}"
+            if [ -z "$COMPOSER_BIN" ]; then
+              COMPOSER_BIN="/usr/local/bin/composer"
+            fi
+
+            echo "Using PHP: $PHP_BIN"
+            echo "Using Composer: $COMPOSER_BIN"
+
+            # Determine which branch to pull based on the trigger
+            BRANCH="${{ github.ref_name }}"
+            echo "Pulling branch: $BRANCH"
+
+            # Pull latest code
+            echo "Pulling latest code..."
+            git fetch origin
+            git checkout $BRANCH || git checkout -b $BRANCH origin/$BRANCH
+            git pull origin $BRANCH
+
+            # Put application in maintenance mode
+            echo "Enabling maintenance mode..."
+            $PHP_BIN artisan down --refresh=30 || true
+
+            # Clear caches before composer install
+            echo "Clearing caches..."
+            $PHP_BIN artisan config:clear || true
+            $PHP_BIN artisan cache:clear || true
+            $PHP_BIN artisan view:clear || true
+            $PHP_BIN artisan route:clear || true
+
+            # Remove bootstrap cache files
+            rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/services.php bootstrap/cache/packages.php || true
+
+            # Install dependencies
+            echo "Installing dependencies..."
+            $PHP_BIN $COMPOSER_BIN install --optimize-autoloader --no-dev --no-interaction
+
+            # Run database migrations
+            echo "Running database migrations..."
+            $PHP_BIN artisan migrate --force
+
+            # Optimize application
+            echo "Optimizing application..."
+            $PHP_BIN artisan config:cache
+            $PHP_BIN artisan route:cache
+            $PHP_BIN artisan view:cache
+            $PHP_BIN artisan event:cache
+
+            # Regenerate autoloader
+            $PHP_BIN $COMPOSER_BIN dump-autoload --optimize --no-dev
+
+            # Clear opcache if available
+            $PHP_BIN -r "if (function_exists('opcache_reset')) { opcache_reset(); echo 'OPcache cleared'; }" || true
+
+            # Restart queue workers if using supervisor
+            # $PHP_BIN artisan queue:restart
+
+            # Bring application back up
+            echo "Disabling maintenance mode..."
+            $PHP_BIN artisan up
+
+            echo "✅ Deployment completed successfully!"
+
