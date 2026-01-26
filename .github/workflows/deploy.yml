@@ -8,8 +8,8 @@ on:
   workflow_dispatch: # Allows manual triggering from GitHub UI
 
 jobs:
-  deploy:
-    name: Deploy to Production Server
+  build:
+    name: Build Assets
     runs-on: ubuntu-latest
 
     steps:
@@ -28,128 +28,88 @@ jobs:
       - name: Build assets for production
         run: npm run build
 
-      - name: Copy built assets to production server
-        uses: appleboy/scp-action@v0.1.7
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "public/build"
-          target: "${{ secrets.SSH_PROJECT_PATH }}/public"
-          strip_components: 1
+          name: build-assets
+          path: public/build
+          retention-days: 1
 
-      - name: Deploy to cPanel server via SSH
-        uses: appleboy/ssh-action@v1.0.3
+  deploy:
+    name: Deploy to cPanel
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            # Debug: Show where we are
-            echo "=== Starting Deployment ==="
-            echo "Current directory: $(pwd)"
-            echo "User: $(whoami)"
+          name: build-assets
+          path: public/build
 
-            # Set project path
-            PROJECT_PATH="${{ secrets.SSH_PROJECT_PATH }}"
-            PROJECT_PATH="${PROJECT_PATH%/}"  # Remove trailing slash
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json, zip
+          coverage: none
 
-            # Check if project path is set
-            if [ -z "$PROJECT_PATH" ] || [ "$PROJECT_PATH" = "" ]; then
-              echo "❌ ERROR: SSH_PROJECT_PATH secret is not set!"
-              exit 1
-            fi
+      - name: Install Composer dependencies
+        run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
-            # Check if directory exists
-            if [ ! -d "$PROJECT_PATH" ]; then
-              echo "❌ ERROR: Project directory does not exist: $PROJECT_PATH"
-              exit 1
-            fi
+      - name: Create deployment package
+        run: |
+          # Remove files not needed in production
+          rm -rf node_modules
+          rm -rf tests
+          rm -rf .git
+          rm -rf .github
+          rm -f .env.example
+          rm -f phpunit.xml
+          rm -f vite.config.js
+          rm -f package.json
+          rm -f package-lock.json
+          rm -f postcss.config.js
+          rm -rf old
 
-            echo "✅ Project directory exists: $PROJECT_PATH"
+      - name: Deploy to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
+            **/storage/debugbar/**
+            **/old/**
 
-            # Navigate to project directory
-            cd "$PROJECT_PATH" || exit 1
-            echo "Working in: $(pwd)"
-
-            # Verify it's a git repository
-            if [ ! -d ".git" ]; then
-              echo "❌ ERROR: Not a git repository"
-              exit 1
-            fi
-
-            # Set PHP path for cPanel (adjust based on your server's PHP version)
-            # Common cPanel PHP paths:
-            # /usr/local/bin/php
-            # /opt/cpanel/ea-php82/root/usr/bin/php
-            # /opt/cpanel/ea-php83/root/usr/bin/php
-            # /opt/cpanel/ea-php84/root/usr/bin/php
-            PHP_BIN="${{ secrets.PHP_PATH }}"
-            if [ -z "$PHP_BIN" ]; then
-              PHP_BIN="/usr/local/bin/php"
-            fi
-
-            COMPOSER_BIN="${{ secrets.COMPOSER_PATH }}"
-            if [ -z "$COMPOSER_BIN" ]; then
-              COMPOSER_BIN="/usr/local/bin/composer"
-            fi
-
-            echo "Using PHP: $PHP_BIN"
-            echo "Using Composer: $COMPOSER_BIN"
-
-            # Determine which branch to pull based on the trigger
-            BRANCH="${{ github.ref_name }}"
-            echo "Pulling branch: $BRANCH"
-
-            # Pull latest code
-            echo "Pulling latest code..."
-            git fetch origin
-            git checkout $BRANCH || git checkout -b $BRANCH origin/$BRANCH
-            git pull origin $BRANCH
-
-            # Put application in maintenance mode
-            echo "Enabling maintenance mode..."
-            $PHP_BIN artisan down --refresh=30 || true
-
-            # Clear caches before composer install
-            echo "Clearing caches..."
-            $PHP_BIN artisan config:clear || true
-            $PHP_BIN artisan cache:clear || true
-            $PHP_BIN artisan view:clear || true
-            $PHP_BIN artisan route:clear || true
-
-            # Remove bootstrap cache files
-            rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/services.php bootstrap/cache/packages.php || true
-
-            # Install dependencies
-            echo "Installing dependencies..."
-            $PHP_BIN $COMPOSER_BIN install --optimize-autoloader --no-dev --no-interaction
-
-            # Run database migrations
-            echo "Running database migrations..."
-            $PHP_BIN artisan migrate --force
-
-            # Optimize application
-            echo "Optimizing application..."
-            $PHP_BIN artisan config:cache
-            $PHP_BIN artisan route:cache
-            $PHP_BIN artisan view:cache
-            $PHP_BIN artisan event:cache
-
-            # Regenerate autoloader
-            $PHP_BIN $COMPOSER_BIN dump-autoload --optimize --no-dev
-
-            # Clear opcache if available
-            $PHP_BIN -r "if (function_exists('opcache_reset')) { opcache_reset(); echo 'OPcache cleared'; }" || true
-
-            # Restart queue workers if using supervisor
-            # $PHP_BIN artisan queue:restart
-
-            # Bring application back up
-            echo "Disabling maintenance mode..."
-            $PHP_BIN artisan up
-
-            echo "✅ Deployment completed successfully!"
-
+      - name: Run post-deployment commands via webhook
+        run: |
+          echo "Triggering post-deployment webhook..."
+          response=$(curl -s -w "\n%{http_code}" "${{ secrets.DEPLOY_WEBHOOK_URL }}?token=${{ secrets.DEPLOY_WEBHOOK_TOKEN }}")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          
+          echo "$body"
+          
+          if [ "$http_code" != "200" ]; then
+            echo "⚠️  Webhook returned HTTP $http_code"
+            # Don't fail the deployment, just warn
+          else
+            echo "✅ Post-deployment commands executed successfully"
+          fi
