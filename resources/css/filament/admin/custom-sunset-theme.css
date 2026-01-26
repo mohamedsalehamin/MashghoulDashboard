@@ -123,12 +123,6 @@
 }
 
 /* Checkbox and Radio colors */
-[type=checkbox]:checked,
-[type=radio]:checked {
-    --tw-bg-opacity: 1;
-    background-color: rgba(var(--primary-500), var(--tw-bg-opacity));
-    border-color: rgba(var(--primary-500), 1);
-}
 
 /* Progress bar */
 .fi-progress-bar-fill {

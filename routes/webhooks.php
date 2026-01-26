@@ -17,36 +17,7 @@ use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 use App\Http\Controllers\Webhook\TabbyController;
 
-Route::get('testo', function () {
-    // $user = \App\Models\User::find(request()->get('id'));
-    // $token = request()->get('token');
-    // if (request()->filled('token')) {
 
-    //     dd(Firebase::make()
-    //         ->setTitle('test')
-    //         ->setBody('test')
-    //         ->setTokens([$token])
-    //         ->do());
-    // }
-    // dd(Firebase::make()
-    //     ->setTitle('test')
-    //     ->setBody('test')
-    //     ->setTokens([$user->deviceTokens->pluck('token')->toArray()])
-    //     ->do());
-    Mail::to('ahmed.mostafa.dev.eg@gmail.com')->send(new SendEmailNotification('test', 'test'));
-    dd('as');
-//    return view('mails.order-invoice',['order' => \App\Models\Order::first()]);
-//    $id=request()->get('id')??20;
-//    $user = \App\Models\User::find($id);
-//dd($user);
-//    Notification::send($user, new ReservationTimeIsClosestNotification(App\Models\Order::first()));
-    return 200;
-
-    $tabby = new TabbyService();
-
-
-    dd($tabby->updateWebhook('2dac4151-0880-4a43-9fa1-b0fc70886bd6'));
-});
 
 Route::any('webhooks/myfatoorah/transactions/callback', function (MyFatoorahPaymentStatus $myfatoorahApiV2) {
     $response = $myfatoorahApiV2->getPaymentStatus(request()->get('Id'), 'PaymentId');

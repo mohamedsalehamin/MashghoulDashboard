@@ -21,8 +21,9 @@
 
         /* body */
         body {
-            font-family: "din-light";
+            font-family: tajawal, sans-serif;
             margin: 0;
+            direction: rtl;
         }
 
         .logo {
@@ -36,7 +37,8 @@
         .table-title {
             color: #000;
             font-size: 20px;
-            font-family: "din-bold";
+            font-family: tajawal, sans-serif;
+            font-weight: bold;
             margin-bottom: 12px;
         }
 
@@ -107,7 +109,8 @@
 
         .details-table .total-row td {
             color: #000084;
-            font-family: "din-bold";
+            font-family: tajawal, sans-serif;
+            font-weight: bold;
             font-size: 18px;
         }
 
@@ -371,14 +374,16 @@
                         <div class="col-6">
                             <div class="hold-details">
                                 <p><strong>رقم الفاتورة:</strong> {{$reservation->reservation_number}}</p>
-                                <p>
-                                    <strong>تاريخ إصدار الفاتورة:</strong>
-                                    {{$paymentDate->translatedFormat("Y-m-d h:i a")}}
-                                </p>
+                                
                                 <p><strong>حالة الحجز:</strong> {{$reservation->status->getLabel()}}</p>
                             </div>
                         </div>
-                        <div class="col-6"></div>
+                        <div class="col-6">
+                        <p>
+                                    <strong>تاريخ إصدار الفاتورة:</strong>
+                                    {{$paymentDate->translatedFormat("Y-m-d h:i a")}}
+                                </p>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12">
@@ -388,12 +393,13 @@
                                 <p><strong>اسم العميل:</strong>{{$reservation->customer?->name}}</p>
                                 <p><strong>رقم
                                         الهاتف:</strong> {{$reservation?->customer?->phone}}</p>
-                                <p><strong>البريد الإلكتروني:</strong> {{$reservation?->customer?->email}}</p>
+                                
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="hold-details">
                                 <p><strong>طريقة الدفع:</strong> {{ $paymentMethod }}</p>
+                                <p><strong>البريد الإلكتروني:</strong> {{$reservation?->customer?->email}}</p>
                             </div>
                         </div>
                     </div>
@@ -434,7 +440,7 @@
                 </tbody>
                 <tfoot>
                 <tr class="highlight-row">
-                    <td colspan="3"></td>
+                    <td colspan="5"></td>
                     <td colspan="2">إجمالي الخدمات</td>
                     <td colspan="1">{{$totals['services_total']}}</td>
                 </tr>

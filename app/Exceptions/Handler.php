@@ -7,7 +7,6 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -33,9 +32,6 @@ class Handler extends ExceptionHandler {
     }
 
     public function render($request, Throwable $e) {
-        if ($e instanceof TenantCouldNotBeIdentifiedOnDomainException) {
-            abort(404);
-        }
         if ($e instanceof ModelNotFoundException && $request->wantsJson()) {
             return Api::isNotFound("This record can't be found")->build();
         }

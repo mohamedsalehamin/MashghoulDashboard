@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\DefaultPanel\DefaultPanelServiceProvider;
+use App\ProviderPanel\ProviderPanelServiceProvider;
 use Filament\Schemas\Components\Section;
 use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Banner;
@@ -44,6 +46,9 @@ class AppServiceProvider extends ServiceProvider {
      * Register any application services.
      */
     public function register(): void {
+        // Register custom service providers
+        $this->app->register(DefaultPanelServiceProvider::class);
+        $this->app->register(ProviderPanelServiceProvider::class);
 
         $this->cart();
 
@@ -79,12 +84,7 @@ class AppServiceProvider extends ServiceProvider {
         view()->share('settings', new GeneralSettings());
 //        config()->set("app.debug", $settings->debug_mode);
 
-        // Register themes views manually
-        $themesViewsPath = base_path('vendor/hasnayeen/themes/resources/views');
-        if (file_exists($themesViewsPath)) {
-            view()->addNamespace('themes', $themesViewsPath);
-        }
-
+       
         // Register filament-panels views namespace for custom views
         $filamentPanelsViewsPath = resource_path('views/filament-panels');
         if (file_exists($filamentPanelsViewsPath)) {
@@ -153,12 +153,12 @@ class AppServiceProvider extends ServiceProvider {
             $field->label(__('forms.fields.' . Str::replace('.', '_', $field->getName())));
         });
 
-        Section::configureUsing(function (Section $section): void {
-            $section
-                ->collapsible()
-                ->heading(__('sections.' . Str::lower($section->getHeading())));
+        // Section::configureUsing(function (Section $section): void {
+        //     $section
+        //         ->collapsible()
+        //         ->heading(__( Str::lower($section->getHeading())));
 
-        });
+        // });
         Column::configureUsing(function ($c): void {
             $c->label(fn($column): string => __("forms.fields." . Str::replace('.', '_', Str::after($column->getName(), '.'))))
                 ->translateLabel()
