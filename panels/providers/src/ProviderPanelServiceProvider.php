@@ -120,7 +120,7 @@ class ProviderPanelServiceProvider extends PanelProvider
                 NotificationResource::class,
                 WalletResource::class,
             ])
-            ->darkMode(true)
+            ->darkMode(false)
             ->authMiddleware([
                 Authenticate::class,
             ]);

@@ -167,7 +167,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
 //                Contacts::class
 
             ])
-            ->darkMode(true)
+            ->darkMode(false)
             ->authMiddleware([
                 Authenticate::class,
             ]);
