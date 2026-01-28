@@ -47,9 +47,11 @@ use App\Policies\WithdrawalRequestPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\SeatPolicy;
 use App\Policies\NotificationPolicy;
+use App\Policies\RatePolicy;
 use App\UsersModule\Models\WithdrawalRequest;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\Reservation\Rate;
 use App\UsersModule\Models\Users\Customer;
 use App\Models\Notification;
 class AuthServiceProvider extends ServiceProvider {
@@ -76,9 +78,7 @@ class AuthServiceProvider extends ServiceProvider {
         Seat::class => SeatPolicy::class,
         Customer::class => CustomerPolicy::class,
         Notification::class => NotificationPolicy::class,
-
-
-
+        Rate::class => RatePolicy::class,
     ];
 
     /**
