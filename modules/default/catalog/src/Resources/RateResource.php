@@ -13,16 +13,14 @@ use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section as InfoSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -63,10 +61,10 @@ class RateResource extends Resource
         return __('panel.ratings');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('panel.rating_details'))
                     ->schema([
                         Select::make('provider_id')
@@ -301,11 +299,11 @@ class RateResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
-                InfoSection::make(__('panel.rating_details'))
+        return $schema
+            ->components([
+                Section::make(__('panel.rating_details'))
                     ->schema([
                         TextEntry::make('provider.name')
                             ->label(__('panel.provider')),
@@ -350,7 +348,7 @@ class RateResource extends Resource
                     ])
                     ->columns(3),
 
-                InfoSection::make(__('panel.replies'))
+                Section::make(__('panel.replies'))
                     ->schema([
                         TextEntry::make('replies')
                             ->label('')
@@ -397,4 +395,3 @@ class RateResource extends Resource
             ->with(['provider', 'user', 'reservation', 'replies']);
     }
 }
-
