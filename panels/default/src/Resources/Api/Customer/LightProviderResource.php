@@ -14,7 +14,7 @@ class LightProviderResource extends JsonResource {
             'image' => $this->getFirstMediaUrl(),
             'name' => $this->name,
             'city' => $this->city->name,
-            'rate' => $this->avgRate(),
+            'rate' => $this->getAvgRate(),
             $this->mergeWhen(request()->filled('latitude') && request()->filled('longitude'), [
                 'distance' => round($this->distance / 1000, 2),
             ]),
@@ -30,4 +30,30 @@ class LightProviderResource extends JsonResource {
 
         ];
     }
+    /**
+     * Average rating including ALL reservation-based + manual ratings (excluding replies).
+     */
+    private function getAvgRate(): float
+    {
+        $avg = \App\CatalogModule\Models\Reservation\Rate::query()
+            ->where(function($query) {
+                // Reservation-based ratings
+                $query->whereHas('reservation', function($q) {
+                    $q->where('reservable_type', \App\UsersModule\Models\Provider::class)
+                        ->where('reservable_id', $this->id);
+                })
+                // OR manual ratings with this provider
+                ->orWhere(function($q) {
+                    $q->where('provider_id', $this->user_id)
+                        ->where('source', 'manual');
+                });
+            })
+            ->whereNull('parent_id') // exclude replies
+            ->where('is_approved', true)
+            ->whereNotNull('rate') // ensure rate is not null
+            ->avg('rate');
+
+        return (float) ($avg ?? 0);
+    }
+
 }
