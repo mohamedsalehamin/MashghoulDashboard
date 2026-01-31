@@ -70,9 +70,9 @@ class RateResource extends Resource
                 Section::make(__('panel.rating_details'))
                     ->schema([
                         Select::make('provider_id')
-                            ->label(__('panel.provider'))
+                            ->label(__('forms.fields.provider_name'))
                             ->options(function () {
-                                return Provider::with('user')->get()->pluck('user.name', 'user_id');
+                                return Provider::get()->pluck('name', 'user_id');
                             })
                             ->searchable()
                             ->required()
@@ -80,7 +80,7 @@ class RateResource extends Resource
                             ->disabled(fn($record) => $record && $record->source !== 'manual'),
 
                         Select::make('user_id')
-                            ->label(__('panel.customer'))
+                            ->label(__('forms.fields.customer_name'))
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
@@ -163,16 +163,16 @@ class RateResource extends Resource
                 Section::make(__('panel.service_rating'))
                     ->schema([
                         Select::make('provider_id')
-                            ->label(__('panel.provider'))
+                            ->label(__('forms.fields.provider_name'))
                             ->options(function () {
-                                return Provider::with('user')->get()->pluck('user.name', 'user_id');
+                                return Provider::get()->pluck('name', 'user_id');
                             })
                             ->searchable()
                             ->required()
                             ->preload(),
 
                         Select::make('user_id')
-                            ->label(__('panel.customer'))
+                            ->label(__('forms.fields.customer_name'))
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload(),
