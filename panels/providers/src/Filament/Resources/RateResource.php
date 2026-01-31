@@ -8,6 +8,7 @@ use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\ProviderPanel\Filament\Resources\RateResource\Pages\ListRates;
 use App\ProviderPanel\Filament\Resources\RateResource\Pages\ViewRate;
 use App\ProviderPanel\Filament\Resources\RateResource\Widgets\RateSummary;
+use App\ProviderPanel\Filament\Resources\ReservationResource;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Textarea;
@@ -123,7 +124,7 @@ class RateResource extends Resource
                     ->label(__('panel.reservation'))
                     ->placeholder('-')
                     ->url(fn($record) => $record->reservation_id
-                        ? route('filament.providers.resources.reservations.view', $record->reservation_id)
+                        ? ReservationResource::getUrl('view', ['record' => $record->reservation_id])
                         : null),
 
                 TextColumn::make('created_at')
