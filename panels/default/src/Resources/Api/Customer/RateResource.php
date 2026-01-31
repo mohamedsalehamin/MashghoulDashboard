@@ -2,19 +2,29 @@
 
 namespace App\DefaultPanel\Resources\Api\Customer;
 
-use App\Brands\Resources\Api\BrandResources;
-use App\Fleet\Http\Resources\DriverResource;
-use App\Jobs\Http\Resources\Api\RateResources;
-use App\Orders\Resources\Api\AddressOrderResource;
-use App\Orders\Resources\Api\UserOrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RateResource extends JsonResource {
 
     public function toArray($request) {
         return [
-            "score" => collect($this->rate),
+            "name" => $this->user?->name ?? $this->reservation?->customer?->name ?? __('panel.anonymous'),
+            "rate" => (int) $this->rate,
             "comment" => $this->comment,
+            "type" => $this->type,
+            "created_at" => $this->created_at?->diffForHumans(),
+            "replies" => $this->when(
+                $this->relationLoaded('replies') && $this->replies->isNotEmpty(),
+                function() {
+                    return $this->replies->map(function($reply) {
+                        return [
+                            'comment' => $reply->comment,
+                            'created_at' => $reply->created_at?->diffForHumans(),
+                            'user' => $reply->user?->name ?? __('panel.provider'),
+                        ];
+                    });
+                }
+            ),
         ];
     }
 }

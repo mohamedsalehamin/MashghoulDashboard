@@ -30,18 +30,43 @@ class ReservationsServices {
     }
 
     public function show(Reservation $reservation) {
+        $reservation->load(['rates.replies.user']);
         return Api::isOk("rated successfully", ReservationResource::make($reservation));
     }
 
     public function rate(ReservationRateRequest $request, Reservation $reservation) {
-        $reservation->rate()->create([
+        // Generate a unique pair_id to group service and place ratings together
+        $pairId = \Illuminate\Support\Str::uuid()->toString();
+        
+        // Get provider_id from reservation
+        $providerId = $reservation->reservable instanceof \App\UsersModule\Models\Provider 
+            ? $reservation->reservable->user_id 
+            : null;
+
+        // Create place rating
+        $reservation->rates()->create([
             'type' => 'place',
+            'provider_id' => $providerId,
+            'user_id' => auth()->id(),
+            'pair_id' => $pairId,
+            'source' => 'reservation',
+            'is_approved' => true,
+            'approved_at' => now(),
             ...$request->collect('place')
         ]);
-        $reservation->rate()->create([
+        
+        // Create service rating
+        $reservation->rates()->create([
             'type' => 'service',
+            'provider_id' => $providerId,
+            'user_id' => auth()->id(),
+            'pair_id' => $pairId,
+            'source' => 'reservation',
+            'is_approved' => true,
+            'approved_at' => now(),
             ...$request->collect('service')
         ]);
+        
         return Api::isOk("rated successfully");
 
     }

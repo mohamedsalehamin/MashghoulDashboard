@@ -16,6 +16,7 @@ Route::prefix('v1/providers')->group(function () {
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('profile', [ProfileServices::class, 'index']);
         Route::get('profile/rates', [ProfileServices::class, 'rates']);
+        Route::post('profile/rates/{rate}/reply', [ProfileServices::class, 'reply']);
         Route::put('profile/password', [ProfileServices::class, 'updatePassword']);
         Route::get('profile/reservations', [ReservationServices::class, 'index']);
         Route::get('profile/reservations/{reservation}', [ReservationServices::class, 'show']);

@@ -13,10 +13,21 @@ class RatePolicy
     /**
      * Determine whether the user can view any models.
      * Admin can view all ratings in dashboard.
+     * Provider can view ratings on their profile.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        // Admin can view all
+        if ($user->hasRole(['super_admin', 'Super Admin', 'admin'])) {
+            return true;
+        }
+
+        // Provider can view ratings on their profile
+        if ($user->provider) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -25,7 +36,7 @@ class RatePolicy
     public function view(User $user, Rate $rate): bool
     {
         // Admin can view all
-        if ($user->hasRole(['super_admin', 'admin'])) {
+        if ($user->hasRole(['super_admin', 'Super Admin', 'admin'])) {
             return true;
         }
 
@@ -44,7 +55,7 @@ class RatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -53,7 +64,7 @@ class RatePolicy
     public function update(User $user, Rate $rate): bool
     {
         // Admin can update any
-        if ($user->hasRole(['super_admin', 'admin'])) {
+        if ($user->hasRole(['super_admin', 'Super Admin', 'admin'])) {
             return true;
         }
 
@@ -76,7 +87,7 @@ class RatePolicy
     public function delete(User $user, Rate $rate): bool
     {
         // Admin can delete any
-        if ($user->hasRole(['super_admin', 'admin'])) {
+        if ($user->hasRole(['super_admin', 'Super Admin', 'admin'])) {
             return true;
         }
 
@@ -93,7 +104,7 @@ class RatePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -101,7 +112,7 @@ class RatePolicy
      */
     public function forceDelete(User $user, Rate $rate): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -109,7 +120,7 @@ class RatePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -117,7 +128,7 @@ class RatePolicy
      */
     public function restore(User $user, Rate $rate): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -125,7 +136,7 @@ class RatePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -169,7 +180,7 @@ class RatePolicy
      */
     public function approve(User $user, Rate $rate): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 
     /**
@@ -178,7 +189,7 @@ class RatePolicy
      */
     public function reject(User $user, Rate $rate): bool
     {
-        return $user->hasRole(['super_admin', 'admin']);
+        return $user->hasRole(['super_admin', 'Super Admin', 'admin']);
     }
 }
 

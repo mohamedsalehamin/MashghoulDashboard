@@ -78,7 +78,7 @@ class AuthServiceProvider extends ServiceProvider {
         Seat::class => SeatPolicy::class,
         Customer::class => CustomerPolicy::class,
         Notification::class => NotificationPolicy::class,
-        Rate::class => RatePolicy::class,
+        // Rate::class => RatePolicy::class,
     ];
 
     /**

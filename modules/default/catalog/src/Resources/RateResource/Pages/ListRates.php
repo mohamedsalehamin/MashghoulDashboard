@@ -5,7 +5,7 @@ namespace App\CatalogModule\Resources\RateResource\Pages;
 use App\CatalogModule\Resources\RateResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListRates extends ListRecords
@@ -23,7 +23,7 @@ class ListRates extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make(__('panel.all'))
+            'all' => Tab::make(__('panel.enums.all'))
                 ->icon('heroicon-o-star'),
 
             'reservation' => Tab::make(__('panel.reservation_ratings'))
@@ -40,9 +40,7 @@ class ListRates extends ListRecords
                 ->badge(fn() => \App\CatalogModule\Models\Reservation\Rate::where('is_approved', false)->count())
                 ->badgeColor('warning'),
 
-            'replies' => Tab::make(__('panel.replies'))
-                ->icon('heroicon-o-chat-bubble-left-right')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('source', 'reply')),
+            
         ];
     }
 }

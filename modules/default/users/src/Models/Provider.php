@@ -84,6 +84,48 @@ class Provider extends Model implements HasMedia {
         return $this->hasManyThrough(Rate::class, Reservation::class, 'reservable_id', 'reservation_id');
     }
 
+    /**
+     * Get all ratings for this provider (both reservation-based and manual)
+     * This includes ratings through reservations and direct manual ratings
+     * Grouped by pair_id or reservation_id (one rating per group, preferring service type)
+     */
+    public function allRates() {
+        // Get all matching ratings with minimal columns for grouping
+        $allRatings = Rate::where(function($query) {
+            // Reservation-based ratings
+            $query->whereHas('reservation', function($q) {
+                $q->where('reservable_type', static::class)
+                  ->where('reservable_id', $this->id);
+            })
+            // OR manual ratings with this provider
+            ->orWhere(function($q) {
+                $q->where('provider_id', $this->user_id)
+                  ->where('source', 'manual');
+            });
+        })
+        ->whereNull('parent_id') // Only top-level ratings, not replies
+        ->where('is_approved', true)
+        ->select('id', 'type', 'pair_id', 'reservation_id', 'created_at')
+        ->get();
+
+        // Group by pair_id or reservation_id
+        $grouped = $allRatings->groupBy(function($rate) {
+            return $rate->pair_id ?? $rate->reservation_id ?? 'single_' . $rate->id;
+        });
+
+        // For each group, prefer service rating, otherwise take place rating
+        $selectedIds = $grouped->map(function($group) {
+            $serviceRating = $group->firstWhere('type', 'service');
+            return ($serviceRating ?: $group->first())->id;
+        })->values()->toArray();
+
+        if (empty($selectedIds)) {
+            return Rate::whereRaw('1 = 0'); // Return empty query
+        }
+
+        return Rate::whereIn('id', $selectedIds)->orderBy('created_at', 'desc');
+    }
+
     public function category(): BelongsTo {
         return $this->belongsTo(Category::class);
     }

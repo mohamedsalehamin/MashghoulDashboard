@@ -34,6 +34,7 @@ class ReservationServices {
     }
 
     public function show(Reservation $reservation) {
+        $reservation->load(['rates.replies.user']);
         return Api::isOk(__("Reservation info"), ReservationResource::make($reservation));
     }
 

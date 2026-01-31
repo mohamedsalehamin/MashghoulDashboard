@@ -1,6 +1,7 @@
 <?php
 return [
-    "rates"=>"Rates",
+    "rates"=>"Ratings",
+    "rate"=>"Rating",
     'send_email' => 'Send emails',
     'send_sms' => 'Send SMS',
     "mashghoul_pages" => "Mashghoul pages",

@@ -15,7 +15,7 @@
         "bezhansalleh/filament-language-switch": "^4.0",
         "bezhansalleh/filament-shield": "^4.1",
         "carlos-meneses/laravel-mpdf": "^2.1",
-        "cheesegrits/filament-google-maps": "v3.x-dev",
+        "cheesegrits/filament-google-maps": "^4.0",
         "chillerlan/php-qrcode": "^5.0",
         "christiankuri/laravel-favorite": "^1.4",
         "cknow/laravel-money": "^8.0",
@@ -146,11 +146,6 @@
         "producation": {
             "type": "composer",
             "url": "https://gitlab.com/api/v4/group/12160558/-/packages/composer/packages.json"
-        },
-        "kornafilament-google-maps": {
-            "type": "vcs",
-            "url": "https://github.com/KornaFilament/filament-google-maps",
-            "no-api": true
         },
         "salla-zatca-override": {
             "type": "package",

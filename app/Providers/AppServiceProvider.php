@@ -153,12 +153,12 @@ class AppServiceProvider extends ServiceProvider {
             $field->label(__('forms.fields.' . Str::replace('.', '_', $field->getName())));
         });
 
-        // Section::configureUsing(function (Section $section): void {
-        //     $section
-        //         ->collapsible()
-        //         ->heading(__( Str::lower($section->getHeading())));
+        Section::configureUsing(function (Section $section): void {
+            $section
+                ->collapsible()
+                ->heading(__( Str::lower($section->getHeading())));
 
-        // });
+        });
         Column::configureUsing(function ($c): void {
             $c->label(fn($column): string => __("forms.fields." . Str::replace('.', '_', Str::after($column->getName(), '.'))))
                 ->translateLabel()

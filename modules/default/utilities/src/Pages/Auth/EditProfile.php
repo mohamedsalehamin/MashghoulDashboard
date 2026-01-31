@@ -2,22 +2,19 @@
 
 namespace App\UtilitiesModule\Pages\Auth;
 
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
 use Filament\Pages\Concerns\HasRoutes;
-use Filament\Pages\Concerns\InteractsWithFormActions;
-use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Exception;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Pages\Concerns;
 use Filament\Pages\Page;
 use Filament\Panel;
-use Filament\Support\Enums\Alignment;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
@@ -26,26 +23,20 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rules\Password;
-use App\Filament\Pages\Auth\view;
 
-/**
- * @property \Filament\Schemas\Schema $form
- */
-class EditProfile extends Page {
+class EditProfile extends Page implements HasForms {
     use HasRoutes;
-    use InteractsWithFormActions;
+    use InteractsWithForms;
     use HasPageShield;
 
     protected static bool $shouldRegisterNavigation = false;
-    /**
-     * @var view-string
-     */
+
     protected string $view = 'filament.pages.auth.edit-profile';
 
-    /**
-     * @var array<string, mixed> | null
-     */
-    public ?array $data = [];
+    public ?string $name = '';
+    public ?string $email = '';
+    public ?string $password = '';
+    public ?string $passwordConfirmation = '';
 
     public static function getLabel(): string {
         return __('menu.edit_profile');
@@ -60,9 +51,6 @@ class EditProfile extends Page {
             ->name('profile');
     }
 
-    /**
-     * @return string | array<string>
-     */
     public static function getRouteMiddleware(Panel $panel): string|array {
         return [
             ...(static::isEmailVerificationRequired($panel) ? [static::getEmailVerifiedMiddleware($panel)] : []),
@@ -71,7 +59,9 @@ class EditProfile extends Page {
     }
 
     public function mount(): void {
-        $this->fillForm();
+        $user = $this->getUser();
+        $this->name = $user->name;
+        $this->email = $user->email;
     }
 
     public function getUser(): Authenticatable & Model {
@@ -84,187 +74,73 @@ class EditProfile extends Page {
         return $user;
     }
 
-    protected function fillForm(): void {
-        $data = $this->getUser()->attributesToArray();
+    protected function getFormSchema(): array {
+        return [
+            Section::make(__('menu.edit_profile'))
+                ->schema([
+                    TextInput::make('name')
+                        ->label(__('filament-panels::pages/auth/edit-profile.form.name.label'))
+                        ->required()
+                        ->maxLength(255)
+                        ->autofocus(),
 
-        $this->callHook('beforeFill');
+                    TextInput::make('email')
+                        ->label(__('filament-panels::pages/auth/edit-profile.form.email.label'))
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
 
-        $data = $this->mutateFormDataBeforeFill($data);
+                    TextInput::make('password')
+                        ->label(__('filament-panels::pages/auth/edit-profile.form.password.label'))
+                        ->password()
+                        ->rule(Password::default())
+                        ->autocomplete('new-password')
+                        ->dehydrated(fn($state): bool => filled($state))
+                        ->dehydrateStateUsing(fn($state): string => Hash::make($state))
+                        ->live(debounce: 500)
+                        ->same('passwordConfirmation'),
 
-        $this->form->fill($data);
-
-        $this->callHook('afterFill');
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeFill(array $data): array {
-        return $data;
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeSave(array $data): array {
-        return $data;
+                    TextInput::make('passwordConfirmation')
+                        ->label(__('filament-panels::pages/auth/edit-profile.form.password_confirmation.label'))
+                        ->password()
+                        ->requiredWith('password')
+                        ->visible(fn(Get $get): bool => filled($get('password')))
+                        ->dehydrated(false),
+                ]),
+        ];
     }
 
     public function save(): void {
         try {
-            $this->callHook('beforeValidate');
-
             $data = $this->form->getState();
 
-            $this->callHook('afterValidate');
+            $updateData = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ];
 
-            $data = $this->mutateFormDataBeforeSave($data);
+            if (!empty($data['password'])) {
+                $updateData['password'] = $data['password'];
+            }
 
-            $this->callHook('beforeSave');
-
-            $this->handleRecordUpdate($this->getUser(), $data);
-
-            $this->callHook('afterSave');
+            $this->getUser()->update($updateData);
         } catch (Halt $exception) {
             return;
         }
 
-        if (request()->hasSession() && array_key_exists('password', $data)) {
+        if (request()->hasSession() && !empty($data['password'])) {
             request()->session()->put([
                 'password_hash_' . Filament::getAuthGuard() => $data['password'],
             ]);
         }
 
-        $this->data['password'] = null;
-        $this->data['passwordConfirmation'] = null;
+        $this->password = '';
+        $this->passwordConfirmation = '';
 
-        $this->getSavedNotification()?->send();
-
-        if ($redirectUrl = $this->getRedirectUrl()) {
-            $this->redirect($redirectUrl);
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model {
-        $record->update($data);
-
-        return $record;
-    }
-
-    protected function getSavedNotification(): ?Notification {
-        $title = $this->getSavedNotificationTitle();
-
-        if (blank($title)) {
-            return null;
-        }
-
-        return Notification::make()
+        Notification::make()
             ->success()
-            ->title($this->getSavedNotificationTitle());
-    }
-
-    protected function getSavedNotificationTitle(): ?string {
-        return __('filament-panels::pages/auth/edit-profile.notifications.saved.title');
-    }
-
-    protected function getRedirectUrl(): ?string {
-        return null;
-    }
-
-    protected function getNameFormComponent(): Component {
-        return TextInput::make('name')
-            ->label(__('filament-panels::pages/auth/edit-profile.form.name.label'))
-            ->required()
-            ->maxLength(255)
-            ->autofocus();
-    }
-
-    protected function getEmailFormComponent(): Component {
-        return TextInput::make('email')
-            ->label(__('filament-panels::pages/auth/edit-profile.form.email.label'))
-            ->email()
-            ->required()
-            ->maxLength(255)
-            ->unique(ignoreRecord: true);
-    }
-
-    protected function getPasswordFormComponent(): Component {
-        return TextInput::make('password')
-            ->label(__('filament-panels::pages/auth/edit-profile.form.password.label'))
-            ->password()
-            ->rule(Password::default())
-            ->autocomplete('new-password')
-            ->dehydrated(fn($state): bool => filled($state))
-            ->dehydrateStateUsing(fn($state): string => Hash::make($state))
-            ->live(debounce: 500)
-            ->same('passwordConfirmation');
-    }
-
-    protected function getPasswordConfirmationFormComponent(): Component {
-        return TextInput::make('passwordConfirmation')
-            ->label(__('filament-panels::pages/auth/edit-profile.form.password_confirmation.label'))
-            ->password()
-            ->required()
-            ->visible(fn(Get $get): bool => filled($get('password')))
-            ->dehydrated(false);
-    }
-
-    public function form(Schema $schema): Schema {
-        return $schema;
-    }
-
-    /**
-     * @return array<int|string, string|\Filament\Schemas\Schema>
-     */
-    protected function getForms(): array {
-        return [
-            'form' => $this->form(
-                $this->makeForm()
-                    ->components([
-                        $this->getNameFormComponent(),
-                        $this->getEmailFormComponent(),
-                        $this->getPasswordFormComponent(),
-                        $this->getPasswordConfirmationFormComponent(),
-                    ])
-                    ->operation('edit')
-                    ->model($this->getUser())
-                    ->statePath('data'),
-            ),
-        ];
-    }
-
-    /**
-     * @return array<Action | ActionGroup>
-     */
-    protected function getFormActions(): array {
-        return [
-            $this->getSaveFormAction(),
-            $this->getCancelFormAction(),
-        ];
-    }
-
-    protected function getCancelFormAction(): Action {
-        return $this->backAction();
-    }
-
-    protected function getSaveFormAction(): Action {
-        return Action::make('save')
-            ->label(__('filament-panels::pages/auth/edit-profile.form.actions.save.label'))
-            ->submit('save')
-            ->keyBindings(['mod+s']);
-    }
-
-    protected function hasFullWidthFormActions(): bool {
-        return false;
-    }
-
-    public function getFormActionsAlignment(): string|Alignment {
-        return Alignment::Start;
+            ->title(__('filament-panels::pages/auth/edit-profile.notifications.saved.title'))
+            ->send();
     }
 
     public function getTitle(): string|Htmlable {
@@ -278,15 +154,4 @@ class EditProfile extends Page {
     public function hasLogo(): bool {
         return false;
     }
-
-    /**
-     * @deprecated Use `getCancelFormAction()` instead.
-     */
-    public function backAction(): Action {
-        return Action::make('back')
-            ->label(__('filament-panels::pages/auth/edit-profile.actions.cancel.label'))
-            ->url(filament()->getUrl())
-            ->color('gray');
-    }
-
 }

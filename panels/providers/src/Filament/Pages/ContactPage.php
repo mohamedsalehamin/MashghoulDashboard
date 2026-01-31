@@ -9,58 +9,57 @@ use App\DefaultPanel\Enum\ContactSourceEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Schema;
-use Filament\Pages\Concerns\InteractsWithFormActions;
-use Filament\Actions\Action;
+use Filament\Schemas\Components\Section;
 
-class ContactPage extends Page {
-    use InteractsWithFormActions;
+class ContactPage extends Page implements HasForms {
+    use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
     protected string $view = 'filament.pages.content.contact';
 
-    public function defaultForm(Schema $schema): Schema
-    {
-        return $schema
-            ->statePath('data');
-    }
+    public ?array $data = [];
 
-    public function form(Schema $schema): Schema {
-        return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required(),
-
-                TextInput::make('email')
-                    ->required(),
-
-                TextInput::make('phone')
-                    ->required(),
-                Select::make('contact_type_id')
-                    ->options(ContactType::enabled()->pluck('name', 'id'))
-                    ->label(__("forms.fields.message_type")),
-                TextInput::make('subject')
-                    ->required(),
-
-                Textarea::make('message')
-                    ->required(),
-            ]);
-    }
-
-    protected function getFormActions(): array
-    {
+    protected function getFormSchema(): array {
         return [
-            Action::make('submit')
-                ->label(__('forms.actions.send'))
-                ->submit('submit'),
+            Section::make(__('menu.contact_us'))
+                ->schema([
+                    TextInput::make('name')
+                        ->label(__('forms.fields.name'))
+                        ->required(),
+
+                    TextInput::make('email')
+                        ->label(__('forms.fields.email'))
+                        ->email()
+                        ->required(),
+
+                    TextInput::make('phone')
+                        ->label(__('forms.fields.phone'))
+                        ->required(),
+
+                    Select::make('contact_type_id')
+                        ->label(__('forms.fields.message_type'))
+                        ->options(ContactType::enabled()->pluck('name', 'id')),
+
+                    TextInput::make('subject')
+                        ->label(__('forms.fields.subject'))
+                        ->required(),
+
+                    Textarea::make('message')
+                        ->label(__('forms.fields.message'))
+                        ->required()
+                        ->rows(5),
+                ]),
         ];
     }
 
-    public function submit() {
+    public function submit(): void {
         $data = $this->form->getState();
+        
         Contact::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -70,18 +69,16 @@ class ContactPage extends Page {
             'message' => $data['message'],
             'source' => ContactSourceEnum::PROVIDER
         ]);
+        
         $this->form->fill();
+        
         Notification::make()
             ->title(__('panel.messages.success'))
             ->success()
             ->send();
     }
 
-    public function getTitle(): string {
-        return __('menu.contact_us');
-    }
-
-    public function get(): Htmlable|string {
+    public function getTitle(): string|Htmlable {
         return __('menu.contact_us');
     }
 
@@ -92,6 +89,4 @@ class ContactPage extends Page {
     public static function getNavigationLabel(): string {
         return __('menu.contact_us');
     }
-
-
 }

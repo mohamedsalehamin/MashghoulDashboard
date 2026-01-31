@@ -21,13 +21,14 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -44,12 +45,12 @@ class RateResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
 
-    protected static ?int $navigationSort = 15;
+    protected static ?int $navigationSort = 3;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('panel.groups.catalog');
-    }
+    // public static function getNavigationGroup(): ?string
+    // {
+    //     return __('panel.groups.catalog');
+    // }
 
     public static function getModelLabel(): string
     {
@@ -65,6 +66,7 @@ class RateResource extends Resource
     {
         return $schema
             ->components([
+                // For editing existing records (non-manual or single record edit)
                 Section::make(__('panel.rating_details'))
                     ->schema([
                         Select::make('provider_id')
@@ -75,43 +77,142 @@ class RateResource extends Resource
                             ->searchable()
                             ->required()
                             ->preload()
-                            ->visible(fn($record) => !$record || $record->source === 'manual'),
+                            ->disabled(fn($record) => $record && $record->source !== 'manual'),
 
                         Select::make('user_id')
                             ->label(__('panel.customer'))
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
-                            ->visible(fn($record) => !$record || $record->source === 'manual'),
-
-                        TextInput::make('rate')
-                            ->label(__('panel.rate'))
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(5)
-                            ->required()
-                            ->visible(fn($record) => !$record || !$record->isReply()),
-
-                        Textarea::make('comment')
-                            ->label(__('panel.comment'))
-                            ->required()
-                            ->rows(4)
-                            ->columnSpanFull(),
-
-                        Select::make('type')
-                            ->label(__('panel.type'))
-                            ->options([
-                                'service' => __('panel.service'),
-                                'product' => __('panel.product'),
-                                'general' => __('panel.general'),
-                            ])
-                            ->default('general')
-                            ->visible(fn($record) => !$record || !$record->isReply()),
+                            ->disabled(fn($record) => $record && $record->source !== 'manual'),
 
                         Hidden::make('source')
                             ->default('manual'),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->visible(fn($record) => $record !== null),
+
+                // For editing existing top-level ratings (edit service + place together)
+                Section::make(__('panel.service_rating'))
+                    ->schema([
+                        TextInput::make('service_rate')
+                            ->label(__('panel.service_rate'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(5)
+                            ->required()
+                            ->helperText(__('panel.rate_1_to_5'))
+                            ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                                if (!$record || $record->isReply()) {
+                                    return;
+                                }
+                                $service = $record->type === 'service' ? $record : $record->service_rating;
+                                $component->state($service?->rate);
+                            }),
+
+                        Textarea::make('service_comment')
+                            ->label(__('panel.service_comment'))
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->afterStateHydrated(function (Textarea $component, $state, $record) {
+                                if (!$record || $record->isReply()) {
+                                    return;
+                                }
+                                $service = $record->type === 'service' ? $record : $record->service_rating;
+                                $component->state($service?->comment);
+                            }),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => $record !== null && !$record->isReply()),
+
+                Section::make(__('panel.place_rating'))
+                    ->schema([
+                        TextInput::make('place_rate')
+                            ->label(__('panel.place_rate'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(5)
+                            ->required()
+                            ->helperText(__('panel.rate_1_to_5'))
+                            ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                                if (!$record || $record->isReply()) {
+                                    return;
+                                }
+                                $place = $record->type === 'place' ? $record : $record->place_rating;
+                                $component->state($place?->rate);
+                            }),
+
+                        Textarea::make('place_comment')
+                            ->label(__('panel.place_comment'))
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull()
+                            ->afterStateHydrated(function (Textarea $component, $state, $record) {
+                                if (!$record || $record->isReply()) {
+                                    return;
+                                }
+                                $place = $record->type === 'place' ? $record : $record->place_rating;
+                                $component->state($place?->comment);
+                            }),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => $record !== null && !$record->isReply()),
+
+                // For creating new manual ratings - Service Rating
+                Section::make(__('panel.service_rating'))
+                    ->schema([
+                        Select::make('provider_id')
+                            ->label(__('panel.provider'))
+                            ->options(function () {
+                                return Provider::with('user')->get()->pluck('user.name', 'user_id');
+                            })
+                            ->searchable()
+                            ->required()
+                            ->preload(),
+
+                        Select::make('user_id')
+                            ->label(__('panel.customer'))
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->preload(),
+
+                        TextInput::make('service_rate')
+                            ->label(__('panel.service_rate'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(5)
+                            ->required()
+                            ->helperText(__('panel.rate_1_to_5')),
+
+                        Textarea::make('service_comment')
+                            ->label(__('panel.service_comment'))
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => $record === null),
+
+                // For creating new manual ratings - Place Rating
+                Section::make(__('panel.place_rating'))
+                    ->schema([
+                        TextInput::make('place_rate')
+                            ->label(__('panel.place_rate'))
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(5)
+                            ->required()
+                            ->helperText(__('panel.rate_1_to_5')),
+
+                        Textarea::make('place_comment')
+                            ->label(__('panel.place_comment'))
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => $record === null),
 
                 Section::make(__('panel.approval'))
                     ->schema([
@@ -130,8 +231,7 @@ class RateResource extends Resource
                             ->content(fn($record) => $record?->approved_at?->format('Y-m-d H:i') ?? '-')
                             ->visible(fn($record) => $record && $record->is_approved),
                     ])
-                    ->columns(3)
-                    ->visible(fn($record) => !$record || $record->source === 'manual'),
+                    ->columns(3),
             ]);
     }
 
@@ -143,26 +243,45 @@ class RateResource extends Resource
                     ->label('#')
                     ->sortable(),
 
-                TextColumn::make('provider.name')
-                    ->label(__('panel.provider'))
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('provider_name')
+                    ->label(__('forms.fields.provider'))
+                    ->state(fn($record) => $record->provider?->name ?? $record->reservation?->reservable?->name ?? '-')
+                    ->searchable(query: function ($query, $search) {
+                        $query->whereHas('provider', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                              ->orWhereHas('reservation.reservable', fn($q) => $q->where('name', 'like', "%{$search}%"));
+                    }),
 
-                TextColumn::make('user.name')
-                    ->label(__('panel.customer'))
-                    ->searchable()
-                    ->sortable(),
+                TextColumn::make('customer_name')
+                    ->label(__('forms.fields.customer_name'))
+                    ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-')
+                    ->searchable(query: function ($query, $search) {
+                        $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                              ->orWhereHas('reservation.customer', fn($q) => $q->where('name', 'like', "%{$search}%"));
+                    }),
 
-                TextColumn::make('rate')
-                    ->label(__('panel.rate'))
-                    ->formatStateUsing(fn($state) => $state ? str_repeat('⭐', $state) : '-')
-                    ->sortable(),
+                // Service Rating Column
+                TextColumn::make('service_rate_display')
+                    ->label(__('panel.service_rate'))
+                    ->state(function ($record) {
+                        $serviceRating = $record->type === 'service' ? $record : $record->service_rating;
+                        return $serviceRating?->rate ? str_repeat('⭐', $serviceRating->rate) : '-';
+                    })
+                    ->tooltip(function ($record) {
+                        $serviceRating = $record->type === 'service' ? $record : $record->service_rating;
+                        return $serviceRating?->comment ?? '';
+                    }),
 
-                TextColumn::make('comment')
-                    ->label(__('panel.comment'))
-                    ->limit(50)
-                    ->tooltip(fn($record) => $record->comment)
-                    ->wrap(),
+                // Place Rating Column
+                TextColumn::make('place_rate_display')
+                    ->label(__('panel.place_rate'))
+                    ->state(function ($record) {
+                        $placeRating = $record->type === 'place' ? $record : $record->place_rating;
+                        return $placeRating?->rate ? str_repeat('⭐', $placeRating->rate) : '-';
+                    })
+                    ->tooltip(function ($record) {
+                        $placeRating = $record->type === 'place' ? $record : $record->place_rating;
+                        return $placeRating?->comment ?? '';
+                    }),
 
                 TextColumn::make('source')
                     ->label(__('panel.source'))
@@ -194,7 +313,7 @@ class RateResource extends Resource
                     ->badge()
                     ->color('info'),
 
-                TextColumn::make('reservation.reservation_number')
+                TextColumn::make('reservation.id')
                     ->label(__('panel.reservation'))
                     ->placeholder('-')
                     ->url(fn($record) => $record->reservation_id
@@ -202,7 +321,7 @@ class RateResource extends Resource
                         : null),
 
                 TextColumn::make('created_at')
-                    ->label(__('panel.created_at'))
+                    ->label(__('forms.fields.created_at'))
                     ->dateTime('Y-m-d H:i')
                     ->sortable(),
             ])
@@ -212,7 +331,6 @@ class RateResource extends Resource
                     ->options([
                         'reservation' => __('panel.reservation'),
                         'manual' => __('panel.manual'),
-                        'reply' => __('panel.reply'),
                     ]),
 
                 TernaryFilter::make('is_approved')
@@ -221,22 +339,17 @@ class RateResource extends Resource
                     ->falseLabel(__('panel.pending')),
 
                 SelectFilter::make('provider_id')
-                    ->label(__('panel.provider'))
+                    ->label(__('forms.fields.provider'))
                     ->relationship('provider', 'name')
                     ->searchable()
                     ->preload(),
 
-                Filter::make('top_level')
-                    ->label(__('panel.top_level_only'))
-                    ->query(fn(Builder $query) => $query->whereNull('parent_id'))
-                    ->default(true),
-
                 Filter::make('created_at')
                     ->form([
                         DateTimePicker::make('from')
-                            ->label(__('panel.from')),
+                            ->label(__('forms.fields.from')),
                         DateTimePicker::make('to')
-                            ->label(__('panel.to')),
+                            ->label(__('forms.fields.to')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -265,15 +378,6 @@ class RateResource extends Resource
                         ->visible(fn($record) => $record->is_approved && $record->source === 'manual')
                         ->action(fn($record) => $record->reject()),
 
-                    Action::make('view_replies')
-                        ->label(__('panel.view_replies'))
-                        ->icon('heroicon-o-chat-bubble-left-right')
-                        ->color('info')
-                        ->visible(fn($record) => $record->replies()->count() > 0)
-                        ->url(fn($record) => static::getUrl('index', [
-                            'tableFilters[parent_id][value]' => $record->id
-                        ])),
-
                     DeleteAction::make(),
                 ]),
             ])
@@ -281,14 +385,14 @@ class RateResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
 
-                    \Filament\Tables\Actions\BulkAction::make('approve_selected')
+                    BulkAction::make('approve_selected')
                         ->label(__('panel.approve_selected'))
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(fn($records) => $records->each->approve()),
 
-                    \Filament\Tables\Actions\BulkAction::make('reject_selected')
+                    BulkAction::make('reject_selected')
                         ->label(__('panel.reject_selected'))
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
@@ -306,14 +410,12 @@ class RateResource extends Resource
                 Section::make(__('panel.rating_details'))
                     ->schema([
                         TextEntry::make('provider.name')
-                            ->label(__('panel.provider')),
+                            ->label(__('panel.provider'))
+                            ->state(fn($record) => $record->provider?->name ?? $record->reservation?->reservable?->name ?? '-'),
 
                         TextEntry::make('user.name')
-                            ->label(__('panel.customer')),
-
-                        TextEntry::make('rate')
-                            ->label(__('panel.rate'))
-                            ->formatStateUsing(fn($state) => $state ? str_repeat('⭐', $state) . " ($state/5)" : '-'),
+                            ->label(__('panel.customer'))
+                            ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-'),
 
                         TextEntry::make('source')
                             ->label(__('panel.source'))
@@ -324,10 +426,6 @@ class RateResource extends Resource
                                 'reply' => 'info',
                                 default => 'gray',
                             }),
-
-                        TextEntry::make('comment')
-                            ->label(__('panel.comment'))
-                            ->columnSpanFull(),
 
                         TextEntry::make('is_approved')
                             ->label(__('panel.status'))
@@ -343,10 +441,36 @@ class RateResource extends Resource
                                 : null),
 
                         TextEntry::make('created_at')
-                            ->label(__('panel.created_at'))
+                            ->label(__('forms.fields.created_at'))
                             ->dateTime(),
                     ])
                     ->columns(3),
+
+                // Service Rating Section
+                Section::make(__('panel.service_rating'))
+                    ->schema([
+                        TextEntry::make('service_rate_display')
+                            ->label(__('panel.rate')),
+
+                        TextEntry::make('service_comment_display')
+                            ->label(__('panel.comment'))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => !$record->isReply()),
+
+                // Place Rating Section
+                Section::make(__('panel.place_rating'))
+                    ->schema([
+                        TextEntry::make('place_rate_display')
+                            ->label(__('panel.rate')),
+
+                        TextEntry::make('place_comment_display')
+                            ->label(__('panel.comment'))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn($record) => !$record->isReply()),
 
                 Section::make(__('panel.replies'))
                     ->schema([
@@ -354,7 +478,20 @@ class RateResource extends Resource
                             ->label('')
                             ->html()
                             ->formatStateUsing(function ($record) {
-                                $replies = $record->replies()->with('user')->get();
+                                // Get replies for both ratings in the pair
+                                $replies = collect();
+                                
+                                // Get replies for current rating
+                                $replies = $replies->merge($record->replies()->with('user')->get());
+                                
+                                // Get replies for paired rating if exists
+                                if ($record->paired_rating) {
+                                    $replies = $replies->merge($record->paired_rating->replies()->with('user')->get());
+                                }
+                                
+                                // Sort by created_at
+                                $replies = $replies->sortBy('created_at');
+                                
                                 if ($replies->isEmpty()) {
                                     return '<p class="text-gray-500">' . __('panel.no_replies') . '</p>';
                                 }
@@ -392,6 +529,12 @@ class RateResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['provider', 'user', 'reservation', 'replies']);
+            ->with(['provider', 'user', 'reservation.reservable', 'reservation.customer', 'replies'])
+            // Show only 'service' type to avoid duplicate rows (place rating shown in same row)
+            // Also show ratings without type. Always hide replies from the table.
+            ->where(function ($query) {
+                $query->where('type', 'service')
+                      ->orWhereNull('type');
+            });
     }
 }
