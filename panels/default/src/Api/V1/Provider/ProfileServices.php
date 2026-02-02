@@ -84,6 +84,7 @@ class ProfileServices {
             return [
                 'id' => $baseRating->id,
                 'name' => $baseRating->user?->name ?? $baseRating->reservation?->customer?->name ?? __('panel.anonymous'),
+                'phone' => $baseRating->user?->phone ?? $baseRating->reservation?->customer?->phone ?? null,
                 'created_at' => $baseRating->created_at?->diffForHumans(),
                 'service' => $serviceRating ? [
                     'rate' => (int) $serviceRating->rate,
