@@ -95,13 +95,20 @@
         ]
     },
     "scripts": {
+        "post-install-cmd": [
+            "@apply-patches"
+        ],
+        "post-update-cmd": [
+            "@apply-patches",
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "apply-patches": [
+            "bash -c 'if [ -f patches/tabbyai-laravel-checkout-trait-fix.patch ] && [ -d vendor/tabbyai/laravel ] && ! grep -q \"secretkey\" vendor/tabbyai/laravel/src/Traits/CheckoutTrait.php 2>/dev/null; then patch -p1 -d vendor/tabbyai/laravel < patches/tabbyai-laravel-checkout-trait-fix.patch 2>/dev/null || true; fi'"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
             "@php artisan filament:upgrade"
-        ],
-        "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -120,6 +127,9 @@
         "patches": {
             "hasnayeen/themes": {
                 "Fix Filament v4 compatibility - Update composer.json and Themes.php": "patches/hasnayeen-themes-filament-v4.patch"
+            },
+            "tabbyai/laravel": {
+                "Fix CheckoutTrait - Handle orderHistory array, use secretkey, add logging, and improve null safety": "patches/tabbyai-laravel-checkout-trait-fix.patch"
             }
         }
     },

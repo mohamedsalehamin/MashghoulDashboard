@@ -1,0 +1,73 @@
+--- a/src/Traits/CheckoutTrait.php	2026-02-02 18:23:39
++++ b/src/Traits/CheckoutTrait.php	2026-02-02 18:23:52
+@@ -28,7 +28,7 @@
+         string $failureCallback = null,
+         string $lang = 'ar',
+         ?BuyerHistory $buyerHistory = null,
+-        ?OrderHistory $orderHistory = null,
++        $orderHistory = null,
+     ): CheckoutSession {
+         try {
+             // Request Endpoint
+@@ -38,21 +38,27 @@
+             $requestHeaders = [
+                 'Accept' => 'application/json',
+                 'Content-Type' => 'application/json',
+-                'Authorization' => "Bearer {$this->publicKey}",
++                'Authorization' => "Bearer {$this->secretkey}",
+             ];
+ 
+             // Set default values
+             $buyerHistory ??= new BuyerHistory();
+-            $orderHistory ??= new OrderHistory(0, $buyer, $shippingAddress);
++            if (empty($orderHistory)) {
++                $orderHistory = [new OrderHistory(0, $buyer, $shippingAddress)];
++            }
++            // If a single OrderHistory object is passed, wrap it in an array
++            if ($orderHistory instanceof OrderHistory) {
++                $orderHistory = [$orderHistory];
++            }
+ 
+             $payment = [
+-                'amount' => number_format($amount, 2),
++                'amount' => number_format($amount, 2, '.', ''),
+                 'currency' => $this->currency,
+                 'description' => $description,
+                 'buyer' => $buyer->toArray(),
+                 'buyer_history' => $buyerHistory->toArray(),
+                 'order' => $order->toArray(),
+-                'order_history' => [$orderHistory->toArray()],
++                'order_history' => array_map(fn($h) => $h->toArray(), $orderHistory),
+                 'shipping_address' => $shippingAddress->toArray(),
+                 // 'meta' => $meta,
+                 // 'attachment' => $attachment,
+@@ -70,7 +76,7 @@
+                 ],
+                 'token' => null,
+             ];
+-
++             \Log::info('$requestBody'.print_r($requestBody,true));
+             // Send a POST request to the authentication endpoint
+             $response = Http::withHeaders($requestHeaders)->post($requestEndpoint, $requestBody);
+ 
+@@ -83,15 +89,15 @@
+             $sessionData = $response->json();
+ 
+             return new CheckoutSession(
+-                id: $sessionData['id'],
++                id: $sessionData['id'] ?? null,
+                 configuration: Configuration::fromArray($sessionData['configuration'] ?? []),
+                 payment: Payment::fromArray($sessionData['payment'] ?? []),
+-                status: $sessionData['status'],
++                status: $sessionData['status'] ?? 'unknown',
+                 merchantUrls: $sessionData['merchant_urls'] ?? [],
+-                lang: $sessionData['lang'],
++                lang: $sessionData['lang'] ?? $lang,
+                 merchant: Merchant::fromArray($sessionData['merchant'] ?? []),
+-                merchantCode: $sessionData['merchant_code'],
+-                token: $sessionData['token'],
++                merchantCode: $sessionData['merchant_code'] ?? $this->merchantCode,
++                token: $sessionData['token'] ?? null,
+                 warnings: $sessionData['warnings'] ?? [],
+             );
+         } catch (\Exception $e) {
