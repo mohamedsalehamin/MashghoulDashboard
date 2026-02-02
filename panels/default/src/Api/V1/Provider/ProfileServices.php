@@ -97,6 +97,9 @@ class ProfileServices {
             ];
         })->values()->toArray();
 
+        // Ensure it's a plain indexed array without keys
+        $rates = array_values($rates);
+
         $avg = $allRatings->whereNotNull('rate')->avg('rate') ?? 0;
 
         return Api::isOk(__("Provider rates"), $rates)
