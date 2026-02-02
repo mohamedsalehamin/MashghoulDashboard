@@ -125,6 +125,14 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
         $this->attributes['phone'] = Str::replace(' ', '', $value);
     }
 
+    public function setPasswordAttribute($value): void {
+        // Only set password if a value is provided (not null or empty)
+        if (!empty($value)) {
+            $this->attributes['password'] = $value;
+        }
+        // If empty/null, don't update the password attribute
+    }
+
     public function getStatusAttribute($value) {
         return $this->active->value;
     }
