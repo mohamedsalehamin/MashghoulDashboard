@@ -102,7 +102,11 @@ class ProfileServices {
 
         $avg = $allRatings->whereNotNull('rate')->avg('rate') ?? 0;
 
-        return Api::isOk(__("Provider rates"), $rates)
+        // Use Collection to preserve array structure (like AnonymousResourceCollection does)
+        // Collections implement JsonSerializable and will be encoded as arrays
+        $ratesCollection = collect($rates);
+
+        return Api::isOk(__("Provider rates"), $ratesCollection)
             ->addAttribute('avg_rates', (float) $avg)
             ->addAttribute('rates_count', (int) $grouped->count());
     }
