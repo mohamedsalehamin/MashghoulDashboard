@@ -33,6 +33,7 @@ class ProviderResource extends JsonResource {
             'reservation_fees_include_taxes' => Money::parse(floatval($this->reservation_fees_include_taxes))->format(),
             "share_link" => route('site.share_provider', str_replace(" ", "&", $this->getTranslation('name', 'en') ?? $this->name)),
             'latest_rates' => $this->getGroupedRates(),
+            'available_coupons' => $this->getActiveCoupons(),
         ];
     }
 
@@ -137,5 +138,55 @@ class ProviderResource extends JsonResource {
         })->values()->toArray();
 
         return $result;
+    }
+
+    /**
+     * Get active coupons for this provider
+     */
+    private function getActiveCoupons(): array
+    {
+        // Get coupon IDs from direct relationship (coupon_provider table)
+        $directCouponIds = \DB::table('coupon_provider')
+            ->where('provider_id', $this->id)
+            ->pluck('coupon_id');
+
+        // Get coupon IDs from indirect relationship (coupon_services table)
+        $indirectCouponIds = \DB::table('coupon_services')
+            ->where('provider_id', $this->id)
+            ->pluck('coupon_id');
+
+        // Combine and get unique coupon IDs
+        $couponIds = $directCouponIds->merge($indirectCouponIds)->unique();
+
+        if ($couponIds->isEmpty()) {
+            return [];
+        }
+
+        $coupons = \App\ContentModule\Models\Coupon::query()
+            ->whereIn('id', $couponIds)
+            ->where('status', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->get();
+
+        return $coupons->map(function($coupon) {
+            // Handle dates - they might be strings or Carbon instances
+            // Carbon::parse handles both cases
+            $startDate = $coupon->start_date ? \Carbon\Carbon::parse($coupon->start_date)->toDateString() : null;
+            $endDate = $coupon->end_date ? \Carbon\Carbon::parse($coupon->end_date)->toDateString() : null;
+            
+            return [
+                'id' => $coupon->id,
+                'name' => $coupon->name,
+                'code' => $coupon->code,
+                'discount_type' => $coupon->discount_type->value,
+                'discount_value' => $coupon->discount_value,
+                'formatted_value' => $coupon->formattedValue(),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'usages' => $coupon->usages,
+                'usage_per_user' => $coupon->usage_per_user,
+            ];
+        })->toArray();
     }
 }
