@@ -34,6 +34,7 @@ class ProviderResource extends JsonResource {
             "share_link" => route('site.share_provider', str_replace(" ", "&", $this->getTranslation('name', 'en') ?? $this->name)),
             'latest_rates' => $this->getGroupedRates(),
             'available_coupons' => $this->getActiveCoupons(),
+            'portfolio' => $this->getPortfolio(),
         ];
     }
 
@@ -189,5 +190,44 @@ class ProviderResource extends JsonResource {
                 'min_order_value' => $coupon->meta_data['min_order_value'] ?? 0,
             ];
         })->toArray();
+    }
+    /**
+     * Get portfolio items with type indicator (image, video, audio)
+     */
+    private function getPortfolio(): array
+    {
+        $portfolio = $this->getMedia('portfolio');
+        
+        if ($portfolio->isEmpty()) {
+            return [];
+        }
+        
+        $items = [];
+        
+        foreach ($portfolio as $media) {
+            $mimeType = $media->mime_type ?? '';
+            
+            // Determine type based on MIME type
+            $type = 'image'; // default
+            if (str_starts_with($mimeType, 'image/')) {
+                $type = 'image';
+            } elseif (str_starts_with($mimeType, 'video/')) {
+                $type = 'video';
+            } elseif (str_starts_with($mimeType, 'audio/')) {
+                $type = 'audio';
+            }
+            
+            $items[] = [
+                'id' => $media->id,
+                'name' => $media->name,
+                'url' => $media->getFullUrl(),
+                'type' => $type,
+                'mime_type' => $mimeType,
+                'size' => $media->size,
+                'created_at' => $media->created_at?->toIso8601String(),
+            ];
+        }
+        
+        return $items;
     }
 }

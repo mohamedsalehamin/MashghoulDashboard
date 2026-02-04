@@ -129,6 +129,24 @@ class EditProfilePage extends Page {
                             SpatieMediaLibraryFileUpload::make('images')
                                 ->collection("images")
                                 ->required(),
+                                SpatieMediaLibraryFileUpload::make('portfolio')
+                                ->collection('portfolio')
+                                ->multiple()
+                                ->label(__('forms.fields.portfolio'))
+                                ->helperText(__('forms.helpers.portfolio_upload'))
+                                ->acceptedFileTypes([
+                                    'image/jpeg', 
+                                    'image/png', 
+                                    'image/webp', 
+                                    'image/gif', 
+                                    'video/mp4', 
+                                    'video/mpeg', 
+                                    'audio/mpeg', 
+                                    'audio/mp3', 
+                                    'audio/wav'
+                                ])
+                                ->nullable(),
+                            
                             SpatieMediaLibraryFileUpload::make('commercial_register')
                                 ->collection("commercial_register")
                                 ->nullable(),
@@ -274,6 +292,11 @@ class EditProfilePage extends Page {
                 $this->form->model?->provider?->addMedia($media)->toMediaCollection("images");
             }
 
+        }
+        foreach ($this->record['provider']['portfolio'] ?? [] as $media) {
+            if ($media instanceof TemporaryUploadedFile) {
+                $this->form->model?->provider?->addMedia($media)->toMediaCollection('portfolio');
+            }
         }
         foreach ($this->record['provider']['commercial_register'] ?? [] as $media) {
             if ($media instanceof TemporaryUploadedFile) {

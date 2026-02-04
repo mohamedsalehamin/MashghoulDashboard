@@ -39,6 +39,19 @@ class Provider extends Model implements HasMedia {
 //        'bio'=>'array',
     ];
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('portfolio')
+            ->acceptsMimeTypes([
+                // Images
+                'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+                // Videos
+                'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm',
+                // Audio
+                'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac'
+            ]);
+    }
+
     /**
      * Override bootHasWallet to prevent wallet creation during pluck operations
      * when the model doesn't have an ID yet.

@@ -382,6 +382,7 @@ return [
         'new_user' => 'new user',
         'existing_customer' => 'existing customer',
         'select_customer' => 'select customer',
+        'portfolio' => 'Portfolio',
     ],
     'tooltip' => [
         'order_limit_per_item' => 'After exceeding the limit, the customer will not pay until approved by one of the branch managers',
@@ -421,5 +422,7 @@ return [
         'mobile_app'=>'Mobile app',
     ],
 
-
+    'helpers' => [
+        'portfolio_upload' => 'Upload images, videos, and audio files for your portfolio',
+    ],
 ];

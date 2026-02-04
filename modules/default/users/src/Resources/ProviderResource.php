@@ -146,9 +146,28 @@ class ProviderResource extends Resource {
                             ->multiple()
                             ->collection("images")
                             ->required(),
+                        SpatieMediaLibraryFileUpload::make('portfolio')
+                            ->collection('portfolio')
+                            ->multiple()
+                            ->label(__('forms.fields.portfolio'))
+                            ->helperText(__('forms.helpers.portfolio_upload'))
+                            ->acceptedFileTypes([
+                                'image/jpeg', 
+                                'image/png', 
+                                'image/webp', 
+                                'image/gif', 
+                                'video/mp4', 
+                                'video/mpeg', 
+                                'audio/mpeg', 
+                                'audio/mp3', 
+                                'audio/wav'
+                            ])
+                            ->nullable(),
                         SpatieMediaLibraryFileUpload::make('commercial_register')
                             ->collection("commercial_register")
                             ->nullable(),
+
+                        
 
                         Select::make('category_id')
                             ->required()

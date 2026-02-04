@@ -394,6 +394,7 @@ return [
         'new_user' => 'مستخدم جديد',
         'existing_customer' => 'عميل موجود',
         'select_user' => 'اختر العميل',
+        'portfolio' => 'معرض الأعمال',
     ],
     'hints' => [
         'price_include_taxes' => 'السعر شامل شاملة الضريبة ونسبة التطبيق'
@@ -444,5 +445,7 @@ return [
         'mobile_app' => 'تطبيق جوال'
     ],
 
-
+    'helpers' => [
+        'portfolio_upload' => 'رفع صور وفيديوهات وملفات صوتية لمعرض الأعمال',
+    ],
 ];
