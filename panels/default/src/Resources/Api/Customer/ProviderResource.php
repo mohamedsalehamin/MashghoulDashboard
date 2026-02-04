@@ -186,6 +186,7 @@ class ProviderResource extends JsonResource {
                 'end_date' => $endDate,
                 'usages' => $coupon->usages,
                 'usage_per_user' => $coupon->usage_per_user,
+                'min_order_amount' => $coupon->meta_data['min_order_amount'] ?? 0,
             ];
         })->toArray();
     }
