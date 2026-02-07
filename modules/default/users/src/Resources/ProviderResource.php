@@ -149,6 +149,7 @@ class ProviderResource extends Resource {
                         SpatieMediaLibraryFileUpload::make('portfolio')
                             ->collection('portfolio')
                             ->multiple()
+                            ->reorderable()
                             ->label(__('forms.fields.portfolio'))
                             ->helperText(__('forms.helpers.portfolio_upload'))
                             ->acceptedFileTypes([

@@ -30,11 +30,102 @@ class PayTransactionViaTabby
                 currency: 'SAR'
             );
          
+            // =====================================================================
+            // VALIDATE BUYER INFORMATION BEFORE CREATING SESSION
+            // =====================================================================
+            $user = $transaction->user;
+            $buyerPhone = $user->phone ?? null;
+            $buyerEmail = $user->email ?? null;
+            $buyerName = $user->name ?? null;
+
+            // Validate required buyer information
+            if (empty($buyerPhone) || empty($buyerEmail) || empty($buyerName)) {
+                Log::error('Tabby payment: Missing buyer information', [
+                    'transaction_id' => $transaction->id,
+                    'user_id' => $user->id,
+                    'has_phone' => !empty($buyerPhone),
+                    'has_email' => !empty($buyerEmail),
+                    'has_name' => !empty($buyerName),
+                ]);
+                
+                self::markTransactionFailed(
+                    $transaction, 
+                    'missing_buyer_info', 
+                    'Buyer information (name, email, or phone) is missing. Please update your profile.',
+                    [
+                        'missing_fields' => [
+                            'phone' => empty($buyerPhone),
+                            'email' => empty($buyerEmail),
+                            'name' => empty($buyerName),
+                        ]
+                    ]
+                );
+                
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Please complete your profile information (name, email, and phone) before making a payment.',
+                    'payment_status' => ReservationPaymentStatus::CANCELED->value,
+                    'reservation_status' => ReservationStatus::CANCELED->value,
+                    'errors' => [
+                        'missing_buyer_info' => true,
+                        'missing_fields' => [
+                            'phone' => empty($buyerPhone),
+                            'email' => empty($buyerEmail),
+                            'name' => empty($buyerName),
+                        ]
+                    ]
+                ], 400);
+            }
+
+            // Validate phone format (should be E.164 format for Tabby)
+            if (!preg_match('/^\+[1-9]\d{1,14}$/', $buyerPhone)) {
+                Log::warning('Tabby payment: Invalid phone format, attempting to fix', [
+                    'transaction_id' => $transaction->id,
+                    'user_id' => $user->id,
+                    'phone' => $buyerPhone,
+                ]);
+                
+                // Try to format phone if it's missing the + prefix
+                if (!str_starts_with($buyerPhone, '+')) {
+                    // If phone starts with country code without +, add it
+                    if (str_starts_with($buyerPhone, '966')) {
+                        $buyerPhone = '+' . $buyerPhone;
+                    } else {
+                        // Default to Saudi Arabia if no country code
+                        $buyerPhone = '+966' . ltrim($buyerPhone, '0');
+                    }
+                }
+            }
+
+            // Validate email format
+            if (!filter_var($buyerEmail, FILTER_VALIDATE_EMAIL)) {
+                Log::error('Tabby payment: Invalid email format', [
+                    'transaction_id' => $transaction->id,
+                    'user_id' => $user->id,
+                    'email' => $buyerEmail,
+                ]);
+                
+                self::markTransactionFailed(
+                    $transaction, 
+                    'invalid_email', 
+                    'Invalid email address. Please update your profile.',
+                    ['email' => $buyerEmail]
+                );
+                
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid email address. Please update your profile.',
+                    'payment_status' => ReservationPaymentStatus::CANCELED->value,
+                    'reservation_status' => ReservationStatus::CANCELED->value,
+                    'errors' => ['invalid_email' => true]
+                ], 400);
+            }
+
             // Get user's order history (5-10 previous orders) - exclude current transaction
             $previousOrders = $transaction->user->reservations()
-                ->where('id', '!=', $transaction->transactionable_id) // Exclude current reservation
+                ->where('id', '!=', $transaction->transactionable_id)
                 ->orderBy('created_at', 'desc')
-                ->limit(10) // Get up to 10 previous orders
+                ->limit(10)
                 ->get();
 
             // Get user's registration date or first order date
@@ -45,10 +136,11 @@ class PayTransactionViaTabby
             // Count successful orders for loyalty level - exclude current transaction
             $successfulOrdersCount = $transaction->user->reservations()
                 ->where('status', ReservationStatus::COMPLETED->value)
-                ->where('id', '!=', $transaction->transactionable_id) // Exclude current reservation
+                ->where('id', '!=', $transaction->transactionable_id)
                 ->count();
-                Log::info('successfulOrdersCount', ['successfulOrdersCount'=>$successfulOrdersCount]);
-            // Log loyalty level calculation for debugging
+                
+            Log::info('successfulOrdersCount', ['successfulOrdersCount'=>$successfulOrdersCount]);
+            
             Log::info('Tabby loyalty level calculation', [
                 'user_id' => $transaction->user->id,
                 'current_reservation_id' => $transaction->transactionable_id,
@@ -63,15 +155,11 @@ class PayTransactionViaTabby
                 registeredSince: $registeredSince->toIso8601String()
             );
 
+            // Create buyer with validated information
             $buyer = new Buyer(
-                // phone: '+966500000002',
-                // // email: 'otp.rejected@tabby.ai',
-                // email :'otp.success@tabby.ai',
-                // name: 'John Doe',
-                
-                phone: $transaction->user->phone,
-                email: $transaction->user->email,
-                name: $transaction->user->name,
+                phone: $buyerPhone,
+                email: $buyerEmail,
+                name: $buyerName,
             );
 
             $amount = (float) $transaction->price->getAmount() / 100;
@@ -110,9 +198,8 @@ class PayTransactionViaTabby
             $orderHistory = null;
             
             if ($previousOrders->isNotEmpty()) {
-                // Create order history for up to 10 previous orders
                 foreach ($previousOrders->take(10) as $previousOrder) {
-                    $previousTransaction = $previousOrder->transaction; // Use transaction() method
+                    $previousTransaction = $previousOrder->transaction;
                     
                     if ($previousTransaction) {
                         $previousAmount = (float) $previousTransaction->price->getAmount() / 100;
@@ -132,19 +219,15 @@ class PayTransactionViaTabby
                             purchasedAt: $previousOrder->created_at->toIso8601String(),
                             status: self::mapStatusToTabby($previousOrder->status->value),
                             items: [$previousOrderItem]
-
                         );
                     }
                 }
                 
-                // Pass all order histories to Tabby (5-10 previous orders)
                 if (!empty($orderHistoryArray)) {
-                    // Pass all order histories to Tabby
                     $orderHistory = $orderHistoryArray;
                 }
             }
 
-            // Log order history for debugging
             Log::info('Tabby order history', [
                 'user_id' => $transaction->user->id,
                 'current_reservation_id' => $transaction->transactionable_id,
@@ -201,7 +284,25 @@ class PayTransactionViaTabby
             Log::info('Tabby createSession response', $sessionData);
             
             // =====================================================================
-            // Check for errors following the recommended pattern from CheckoutTrait
+            // CHECK BUYER INFO IN RESPONSE
+            // =====================================================================
+            if (isset($sessionData['payment']['buyer'])) {
+                $responseBuyer = $sessionData['payment']['buyer'];
+                $hasBuyerInfo = !empty($responseBuyer['name']) && 
+                                !empty($responseBuyer['email']) && 
+                                !empty($responseBuyer['phone']);
+                
+                if (!$hasBuyerInfo) {
+                    Log::warning('Tabby payment: Buyer information missing in response', [
+                        'transaction_id' => $transaction->id,
+                        'response_buyer' => $responseBuyer,
+                        'sent_buyer' => $buyer->toArray(),
+                    ]);
+                }
+            }
+            
+            // =====================================================================
+            // CHECK FOR ERRORS FOLLOWING THE RECOMMENDED PATTERN FROM CHECKOUTTRAIT
             // =====================================================================
             
             // Check for explicit rejection status
@@ -211,7 +312,6 @@ class PayTransactionViaTabby
                     'session_data' => $sessionData
                 ]);
                 
-                // Get warnings array if available
                 $warnings = $sessionData['warnings'] ?? [];
                 
                 // Check if we have an explicit rejection reason
@@ -225,15 +325,27 @@ class PayTransactionViaTabby
                     }
                 }
                 
-              
                 $errorMessage = self::mapRejectionReason($rejectionReason);
-              
+                
+                // Store payment ID even if rejected - so we can check status later
+                $paymentId = $sessionData['payment']['id'] ?? null;
+                $responseBuyer = $sessionData['payment']['buyer'] ?? [];
                 
                 // Update transaction status
                 self::markTransactionFailed($transaction, 'rejected', $errorMessage, [
                     'rejection_reason' => $rejectionReason,
                     'warnings' => $warnings,
-                    'original_response' => $sessionData
+                    'original_response' => $sessionData,
+                    'gateway' => 'tabby',
+                    'invoiceId' => $paymentId, // Store payment ID for later checking
+                    'sessionId' => $sessionData['id'] ?? null,
+                    'paid_at' => $sessionData['payment']['created_at'] ?? null,
+                    'expires_at' => $sessionData['payment']['expires_at'] ?? null,
+                    'buyer_info_missing_in_response' => empty($responseBuyer['name']) || 
+                                                       empty($responseBuyer['email']) || 
+                                                       empty($responseBuyer['phone']),
+                    'sent_buyer_info' => $buyer->toArray(), // Store what we sent
+                    'response_buyer_info' => $responseBuyer, // Store what Tabby returned
                 ]);
                 
                 return response()->json([
@@ -246,7 +358,8 @@ class PayTransactionViaTabby
                         'warnings' => $warnings,
                         'rejection_reason' => $rejectionReason,
                         'rejection_message' => $errorMessage,
-                        'detailed_error' => $errorMessage
+                        'detailed_error' => $errorMessage,
+                        'payment_id' => $paymentId, // Include payment ID in response
                     ]
                 ], 400);
             }
@@ -258,7 +371,6 @@ class PayTransactionViaTabby
                     'session_data' => $sessionData
                 ]);
                 
-                // Check if we have a specific rejection reason for installments
                 $rejectionReason = null;
                 if (isset($sessionData['configuration']['products']['installments'])) {
                     $installmentsData = $sessionData['configuration']['products']['installments'];
@@ -269,21 +381,28 @@ class PayTransactionViaTabby
                     }
                 }
                 
-                // Map the rejection reason to a user-friendly message
                 $mappedReason = self::mapRejectionReason($rejectionReason ?? 'not_available');
                 
-                // Update transaction status
-                self::markTransactionFailed($transaction, 'no_options', $mappedReason, $sessionData);
+                // Store payment ID for later checking
+                $paymentId = $sessionData['payment']['id'] ?? null;
+                
+                self::markTransactionFailed($transaction, 'no_options', $mappedReason, [
+                    'gateway' => 'tabby',
+                    'invoiceId' => $paymentId,
+                    'sessionId' => $sessionData['id'] ?? null,
+                    'original_response' => $sessionData
+                ]);
                 
                 return response()->json([
                     'status' => 400,
-                    'message' => $mappedReason . 'ddddd',
+                    'message' => $mappedReason,
                     'payment_status' => ReservationPaymentStatus::CANCELED->value,
                     'reservation_status' => ReservationStatus::CANCELED->value,
                     'errors' => [
                         'disable_tabby' => true,
                         'rejection_reason' => $rejectionReason,
-                        'rejection_message' => $mappedReason
+                        'rejection_message' => $mappedReason,
+                        'payment_id' => $paymentId,
                     ]
                 ], 400);
             }
@@ -292,12 +411,10 @@ class PayTransactionViaTabby
             $availableProducts = $sessionData['configuration']['available_products'];
             $webUrl = null;
             
-            // Try to get web URL from installments first
             if (isset($availableProducts['installments']) && !empty($availableProducts['installments'])) {
                 $webUrl = $availableProducts['installments'][0]['web_url'] ?? null;
             }
             
-            // If no installments, try to get web URL from any available product
             if (!$webUrl) {
                 foreach ($availableProducts as $productType => $productDetails) {
                     if (isset($productDetails[0]['web_url'])) {
@@ -307,26 +424,33 @@ class PayTransactionViaTabby
                 }
             }
             
-            // Final check if we have a web URL
             if (!$webUrl) {
                 Log::warning('Tabby no web URL found', [
                     'transaction_id' => $transaction->id,
                     'available_products' => $availableProducts
                 ]);
                 
-                // Update transaction status
-                self::markTransactionFailed($transaction, 'no_web_url', 'No payment URL found in Tabby response', $sessionData);
+                $paymentId = $sessionData['payment']['id'] ?? null;
+                
+                self::markTransactionFailed($transaction, 'no_web_url', 'No payment URL found in Tabby response', [
+                    'gateway' => 'tabby',
+                    'invoiceId' => $paymentId,
+                    'sessionId' => $sessionData['id'] ?? null,
+                    'original_response' => $sessionData
+                ]);
                 
                 return response()->json([
                     'status' => 400,
                     'message' => 'No payment URL found in Tabby response',
                     'payment_status' => ReservationPaymentStatus::CANCELED->value,
                     'reservation_status' => ReservationStatus::CANCELED->value,
-                    'errors' => ['disable_tabby' => true]
+                    'errors' => [
+                        'disable_tabby' => true,
+                        'payment_id' => $paymentId,
+                    ]
                 ], 400);
             }
             
-            // If we got here, we have a successful session with a valid web URL
             Log::info('Tabby payment session created successfully', [
                 'transaction_id' => $transaction->id,
                 'payment_id' => $sessionData['payment']['id'] ?? null,
@@ -357,7 +481,6 @@ class PayTransactionViaTabby
             ], 200);
             
         } catch (TabbyApiException $tabbyException) {
-            // Log the TabbyApiException with its original message and data
             Log::error('Tabby API Exception', [
                 'transaction_id' => $transaction->id,
                 'message' => $tabbyException->getMessage(),
@@ -365,11 +488,9 @@ class PayTransactionViaTabby
                 'code' => $tabbyException->getCode()
             ]);
             
-            // Get detailed error message
             $context = $tabbyException->context();
             $errorMessage = self::extractErrorMessage($context['response'] ?? [], $tabbyException->getMessage());
             
-            // Update transaction status
             self::markTransactionFailed(
                 $transaction, 
                 'api_exception', 
@@ -393,14 +514,12 @@ class PayTransactionViaTabby
             ], $tabbyException->getCode() ?? 400);
             
         } catch (Exception $e) {
-            // General exception handling (not TabbyApiException)
             Log::error('Tabby payment error', [
                 'transaction_id' => $transaction->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             
-            // Update transaction status
             self::markTransactionFailed($transaction, 'exception', $e->getMessage());
             
             return response()->json([
@@ -425,7 +544,6 @@ class PayTransactionViaTabby
         string $message, 
         array $additionalData = []
     ): void {
-        // Update transaction status
         $transaction->update([
             'status' => ReservationPaymentStatus::CANCELED->value,
             'meta_data' => array_merge([
@@ -436,7 +554,6 @@ class PayTransactionViaTabby
             ], $additionalData)
         ]);
         
-        // Update reservation status if it exists
         if ($transaction->transactionable) {
             $transaction->transactionable->update([
                 'status' => ReservationStatus::CANCELED->value
@@ -448,24 +565,19 @@ class PayTransactionViaTabby
      * Extract a meaningful error message from errors or warnings
      */
     private static function extractErrorMessage($errorData, string $defaultMessage): string {
-        // If we have no data, return the default message
         if (empty($errorData)) {
             return $defaultMessage;
         }
         
-        // If it's a string, return it
         if (is_string($errorData)) {
             return $errorData;
         }
         
-        // If it's an array of errors or warnings
         if (is_array($errorData)) {
-            // Check for common Tabby warning structure
             if (isset($errorData[0]['message'])) {
                 return $errorData[0]['message'];
             }
             
-            // For errors array with field->message structure
             foreach ($errorData as $field => $fieldError) {
                 if (is_string($fieldError)) {
                     return $field . ': ' . $fieldError;
@@ -475,11 +587,9 @@ class PayTransactionViaTabby
                 }
             }
             
-            // Fall back to JSON representation
             return json_encode($errorData);
         }
         
-        // Fall back to default message
         return $defaultMessage;
     }
     
@@ -496,7 +606,6 @@ class PayTransactionViaTabby
     
     /**
      * Map Tabby rejection reason to user-friendly message
-     * Based on: https://docs.tabby.ai/pay-in-4-custom-integration/checkout-flow
      */
     private static function mapRejectionReason(string $reason): string {
         $rejectionMessages = [

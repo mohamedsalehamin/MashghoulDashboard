@@ -61,7 +61,17 @@ return [
         'amount_exceeds_balance' => 'The amount cannot exceed your available balance',
         'no_transactions_wallet' => 'There are no transactions on the wallet.',
         'no_products' => 'no products found.',
-
+        'capture_tabby_payment_description' => 'This will check the current payment status with Tabby and attempt to capture it if authorized.',
+        'tabby_payment_id_not_found' => 'Tabby payment ID not found in transaction metadata.',
+        'tabby_payment_already_captured' => 'Payment was already captured. Transaction status updated.',
+        'tabby_payment_created_not_authorized' => 'Payment is created but not yet authorized. Please wait for customer to complete payment.',
+        'tabby_payment_failed' => 'Payment status is :status. Cannot capture failed payment.',
+        'tabby_payment_status_unknown' => 'Payment status is :status. Cannot capture.',
+        'tabby_payment_captured_successfully' => 'Payment captured successfully!',
+        'tabby_payment_capture_failed' => 'Failed to capture payment. Please check logs for details.',
+        'tabby_api_error' => 'Tabby API error: :error',
+        'payment_not_authorized' => 'Payment Not Authorized',
+        'transaction_not_found' => 'Transaction not found for this reservation.',
     ],
     'languages' => [
         'arabic' => 'Arabic',
@@ -74,7 +84,9 @@ return [
         'print' => 'Print',
         'share' => 'Share',
         'add' => 'Add',
-        'delete' => 'Delete'
+        'delete' => 'Delete',
+        'capture_tabby_payment' => 'Check & Capture Tabby Payment',
+        'capture' => 'Capture',
     ],
     'enums' => [
         'waiting_transfer' => 'Waiting for transfer',

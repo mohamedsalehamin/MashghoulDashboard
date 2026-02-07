@@ -4,6 +4,7 @@ namespace App\CatalogModule\Resources\ReservationResource\Pages;
 
 use App\CatalogModule\Resources\ReservationResource;
 use App\CatalogModule\Resources\ReservationResource\Actions\ChangeReservationStatusAction;
+use App\CatalogModule\Resources\ReservationResource\Actions\CaptureTabbyPaymentAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewReservation extends ViewRecord {
@@ -12,6 +13,7 @@ class ViewReservation extends ViewRecord {
     protected function getHeaderActions(): array {
         return [
             ChangeReservationStatusAction::make(true),
+            CaptureTabbyPaymentAction::make(),
         ];
     }
 }

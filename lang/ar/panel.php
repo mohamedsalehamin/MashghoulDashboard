@@ -77,6 +77,17 @@ return [
         'withdrawal_request_created' => 'تم إنشاء طلب سحب',
         'no_transactions_wallet' => 'لا يوجد عمليات على المحفظة',
         'no_products' => 'لا يوجد منتجات',
+        'capture_tabby_payment_description' => 'سيتم التحقق من حالة الدفع الحالية مع تابي ومحاولة تحصيلها إذا كانت مصرح بها.',
+        'tabby_payment_id_not_found' => 'معرف دفع تابي غير موجود في بيانات المعاملة.',
+        'tabby_payment_already_captured' => 'تم تحصيل الدفع مسبقاً. تم تحديث حالة المعاملة.',
+        'tabby_payment_created_not_authorized' => 'تم إنشاء الدفع ولكن لم يتم الترخيص بعد. يرجى انتظار إتمام العميل للدفع.',
+        'tabby_payment_failed' => 'حالة الدفع هي :status. لا يمكن تحصيل الدفع الفاشل.',
+        'tabby_payment_status_unknown' => 'حالة الدفع هي :status. لا يمكن التحصيل.',
+        'tabby_payment_captured_successfully' => 'تم تحصيل الدفع بنجاح!',
+        'tabby_payment_capture_failed' => 'فشل في تحصيل الدفع. يرجى التحقق من السجلات للتفاصيل.',
+        'tabby_api_error' => 'خطأ في واجهة برمجة تطبيقات تابي: :error',
+        'payment_not_authorized' => 'الدفع غير مصرح به',
+        'transaction_not_found' => 'لم يتم العثور على معاملة لهذا الحجز.',
     ],
     'languages' => [
         'arabic' => 'العربية',
@@ -90,7 +101,8 @@ return [
         'cancel' => 'إلغاء',
         'print' => 'طباعة',
         'share' => 'مشاركة',
-
+        'capture_tabby_payment' => 'التحقق من دفع تابي ومحاولة التحصيل',
+        'capture' => 'تحصيل',
 
     ],
     'enums' => [

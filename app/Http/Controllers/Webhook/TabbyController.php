@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Webhook;
 
-use Exception;
 use App\CatalogModule\Models\Transaction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -40,9 +39,9 @@ class TabbyController extends Controller
                 ]);
                 return response()->json(['error' => 'Missing payment_id'], 400);
             }
-
+    
             $transaction = Transaction::where('meta_data->invoiceId', $paymentId)->first();
-
+    
             if (!$transaction) {
                 Log::error('Tabby webhook: Transaction not found', [
                     'payment_id' => $paymentId,
@@ -50,58 +49,140 @@ class TabbyController extends Controller
                 ]);
                 return response()->json(['error' => 'Transaction not found'], 404);
             }
-
-            // Log the webhook data
+    
             Log::info('Tabby webhook received', [
                 'transaction_id' => $transaction->id,
                 'payment_id' => $paymentId,
                 'webhook_status' => $webhookStatus,
                 'request_data' => $request->all()
             ]);
-
-            // Verify payment status with Tabby API (getPayment request)
+    
             try {
                 $payment = $this->tabbyService->retrievePayment($paymentId);
                 $paymentData = $payment->toArray();
-
-                // Log the payment verification response
+                $paymentStatus = strtoupper($paymentData['status'] ?? '');
+    
                 Log::info('Tabby payment verification response', [
                     'transaction_id' => $transaction->id,
                     'payment_id' => $paymentId,
                     'webhook_status' => $webhookStatus,
-                    'api_status' => $paymentData['status'] ?? null,
+                    'api_status' => $paymentStatus,
                     'response' => $paymentData
                 ]);
-
-                // Check if payment is authorized (API returns "AUTHORIZED" in uppercase)
-                if (($paymentData['status'] ?? '') !== 'AUTHORIZED') {
-                    Log::warning('Tabby payment not authorized', [
+    
+                // Check if payment is already captured/closed
+                if ($paymentStatus === 'CLOSED') {
+                    $hasCaptures = !empty($paymentData['captures'] ?? []);
+                    
+                    if ($hasCaptures) {
+                        Log::info('Tabby payment already captured (CLOSED)', [
+                            'transaction_id' => $transaction->id,
+                            'payment_id' => $paymentId,
+                            'api_status' => $paymentStatus,
+                            'captures' => $paymentData['captures'] ?? []
+                        ]);
+                        
+                        $transaction->update([
+                            'status' => ReservationPaymentStatus::PAID->value,
+                            'meta_data' => array_merge($transaction->meta_data, [
+                                'captured_at' => now()->toIso8601String(),
+                                'webhook_status' => $webhookStatus,
+                                'api_status' => $paymentStatus,
+                                'verification_response' => $paymentData,
+                                'capture_response' => $paymentData
+                            ])
+                        ]);
+                        
+                        if ($transaction->transactionable && $transaction->transactionable instanceof Reservation) {
+                            $transaction->transactionable->update([
+                                'status' => ReservationStatus::PENDING->value
+                            ]);
+                        }
+                        
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Payment already captured'
+                        ], 200);
+                    }
+                }
+    
+                // Check if payment is CREATED (not yet authorized)
+                if ($paymentStatus === 'CREATED') {
+                    Log::info('Tabby payment created but not yet authorized', [
                         'transaction_id' => $transaction->id,
                         'payment_id' => $paymentId,
-                        'webhook_status' => $webhookStatus,
-                        'api_status' => $paymentData['status'] ?? null,
-                        'response' => $paymentData
+                        'api_status' => $paymentStatus,
                     ]);
-
-                    // Update transaction status
+                    
                     $transaction->update([
-                        'status' => ReservationPaymentStatus::CANCELED->value,
+                        'status' => ReservationPaymentStatus::PENDING->value,
                         'meta_data' => array_merge($transaction->meta_data, [
-                            'verification_failed_at' => now()->toIso8601String(),
+                            'created_at' => now()->toIso8601String(),
                             'webhook_status' => $webhookStatus,
-                            'api_status' => $paymentData['status'] ?? null,
+                            'api_status' => $paymentStatus,
                             'verification_response' => $paymentData,
-                            'failure_reason' => 'Payment not authorized'
+                            'note' => 'Payment created, waiting for authorization'
                         ])
                     ]);
-
+                    
                     return response()->json([
-                        'error' => 'Payment not authorized',
-                        'status' => $paymentData['status'] ?? 'unknown'
-                    ], 400);
+                        'status' => 'pending',
+                        'message' => 'Payment created, waiting for authorization'
+                    ], 200);
                 }
-
-                // Payment is authorized, update transaction status and trigger capture
+    
+                // Check if payment is authorized
+                if ($paymentStatus !== 'AUTHORIZED') {
+                    $failedStatuses = ['FAILED', 'CANCELED', 'EXPIRED', 'REJECTED'];
+                    
+                    if (in_array($paymentStatus, $failedStatuses)) {
+                        Log::warning('Tabby payment failed', [
+                            'transaction_id' => $transaction->id,
+                            'payment_id' => $paymentId,
+                            'webhook_status' => $webhookStatus,
+                            'api_status' => $paymentStatus,
+                            'response' => $paymentData
+                        ]);
+                        
+                        $transaction->update([
+                            'status' => ReservationPaymentStatus::CANCELED->value,
+                            'meta_data' => array_merge($transaction->meta_data, [
+                                'verification_failed_at' => now()->toIso8601String(),
+                                'webhook_status' => $webhookStatus,
+                                'api_status' => $paymentStatus,
+                                'verification_response' => $paymentData,
+                                'failure_reason' => 'Payment status: ' . $paymentStatus
+                            ])
+                        ]);
+                        
+                        return response()->json([
+                            'error' => 'Payment failed',
+                            'status' => $paymentStatus
+                        ], 400);
+                    } else {
+                        Log::warning('Tabby payment unknown status', [
+                            'transaction_id' => $transaction->id,
+                            'payment_id' => $paymentId,
+                            'api_status' => $paymentStatus,
+                        ]);
+                        
+                        $transaction->update([
+                            'status' => ReservationPaymentStatus::PENDING->value,
+                            'meta_data' => array_merge($transaction->meta_data, [
+                                'api_status' => $paymentStatus,
+                                'verification_response' => $paymentData,
+                                'note' => 'Unknown payment status: ' . $paymentStatus
+                            ])
+                        ]);
+                        
+                        return response()->json([
+                            'status' => 'pending',
+                            'message' => 'Payment status unknown, keeping as pending'
+                        ], 200);
+                    }
+                }
+    
+                // Payment is AUTHORIZED, update transaction status and trigger capture
                 $transaction->update([
                     'status' => ReservationPaymentStatus::PENDING->value,
                     'meta_data' => array_merge($transaction->meta_data, [
@@ -112,17 +193,15 @@ class TabbyController extends Controller
                         'verification_response' => $paymentData
                     ])
                 ]);
-
-                // Update reservation status
+    
                 if ($transaction->transactionable && $transaction->transactionable instanceof Reservation) {
                     $transaction->transactionable->update([
                         'status' => ReservationStatus::PENDING->value
                     ]);
                 }
-
-                // Trigger capture immediately as per Tabby checklist
+    
                 return CaptureTabbyPayment::run($transaction);
-
+    
             } catch (TabbyApiException $e) {
                 Log::error('Tabby payment verification failed', [
                     'transaction_id' => $transaction->id,
@@ -131,8 +210,7 @@ class TabbyController extends Controller
                     'error' => $e->getMessage(),
                     'context' => $e->context()
                 ]);
-
-                // Update transaction status
+    
                 $transaction->update([
                     'status' => ReservationPaymentStatus::CANCELED->value,
                     'meta_data' => array_merge($transaction->meta_data, [
@@ -142,7 +220,7 @@ class TabbyController extends Controller
                         'context' => $e->context()
                     ])
                 ]);
-
+    
                 return response()->json([
                     'error' => 'Payment verification failed',
                     'message' => $e->getMessage()
@@ -190,7 +268,7 @@ class TabbyController extends Controller
             // Proceed with capture (verification already done in success method)
             return CaptureTabbyPayment::run($transaction);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Tabby capture webhook error: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
@@ -225,7 +303,7 @@ class TabbyController extends Controller
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Tabby cancel webhook error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }
@@ -257,7 +335,7 @@ class TabbyController extends Controller
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Tabby failure webhook error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error'], 500);
         }
