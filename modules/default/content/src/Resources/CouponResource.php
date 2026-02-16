@@ -32,6 +32,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -203,6 +204,11 @@ class CouponResource extends Resource implements HasShieldPermissions {
             ]),
 
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {

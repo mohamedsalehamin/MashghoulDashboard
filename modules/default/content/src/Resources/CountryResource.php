@@ -19,6 +19,7 @@ use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,7 +37,7 @@ class CountryResource extends Resource {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
-                Section::make('basic_information')
+                Section::make(__("sections.basic_information"))
                     ->schema([
                         TextInput::make('name')->required(),
                         TextInput::make('phone_code')->numeric()->required(),
@@ -87,6 +88,11 @@ class CountryResource extends Resource {
         return [
             //
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {

@@ -6,10 +6,16 @@ use App\CatalogModule\Resources\RateResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\Width;
 
 class ViewRate extends ViewRecord
 {
     protected static string $resource = RateResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     public function mount(int | string $record): void
     {

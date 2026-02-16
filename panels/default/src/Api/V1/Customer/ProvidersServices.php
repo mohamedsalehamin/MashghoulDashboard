@@ -53,7 +53,12 @@ class ProvidersServices {
     }
 
     public function seats(Provider $provider) {
-        return Api::isOk(__("provider information"), SeatResource::collection($provider->seats()->enabled()->paginate()));
+        return Api::isOk(__("provider information"), SeatResource::collection(
+            $provider->seats()
+                ->enabled()
+                ->with(['serviceGroups' => fn($q) => $q->orderBy('sort')->orderBy('id'), 'services' => fn($q) => $q->enabled()])
+                ->paginate()
+        ));
     }
 
     public function toggleFavorite(Provider $provider) {

@@ -18,6 +18,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\CreateAction;
 use App\CatalogModule\Models\Product;
+use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\Pages\CreateService;
 use App\CatalogModule\Resources\ServiceResource\Pages\EditService;
@@ -40,6 +41,7 @@ use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Tables;
 use pxlrbt\FilamentExcel\Columns\Column;
 use Filament\Tables\Columns\IconColumn;
@@ -62,7 +64,7 @@ class ServiceResource extends Resource {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
-                Section::make('basic_information')->schema([
+                Section::make(__("sections.basic_information"))->schema([
 
                     Select::make('provider_id')
                         ->label(__('forms.fields.provider_name'))
@@ -95,6 +97,33 @@ class ServiceResource extends Resource {
                         ->onColor('success')
                         ->offColor('danger')
                 ])->columnSpan(2),
+                Section::make(__('forms.sections.seat_assignments'))->schema([
+                    Repeater::make('seat_assignments')
+                        ->label('')
+                        ->defaultItems(0)
+                        ->addActionLabel(__('panel.actions.add'))
+                        ->schema([
+                            Select::make('seat_id')
+                                ->label(__('forms.fields.seat'))
+                                ->options(fn($get) => Seat::where('provider_id', $get('../../provider_id'))->pluck('title', 'id'))
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title)
+                                ->required()
+                                ->searchable()
+                                ->live(),
+                            Select::make('service_group_id')
+                                ->label(__('forms.fields.service_group'))
+                                ->options(function ($get) {
+                                    $seatId = $get('seat_id');
+                                    if (!$seatId) {
+                                        return collect();
+                                    }
+                                    return Seat::find($seatId)?->serviceGroups()->orderBy('sort')->orderBy('id')->get()->pluck('title', 'id') ?? collect();
+                                })
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title)
+                                ->searchable()
+                                ->nullable(),
+                        ]),
+                ])->columnSpan(1)->collapsible(),
                 Section::make('products')->schema([
                     Repeater::make('products')
                         ->defaultItems(0)
@@ -324,6 +353,11 @@ class ServiceResource extends Resource {
         return [
             ProductsRelationManager::class,
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {

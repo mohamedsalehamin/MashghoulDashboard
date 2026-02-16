@@ -165,9 +165,9 @@ class AppServiceProvider extends ServiceProvider {
                 ->toggleable();
         });
 
-        Section::configureUsing(function (Section $section): void {
-            $section->collapsible()->heading(__('sections.' . Str::lower($section->getHeading())));
-        });
+        // Section::configureUsing(function (Section $section): void {
+        //     $section->collapsible()->heading(__('sections.' . Str::lower($section->getHeading())));
+        // });
 
 
     }

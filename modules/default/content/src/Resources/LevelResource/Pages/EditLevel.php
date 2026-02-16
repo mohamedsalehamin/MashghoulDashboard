@@ -8,12 +8,18 @@ use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\ContentModule\Resources\LevelResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use App\ContentModule\Resources\PageResource;
+use Filament\Support\Enums\Width;
 
 class EditLevel extends EditRecord
 {
-    protected static string $resource = LevelResource::class;
     use Translatable;
+
+    protected static string $resource = LevelResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array
     {

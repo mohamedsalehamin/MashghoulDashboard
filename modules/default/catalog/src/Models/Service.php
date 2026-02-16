@@ -9,7 +9,9 @@ use Cknow\Money\Money;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -78,6 +80,11 @@ class Service extends Model implements HasMedia {
     }
     public function products(): HasMany {
         return $this->hasMany(Product::class);
+    }
+
+    public function seats(): BelongsToMany {
+        return $this->belongsToMany(Seat::class, 'seat_service')
+            ->withPivot('service_group_id');
     }
 
     public function provider() {

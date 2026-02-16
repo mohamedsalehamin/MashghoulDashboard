@@ -18,5 +18,15 @@ class CreateService extends CreateRecord {
         ];
     }
 
-
+    protected function afterCreate(): void {
+        $data = $this->form->getState();
+        $assignments = $data['seat_assignments'] ?? [];
+        $sync = [];
+        foreach ($assignments as $row) {
+            if (!empty($row['seat_id'] ?? null)) {
+                $sync[$row['seat_id']] = ['service_group_id' => $row['service_group_id'] ?? null];
+            }
+        }
+        $this->record->seats()->sync($sync);
+    }
 }

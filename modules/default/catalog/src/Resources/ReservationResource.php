@@ -34,6 +34,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -183,7 +184,7 @@ class ReservationResource extends Resource {
             ->components([
                 Grid::make()->schema([
                     Group::make([
-                        Section::make("basic_information")
+                        Section::make(__("sections.basic_information"))
                             ->schema([
                                 TextEntry::make('id'),
                                 TextEntry::make('reservable.name')->label(__("forms.fields.provider_name"))
@@ -286,6 +287,11 @@ class ReservationResource extends Resource {
             ItemsLineRelationManager::make(),
 
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {

@@ -64,6 +64,10 @@ return [
         "seat_name"=>"Seat name",
         'services_count'=>"Services count",
         "services"=>"Services",
+        "service_group"=>"Service group",
+        "service_groups"=>"Service groups (pipe-separated, e.g. Group 1|Group 2)",
+        "service_group_names"=>"Service group per service (comma-separated, same order as services)",
+        "seat"=>"Seat",
         "service_name"=>"Service name",
         "title_ar"=>"Title in arabic",
         "title_en"=>"Title in english",
@@ -424,5 +428,11 @@ return [
 
     'helpers' => [
         'portfolio_upload' => 'Upload images, videos, and audio files for your portfolio',
+    ],
+
+    'import_seats' => [
+        'service_groups' => 'Pipe-separated group names, e.g. Group 1|Group 2. Leave empty for a seat with no groups (all services ungrouped).',
+        'services' => 'Comma-separated service import IDs or numeric IDs, e.g. S1,S2,S3 or 80,81,82.',
+        'service_group_names' => 'One per service, same order as Services: group name or empty for ungrouped. E.g. Group 1,Group 1,,Group 2 puts 1st and 2nd in Group 1, 3rd ungrouped, 4th in Group 2.',
     ],
 ];

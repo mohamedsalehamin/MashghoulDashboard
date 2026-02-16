@@ -7,11 +7,18 @@ use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\CatalogModule\Resources\ServiceResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 
-class CreateService extends CreateRecord {
+class CreateService extends CreateRecord
+{
     use Translatable;
 
     protected static string $resource = ServiceResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array {
         return [
@@ -19,5 +26,15 @@ class CreateService extends CreateRecord {
         ];
     }
 
-
+    protected function afterCreate(): void {
+        $data = $this->form->getState();
+        $assignments = $data['seat_assignments'] ?? [];
+        $sync = [];
+        foreach ($assignments as $row) {
+            if (!empty($row['seat_id'] ?? null)) {
+                $sync[$row['seat_id']] = ['service_group_id' => $row['service_group_id'] ?? null];
+            }
+        }
+        $this->record->seats()->sync($sync);
+    }
 }

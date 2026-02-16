@@ -12,6 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\CreateAction;
+use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -52,7 +53,7 @@ class ServiceResource extends Resource {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
-                Section::make('basic_information')->schema([
+                Section::make(__("sections.basic_information"))->schema([
 
                     Hidden::make('provider_id')->default(\provider()->id),
                     TextInput::make('title')
@@ -83,6 +84,33 @@ class ServiceResource extends Resource {
                         ->onColor('success')
                         ->offColor('danger')
                 ])->columnSpan(2),
+                Section::make(__('forms.sections.seat_assignments'))->schema([
+                    Repeater::make('seat_assignments')
+                        ->label('')
+                        ->defaultItems(0)
+                        ->addActionLabel(__('panel.actions.add'))
+                        ->schema([
+                            Select::make('seat_id')
+                                ->label(__('forms.fields.seat'))
+                                ->options(fn($get) => Seat::where('provider_id', $get('../../provider_id'))->pluck('title', 'id'))
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title)
+                                ->required()
+                                ->searchable()
+                                ->live(),
+                            Select::make('service_group_id')
+                                ->label(__('forms.fields.service_group'))
+                                ->options(function ($get) {
+                                    $seatId = $get('seat_id');
+                                    if (!$seatId) {
+                                        return collect();
+                                    }
+                                    return Seat::find($seatId)?->serviceGroups()->orderBy('sort')->orderBy('id')->get()->pluck('title', 'id') ?? collect();
+                                })
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title)
+                                ->searchable()
+                                ->nullable(),
+                        ]),
+                ])->columnSpan(1)->collapsible(),
                 Section::make('products')->schema([
                     Repeater::make('products')
                         ->label('')

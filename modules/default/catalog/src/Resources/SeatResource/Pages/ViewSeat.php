@@ -2,15 +2,16 @@
 
 namespace App\CatalogModule\Resources\SeatResource\Pages;
 
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 use App\CatalogModule\Resources\SeatResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\Width;
 
-class ViewSeat extends ViewRecord {
-    use Translatable;
-
+class ViewSeat extends ViewRecord
+{
     protected static string $resource = SeatResource::class;
 
-
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 }

@@ -60,7 +60,7 @@ class CustomerResource extends Resource {
 
         return $schema->components([
             Group::make([
-                Section::make("basic_information")->schema(array(
+                Section::make(__("sections.basic_information"))->schema(array(
                     SpatieMediaLibraryFileUpload::make('avatar')
                         ->nullable()
                         ->columnSpan(2),

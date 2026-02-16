@@ -27,13 +27,18 @@ class Seat extends Model {
     use LogsActivity;
 
     public array $translatable = ['title'];
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'serviceGroups'];
     protected $casts = [
         'meta_data' => 'array'
     ];
 
+    public function serviceGroups(): HasMany {
+        return $this->hasMany(SeatGroup::class);
+    }
+
     public function services(): BelongsToMany {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsToMany(Service::class, 'seat_service')
+            ->withPivot('service_group_id');
     }
 
     public function provider(): BelongsTo {

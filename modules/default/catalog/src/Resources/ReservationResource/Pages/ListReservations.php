@@ -2,17 +2,22 @@
 
 namespace App\CatalogModule\Resources\ReservationResource\Pages;
 
-
-use Filament\Schemas\Components\Tabs\Tab;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Resources\ReservationResource;
 use App\DefaultPanel\Enum\ReservationStatus;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Builder;
 
-
-class ListReservations extends ListRecords {
+class ListReservations extends ListRecords
+{
     protected static string $resource = ReservationResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
     public function getTabs(): array {
         $tabs = [];
 

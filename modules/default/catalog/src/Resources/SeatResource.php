@@ -19,6 +19,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\CreateAction;
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\SeatGroup;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Resources\SeatResource\Pages\CreateSeat;
 use App\CatalogModule\Resources\SeatResource\Pages\EditSeat;
@@ -53,7 +54,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tasawk\Models\Catalog\Category;
-
+use Filament\Support\Enums\Width;
 
 class SeatResource extends Resource {
     use HasTranslationLabel, Translatable;
@@ -74,16 +75,29 @@ class SeatResource extends Resource {
                 TextInput::make('title')
                     ->label(__('forms.fields.title'))
                     ->required(),
-                Select::make('services')
-                    ->label(__('forms.fields.services'))
-                    ->required()
-                    ->multiple()
-                    ->searchable(false)
-                    ->preload()
-                    ->relationship('services', 'title', fn($query, $get) => $query->where("provider_id", $get("provider_id")))
-                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->getTranslation('title','en')} - {$record->getTranslation('title','ar')}")
 
-                ,
+                Section::make(__('forms.sections.service_groups'))->schema([
+                    Repeater::make('serviceGroups')
+                        ->label('')
+                        ->defaultItems(0)
+                        ->addActionLabel(__('panel.actions.add'))
+                        ->reorderable(false)
+                        ->schema([
+                            TextInput::make('title.ar')
+                                ->label(__('forms.fields.title_ar'))
+                                ->required(),
+                            TextInput::make('title.en')
+                                ->label(__('forms.fields.title_en'))
+                                ->required(),
+                            Select::make('services')
+                                ->label(__('forms.fields.services'))
+                                ->multiple()
+                                ->searchable()
+                                ->options(fn($get) => Service::where('provider_id', $get('../../provider_id'))->pluck('title', 'id'))
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title),
+                        ]),
+                ])->collapsible(),
+
                 Section::make("working_times")->schema([
                     Repeater::make('working_times')
                         ->statePath('meta_data.days_list')
@@ -143,37 +157,7 @@ class SeatResource extends Resource {
                 ExportAction::make()
                     ->modalHeading('')
                     ->modalDescription('')
-                    ->exports([
-
-                        ExcelExport::make()
-                            ->label(__("forms.fields.export_services"))
-                            ->modifyQueryUsing(function ($query, Component $livewire) {
-                                $filters = $livewire->getTable()->getFilters();
-                                $provider_id = $filters['provider_id']->getState()['value'] ?? null;
-                                return Seat::query()->when($provider_id, fn($q) => $q->where('provider_id', $provider_id));
-                            })
-                            ->withColumns([
-                                Column::make('id')->heading(__("forms.fields.db_row_id")),
-                                Column::make('provider_id')->heading(__("forms.fields.provider_id")),
-                                Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
-                                Column::make('title.ar')
-                                    ->heading(__("forms.fields.name_ar"))
-                                    ->getStateUsing(fn($record) => $record->title)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar'] ?? ''),
-
-                                Column::make('title.en')
-                                    ->heading(__("forms.fields.title_en"))
-                                    ->getStateUsing(fn($record) => $record->title)
-                                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en'] ?? ''),
-
-
-                                Column::make('services')
-                                    ->heading(__("forms.fields.services"))
-                                    ->getStateUsing(fn($record) => $record->title)
-                                    ->formatStateUsing(fn($record) => $record->services->pluck('id')->toArray()),
-                            ])->withFilename(fn() => 'seats' . now()->format('Y-m-d')),
-
-                    ]),
+                    ->exports([static::getSeatsExcelExport()]),
                 ImportAction::make('importServices')
                     ->visible(true)
                     ->importer(SeatsImporter::class),
@@ -191,7 +175,8 @@ class SeatResource extends Resource {
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exports([static::getSeatsExcelExport()]),
 
                     DeleteBulkAction::make(),
                 ]),
@@ -235,11 +220,60 @@ class SeatResource extends Resource {
         return $schema;
     }
 
+    public static function getSeatsExcelExport(): ExcelExport {
+        return ExcelExport::make()
+            ->label(__("forms.fields.export_services"))
+            ->modifyQueryUsing(function ($query, $livewire) {
+                $provider_id = null;
+                if ($livewire && method_exists($livewire, 'getTable')) {
+                    $filters = $livewire->getTable()->getFilters();
+                    $provider_id = isset($filters['provider_id']) ? ($filters['provider_id']->getState()['value'] ?? null) : null;
+                }
+                return Seat::query()
+                    ->with(['serviceGroups', 'services'])
+                    ->when($provider_id, fn($q) => $q->where('provider_id', $provider_id));
+            })
+            ->withColumns([
+                Column::make('id')->heading(__("forms.fields.db_row_id")),
+                Column::make('provider_id')->heading(__("forms.fields.provider_id")),
+                Column::make('meta_data.import_id')->heading(__("forms.fields.id")),
+                Column::make('title.ar')
+                    ->heading(__("forms.fields.name_ar"))
+                    ->getStateUsing(fn($record) => $record->title)
+                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['ar'] ?? ''),
+                Column::make('title.en')
+                    ->heading(__("forms.fields.title_en"))
+                    ->getStateUsing(fn($record) => $record->title)
+                    ->formatStateUsing(fn($record) => $record->getOriginal('title')['en'] ?? ''),
+                Column::make('services')
+                    ->heading(__("forms.fields.services"))
+                    ->getStateUsing(fn($record) => $record->services->map(fn($s) => $s->meta_data['import_id'] ?? $s->id)->join(',')),
+                Column::make('service_groups')
+                    ->heading(__("forms.fields.service_groups"))
+                    ->getStateUsing(fn($record) => $record->serviceGroups->pluck('title')->map(fn($t) => is_array($t) ? ($t['ar'] ?? $t['en'] ?? '') : $t)->filter()->unique()->values()->join('|')),
+                Column::make('service_group_names')
+                    ->heading(__("forms.fields.service_group_names"))
+                    ->getStateUsing(function ($record) {
+                        return $record->services->map(function ($s) use ($record) {
+                            $groupId = $s->pivot->service_group_id ?? null;
+                            if (!$groupId) {
+                                return '';
+                            }
+                            $g = $record->serviceGroups->firstWhere('id', $groupId);
+                            return $g ? (is_array($g->title) ? ($g->title['ar'] ?? $g->title['en'] ?? '') : (string) $g->title) : '';
+                        })->join(',');
+                    }),
+            ])->withFilename(fn() => 'seats' . now()->format('Y-m-d'));
+    }
+
     public static function getRelations(): array {
         return [
         ];
     }
-
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
+    }
     public static function getPages(): array {
         return [
             'index' => ListSeats::route('/'),

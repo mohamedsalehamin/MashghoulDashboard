@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Builder;
 use App\CatalogModule\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Enums\Width;
 
-class ListCategories extends ListRecords {
-
+class ListCategories extends ListRecords
+{
     protected static string $resource = CategoryResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected string $view = 'filament.pages.listing.categories';
 

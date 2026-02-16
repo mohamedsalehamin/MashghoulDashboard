@@ -4,13 +4,10 @@ namespace App\Filament\Imports;
 
 use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
-use App\Models\Services;
 use App\UsersModule\Models\Provider;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Filament\Forms\Components\Select;
-use Mpdf\Shaper\Sea;
 
 class SeatsImporter extends Importer {
     protected static ?string $model = Seat::class;
@@ -29,11 +26,16 @@ class SeatsImporter extends Importer {
                 ->label(__("forms.fields.name_en"))
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-
+            ImportColumn::make('service_groups')
+                ->label(__("forms.fields.service_groups"))
+                ->helperText(__("forms.import_seats.service_groups")),
             ImportColumn::make('services')
                 ->label(__("forms.fields.services"))
-                ->requiredMapping(),
-
+                ->requiredMapping()
+                ->helperText(__("forms.import_seats.services")),
+            ImportColumn::make('service_group_names')
+                ->label(__("forms.fields.service_group_names"))
+                ->helperText(__("forms.import_seats.service_group_names")),
         ];
     }
 
@@ -68,13 +70,74 @@ class SeatsImporter extends Importer {
     }
 
     public function saveRecord(): void {
-        $services = Service::whereIn('meta_data->import_id', explode(",", $this->getData()['services']))->pluck("id")->toArray();
-//        $this->record->offsetUnset('id');
+        $data = $this->getData();
         $this->record->offsetUnset('db_row_id');
         $this->record->offsetUnset('name_ar');
         $this->record->offsetUnset('name_en');
+        $this->record->offsetUnset('service_groups');
         $this->record->offsetUnset('services');
+        $this->record->offsetUnset('service_group_names');
         $this->record->save();
-        $this->record->services()->sync($services);
+
+        $serviceIds = $this->resolveServiceIds($data['services'] ?? '');
+
+        $groupNamesStr = trim($data['service_groups'] ?? '');
+        if ($groupNamesStr !== '') {
+            $names = array_filter(array_map('trim', explode('|', $groupNamesStr)));
+            $sort = 0;
+            foreach ($names as $name) {
+                $this->record->serviceGroups()->firstOrCreate(
+                    ['seat_id' => $this->record->id, 'title->ar' => $name],
+                    ['title' => ['ar' => $name, 'en' => $name], 'sort' => $sort++]
+                );
+            }
+        } else {
+            // Seat without groups: remove all groups so all services stay ungrouped
+            $this->record->serviceGroups()->delete();
+        }
+
+        $sync = [];
+        $groupNamesPerService = isset($data['service_group_names']) && $data['service_group_names'] !== ''
+            ? array_map('trim', explode(',', $data['service_group_names']))
+            : [];
+        $seatGroups = $this->record->serviceGroups()->orderBy('sort')->orderBy('id')->get();
+
+        foreach ($serviceIds as $index => $serviceId) {
+            $groupId = null;
+            if (isset($groupNamesPerService[$index]) && $groupNamesPerService[$index] !== '') {
+                $name = $groupNamesPerService[$index];
+                $group = $seatGroups->first(function ($g) use ($name) {
+                    $t = $g->getTranslations('title');
+                    return ($t['ar'] ?? '') === $name || ($t['en'] ?? '') === $name;
+                });
+                $groupId = $group?->id;
+            }
+            $sync[$serviceId] = ['service_group_id' => $groupId];
+        }
+
+        $this->record->services()->sync($sync);
+    }
+
+    /**
+     * Resolve comma-separated service identifiers to internal service IDs.
+     * Each value is matched by meta_data->import_id first, then by numeric id.
+     */
+    private function resolveServiceIds(string $servicesStr): array {
+        $ids = [];
+        $tokens = array_filter(array_map('trim', explode(',', $servicesStr)));
+        foreach ($tokens as $token) {
+            $byImportId = Service::where('meta_data->import_id', $token)->value('id');
+            if ($byImportId) {
+                $ids[] = $byImportId;
+                continue;
+            }
+            if (is_numeric($token)) {
+                $byId = Service::find((int) $token);
+                if ($byId) {
+                    $ids[] = $byId->id;
+                }
+            }
+        }
+        return $ids;
     }
 }

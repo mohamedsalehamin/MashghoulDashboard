@@ -8,11 +8,18 @@ use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\CatalogModule\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 
-class EditCategory extends EditRecord {
+class EditCategory extends EditRecord
+{
     use Translatable;
 
     protected static string $resource = CategoryResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array {
         return [

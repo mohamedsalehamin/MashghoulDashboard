@@ -18,6 +18,7 @@ class ServiceResource extends JsonResource {
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'service_group_id' => $this->pivot?->service_group_id ?? null,
             'price' => $this->price->format(),
             'price_include_taxes' => $this->price_include_taxes->format(),
             'sale_price' => !$this->sale_price->isZero() ? $this->sale_price->format() : false,

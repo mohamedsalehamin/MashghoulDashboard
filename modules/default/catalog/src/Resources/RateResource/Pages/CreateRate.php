@@ -6,11 +6,17 @@ use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Resources\RateResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Str;
 
 class CreateRate extends CreateRecord
 {
     protected static string $resource = RateResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {

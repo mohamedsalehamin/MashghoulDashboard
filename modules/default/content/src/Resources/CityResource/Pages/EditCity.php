@@ -7,11 +7,18 @@ use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\ContentModule\Resources\CityResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 
-class EditCity extends EditRecord {
+class EditCity extends EditRecord
+{
     use Translatable;
 
     protected static string $resource = CityResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array {
         return [

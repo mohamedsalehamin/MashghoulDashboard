@@ -7,10 +7,16 @@ use App\CatalogModule\Resources\RateResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 
 class EditRate extends EditRecord
 {
     protected static string $resource = RateResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array
     {

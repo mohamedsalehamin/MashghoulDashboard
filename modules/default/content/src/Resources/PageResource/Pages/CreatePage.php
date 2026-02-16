@@ -6,12 +6,19 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatab
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use App\ContentModule\Resources\PageResource;
 
 class CreatePage extends CreateRecord
 {
-    protected static string $resource = PageResource::class;
     use Translatable;
+
+    protected static string $resource = PageResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array {
         return [

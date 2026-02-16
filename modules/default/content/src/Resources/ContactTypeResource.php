@@ -19,6 +19,7 @@ use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -40,7 +41,7 @@ class ContactTypeResource extends Resource implements HasShieldPermissions {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
-                Section::make("basic_information")
+                Section::make(__("sections.basic_information"))
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -88,6 +89,11 @@ class ContactTypeResource extends Resource implements HasShieldPermissions {
         return [
             //
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {

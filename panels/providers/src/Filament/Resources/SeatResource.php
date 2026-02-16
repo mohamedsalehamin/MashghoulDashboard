@@ -13,6 +13,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\CreateAction;
 use Filament\Schemas\Components\Grid;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\SeatGroup;
 use App\CatalogModule\Models\Service;
 
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -52,14 +53,28 @@ class SeatResource extends Resource {
                 TextInput::make('title')
                     ->label(__('forms.fields.title'))
                     ->required(),
-                Select::make('services')
-                    ->required()
-                    ->multiple()
-                    ->searchable(false)
-                    ->relationship('services','title')
-                    ->label(__('forms.fields.services'))
-                    ->options(fn($get) => Service::where("provider_id", $get("provider_id"))->pluck('title', 'id'))
-                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title),
+
+                Section::make('service_groups')->schema([
+                    Repeater::make('serviceGroups')
+                        ->label('')
+                        ->defaultItems(0)
+                        ->addActionLabel(__('panel.actions.add'))
+                        ->reorderable(false)
+                        ->schema([
+                            TextInput::make('title.ar')
+                                ->label(__('forms.fields.title_ar'))
+                                ->required(),
+                            TextInput::make('title.en')
+                                ->label(__('forms.fields.title_en'))
+                                ->required(),
+                            Select::make('services')
+                                ->label(__('forms.fields.services'))
+                                ->multiple()
+                                ->searchable()
+                                ->options(fn($get) => Service::where('provider_id', $get('../../provider_id'))->pluck('title', 'id'))
+                                ->getOptionLabelFromRecordUsing(fn(Model $record): string => $record->title),
+                        ]),
+                ])->collapsible(),
 
                 Section::make("working_times")->schema([
                     Repeater::make('working_times')
@@ -133,7 +148,7 @@ class SeatResource extends Resource {
         return $schema
             ->components([
                 Grid::make()->schema([
-                    Section::make("basic_information")
+                    Section::make(__("sections.basic_information"))
                         ->schema([
                             TextEntry::make('id'),
                             TextEntry::make('name'),

@@ -6,11 +6,16 @@ use Filament\Actions\CreateAction;
 use App\ContentModule\Resources\LevelResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use App\ContentModule\Resources\PageResource;
+use Filament\Support\Enums\Width;
 
-class ListLevels extends ListRecords {
-
+class ListLevels extends ListRecords
+{
     protected static string $resource = LevelResource::class;
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
+    }
 
     protected function getHeaderActions(): array {
         return [

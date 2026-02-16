@@ -143,7 +143,7 @@ class ReservationResource extends Resource {
             ->components([
                 Grid::make()->schema([
                     Group::make([
-                        Section::make("basic_information")
+                        Section::make(__("sections.basic_information"))
                             ->schema([
                                 TextEntry::make('id'),
 

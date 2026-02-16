@@ -31,6 +31,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Width;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -52,7 +53,7 @@ class CategoryResource extends Resource implements HasShieldPermissions {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
-                Section::make("basic_information")
+                Section::make(__("sections.basic_information"))
                     ->schema([
                         TextInput::make('name')
                             ->required(),
@@ -135,6 +136,11 @@ class CategoryResource extends Resource implements HasShieldPermissions {
         return [
             ChildrenRelationManager::class
         ];
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function getPages(): array {
