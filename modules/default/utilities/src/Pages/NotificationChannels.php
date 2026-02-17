@@ -64,5 +64,5 @@ trait NotificationChannels {
             ->when($this->target_type == 'in_specific_period', fn($builder) => $builder->whereBetween('created_at', [$this->date_from, $this->date_to]))
             ->get();
     }
-
+    
 }

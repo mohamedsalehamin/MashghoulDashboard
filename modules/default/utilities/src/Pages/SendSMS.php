@@ -14,7 +14,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
-
+use Filament\Support\Enums\Width;
 
 class SendSMS extends Page implements HasForms {
     use HasPageShield, HasTranslationLabel, InteractsWithForms, NotificationChannels;
@@ -90,5 +90,9 @@ class SendSMS extends Page implements HasForms {
             null => static::getNavigationGroup(),
             static::getUrl() => __('menu.send_sms'),
         ];
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

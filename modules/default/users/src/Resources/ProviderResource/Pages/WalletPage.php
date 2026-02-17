@@ -16,6 +16,7 @@ use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -160,5 +161,10 @@ class WalletPage extends Page implements HasTable {
         return [
             WalletStats::make(['record' => $this->record->provider])
         ];
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
     }
 }

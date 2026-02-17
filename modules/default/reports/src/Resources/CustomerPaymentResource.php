@@ -3,6 +3,7 @@
 namespace App\ReportsModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -155,6 +156,11 @@ class CustomerPaymentResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.reports');
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
 }

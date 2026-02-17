@@ -3,6 +3,7 @@
 namespace App\UsersModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Actions\Action;
@@ -254,6 +255,11 @@ class CustomerResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.crew');
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function infolist(Schema $schema): Schema {

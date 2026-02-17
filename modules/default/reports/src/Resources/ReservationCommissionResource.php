@@ -3,6 +3,7 @@
 namespace App\ReportsModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Maatwebsite\Excel\Excel;
@@ -171,6 +172,11 @@ class ReservationCommissionResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.reports');
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
 }

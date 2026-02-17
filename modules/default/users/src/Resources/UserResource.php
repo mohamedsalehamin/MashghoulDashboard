@@ -3,6 +3,7 @@
 namespace App\UsersModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Log;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -207,5 +208,10 @@ class UserResource extends Resource {
     }
     public static function getNavigationGroup(): ?string {
         return __('menu.crew');
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

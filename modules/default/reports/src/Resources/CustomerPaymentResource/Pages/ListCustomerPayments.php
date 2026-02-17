@@ -3,6 +3,7 @@
 namespace App\ReportsModule\Resources\CustomerPaymentResource\Pages;
 
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Enums\Width;
 use App\ReportsModule\Resources\CustomerPaymentResource;
 
 class ListCustomerPayments extends ListRecords
@@ -14,5 +15,10 @@ class ListCustomerPayments extends ListRecords
         return [
 //            Actions\CreateAction::make(),
         ];
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
     }
 }

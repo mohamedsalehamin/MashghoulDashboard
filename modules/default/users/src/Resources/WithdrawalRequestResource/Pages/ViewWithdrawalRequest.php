@@ -5,6 +5,7 @@ namespace App\UsersModule\Resources\WithdrawalRequestResource\Pages;
 use App\UsersModule\Resources\WithdrawalRequestResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\Width;
 
 class ViewWithdrawalRequest extends ViewRecord
 {
@@ -15,5 +16,10 @@ class ViewWithdrawalRequest extends ViewRecord
         return [
             // Actions\EditAction::make(),
         ];
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
     }
 } 

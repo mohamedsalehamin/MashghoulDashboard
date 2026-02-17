@@ -16,7 +16,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Notification;
-
+use Filament\Support\Enums\Width;
 class SendNotifications extends Page implements HasForms {
     use InteractsWithForms, HasPageShield, HasTranslationLabel, NotificationChannels;
 
@@ -108,5 +108,8 @@ class SendNotifications extends Page implements HasForms {
             static::getUrl() => __('menu.send_notifications'),
         ];
     }
-
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
+    }
 }

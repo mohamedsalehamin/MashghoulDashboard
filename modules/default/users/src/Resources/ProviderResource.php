@@ -3,6 +3,7 @@
 namespace App\UsersModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Group;
@@ -359,6 +360,11 @@ class ProviderResource extends Resource {
 
     public static function getNavigationGroup(): ?string {
         return __('menu.crew');
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
 

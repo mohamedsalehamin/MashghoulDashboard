@@ -4,6 +4,7 @@ namespace App\UsersModule\Resources\UserResource\Pages;
 
 use App\UsersModule\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -46,5 +47,10 @@ class CreateUser extends CreateRecord
             $this->redirect(static::getResource()::getUrl('index'));
             $this->halt();
         }
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return static::getResource()::getMaxContentWidth();
     }
 }

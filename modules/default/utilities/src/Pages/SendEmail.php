@@ -17,7 +17,7 @@ use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Mail;
 use Illuminate\Support\Facades\Log;
-
+use Filament\Support\Enums\Width;
 class SendEmail extends Page implements HasForms {
     use HasPageShield, HasTranslationLabel, InteractsWithForms, NotificationChannels;
     protected static ?int $navigationSort = 3;
@@ -118,5 +118,9 @@ class SendEmail extends Page implements HasForms {
             null => static::getNavigationGroup(),
             static::getUrl() => __('menu.send_email'),
         ];
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

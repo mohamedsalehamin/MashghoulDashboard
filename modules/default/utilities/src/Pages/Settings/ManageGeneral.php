@@ -23,7 +23,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Forms\Components\SelectFontAwesomeIcon;
 use App\DefaultPanel\Settings\GeneralSettings;
-
+use Filament\Support\Enums\Width;
 class ManageGeneral extends SettingsPage {
     use HasPageShield;
 
@@ -217,5 +217,9 @@ class ManageGeneral extends SettingsPage {
             null => static::getNavigationGroup(),
             static::getUrl() => static::getNavigationLabel(),
         ];
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\UsersModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\ViewAction;
@@ -279,5 +280,10 @@ class WithdrawalRequestResource extends Resource
     public static function canDelete(Model $record): bool
     {
         return Gate::check('delete_withdrawal::request', $record);
+    }
+
+    public static function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

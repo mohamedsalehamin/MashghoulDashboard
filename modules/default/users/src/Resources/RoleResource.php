@@ -3,6 +3,7 @@
 namespace App\UsersModule\Resources;
 
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -58,5 +59,10 @@ class RoleResource extends ShieldRoleResource
     public static function table(Table $table): Table
     {
         return parent::table($table);
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

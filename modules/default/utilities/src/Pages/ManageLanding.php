@@ -16,7 +16,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Repeater;
-
+use Filament\Support\Enums\Width;
 
 class ManageLanding extends SettingsPage {
     use HasPageShield;
@@ -174,5 +174,9 @@ class ManageLanding extends SettingsPage {
             null => static::getNavigationGroup(),
             static::getUrl() => static::getNavigationLabel(),
         ];
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

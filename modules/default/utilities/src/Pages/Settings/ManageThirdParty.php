@@ -9,7 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Pages\SettingsPage;
 use Illuminate\Contracts\Support\Htmlable;
 use App\DefaultPanel\Settings\ThirdPartySettings;
-
+use Filament\Support\Enums\Width;
 class ManageThirdParty extends SettingsPage {
     use HasPageShield;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-link';
@@ -50,5 +50,9 @@ class ManageThirdParty extends SettingsPage {
             null =>static::getNavigationGroup(),
             static::getUrl() => static::getNavigationLabel(),
         ];
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }

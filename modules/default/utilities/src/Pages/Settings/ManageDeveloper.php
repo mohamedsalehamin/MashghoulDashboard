@@ -9,7 +9,7 @@ use Filament\Forms;
 use Filament\Pages\SettingsPage;
 use Illuminate\Contracts\Support\Htmlable;
 use App\DefaultPanel\Settings\DeveloperSetting;
-
+use Filament\Support\Enums\Width;
 class ManageDeveloper extends SettingsPage {
     use HasPageShield;
 
@@ -49,6 +49,10 @@ class ManageDeveloper extends SettingsPage {
 
     public static function shouldRegisterNavigation(): bool {
         return auth()->user()->email == 'ahmed.mostafa.dev.eg@gmail.com';
+    }
+    public  function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
 }
