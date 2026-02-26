@@ -14,9 +14,13 @@ use App\DefaultPanel\Requests\Api\Customer\Profile\VerifyAltPhoneRequest;
 use App\DefaultPanel\Resources\Api\Customer\MyPointResource;
 use App\DefaultPanel\Resources\Api\Customer\CustomerResource;
 use App\DefaultPanel\Resources\Api\Customer\WalletTransactionResource;
+use App\DefaultPanel\Resources\Api\Customer\WithdrawalRequestResource;
 use App\DefaultPanel\Resources\Api\Customer\User\TransactionResources;
 
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
 use App\Models\PointsExchange;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Tasawk\Api\Core;
 use Tasawk\Api\Facade\Api;

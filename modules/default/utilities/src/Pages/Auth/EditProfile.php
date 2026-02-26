@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Support\Enums\Width;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Support\Htmlable;
@@ -40,6 +41,11 @@ class EditProfile extends Page implements HasForms {
 
     public static function getLabel(): string {
         return __('menu.edit_profile');
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 
     public static function routes(Panel $panel): void {

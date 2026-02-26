@@ -86,7 +86,17 @@ class WalletPage extends Page implements HasTable {
                             'description' => $data['description']
                         ]);
 
-                    })
+                    }),
+                    Action::make('deposit')
+                        ->label(__('panel.enums.deposit'))
+                        ->action(function () {
+                            $this->record->deposit(amount: 100, meta: [
+                                'description' => [
+                                    'ar' => 'Deposit',
+                                    'en' => 'Deposit'
+                                ]
+                            ]);
+                        }),
             ])
             ->columns([
                 TextColumn::make('id')->translateLabel()

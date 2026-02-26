@@ -14,7 +14,6 @@ use App\UsersModule\Models\Lab;
 use App\UsersModule\Models\Provider;
 use App\UsersModule\Models\User\Patient;
 use App\UsersModule\Models\Users\Customer;
-use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Cknow\Money\Money;
 use DB;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -22,7 +21,6 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Theamostafa\Wallet\Models\Wallet;
 
 class WalletStats extends BaseWidget {
-    use HasWidgetShield;
 
     public $record;
 
