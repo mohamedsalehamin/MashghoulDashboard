@@ -31,7 +31,7 @@ class ProviderResource extends JsonResource {
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
             'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]['text_when_order_completed']??'',
             'reservation_fees_include_taxes' => Money::parse(floatval($this->reservation_fees_include_taxes))->format(),
-            "share_link" => route('site.share_provider', str_replace(" ", "&", $this->getTranslation('name', 'en') ?? $this->name)),
+            'share_link' => route('site.provider.show', $this->id),
             'latest_rates' => $this->getGroupedRates(),
             'available_coupons' => $this->getActiveCoupons(),
             'portfolio' => $this->getPortfolio(),
@@ -192,42 +192,46 @@ class ProviderResource extends JsonResource {
         })->toArray();
     }
     /**
-     * Get portfolio items with type indicator (image, video, audio)
+     * Get portfolio albums with items (mirrors provider-show and provider-gallery structure)
      */
     private function getPortfolio(): array
     {
-        $portfolio = $this->getMedia('portfolio');
-        
-        if ($portfolio->isEmpty()) {
-            return [];
+        $locale = app()->getLocale();
+        $albums = collect($this->meta_data['portfolio_albums'] ?? []);
+        $allMedia = $this->getMedia('portfolio');
+
+        if ($albums->isEmpty() && $allMedia->isNotEmpty()) {
+            return [[
+                'title' => __('site.heading.gallery'),
+                'items' => $allMedia->map(fn ($m) => $this->formatPortfolioItem($m))->values()->all(),
+            ]];
         }
-        
-        $items = [];
-        
-        foreach ($portfolio as $media) {
-            $mimeType = $media->mime_type ?? '';
-            
-            // Determine type based on MIME type
-            $type = 'image'; // default
-            if (str_starts_with($mimeType, 'image/')) {
-                $type = 'image';
-            } elseif (str_starts_with($mimeType, 'video/')) {
-                $type = 'video';
-            } elseif (str_starts_with($mimeType, 'audio/')) {
-                $type = 'audio';
-            }
-            
-            $items[] = [
-                'id' => $media->id,
-                'name' => $media->name,
-                'url' => $media->getFullUrl(),
-                'type' => $type,
-                'mime_type' => $mimeType,
-                'size' => $media->size,
-                'created_at' => $media->created_at?->toIso8601String(),
-            ];
-        }
-        
-        return $items;
+
+        return $albums->map(function ($album) use ($allMedia, $locale) {
+            $albumId = $album['album_id'] ?? null;
+            $title = is_array($album['title'] ?? null)
+                ? ($album['title'][$locale] ?? $album['title']['ar'] ?? $album['title']['en'] ?? '')
+                : ($album['title'] ?? '');
+            $items = $allMedia
+                ->filter(fn ($m) => ($m->getCustomProperty('album_id') ?? '') === $albumId)
+                ->map(fn ($m) => $this->formatPortfolioItem($m))
+                ->values()
+                ->all();
+            return ['title' => $title, 'items' => $items];
+        })->filter(fn ($a) => ! empty($a['items']))->values()->all();
+    }
+
+    private function formatPortfolioItem($media): array
+    {
+        $mimeType = $media->mime_type ?? '';
+        $type = str_starts_with($mimeType, 'video/') ? 'video'
+            : (str_starts_with($mimeType, 'audio/') ? 'audio' : 'image');
+
+        return [
+            'id' => $media->id,
+            'url' => $media->getFullUrl(),
+            'type' => $type,
+            'title' => $media->getCustomProperty('title') ?? '',
+        ];
     }
 }

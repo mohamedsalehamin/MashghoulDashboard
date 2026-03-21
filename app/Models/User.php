@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -86,7 +87,8 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        // Password is hashed in setPasswordAttribute (mutator runs before the "hashed" cast,
+        // so the cast never applied and passwords were stored as plaintext — see mutator below).
         'settings' => 'array',
         'data' => 'array',
         'active' => UserStatus::class
@@ -126,11 +128,16 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     }
 
     public function setPasswordAttribute($value): void {
-        // Only set password if a value is provided (not null or empty)
-        if (!empty($value)) {
-            $this->attributes['password'] = $value;
+        if ($value === null || $value === '') {
+            return;
         }
-        // If empty/null, don't update the password attribute
+        // Already hashed (seeders, imports) — store as-is
+        if (Hash::isHashed($value)) {
+            $this->attributes['password'] = $value;
+
+            return;
+        }
+        $this->attributes['password'] = Hash::make($value);
     }
 
     public function getStatusAttribute($value) {
@@ -197,8 +204,15 @@ class User extends Authenticatable implements HasMedia, FilamentUser, HasLocaleP
     }
 
     public function canAccessPanel(Panel $panel): bool {
-        // return !$this->hasRole(['customer']) && $this->active->value == 1;
-        return  $this->active->value == 1;
+        // Provider portal: registered providers awaiting first payment (pending) or active accounts.
+        if ($panel->getId() === 'lab-panel' && $this->hasRole('provider')) {
+            return in_array($this->active->value, [
+                UserStatus::ACTIVE->value,
+                UserStatus::PENDING->value,
+            ], true);
+        }
+
+        return $this->active->value === UserStatus::ACTIVE->value;
     }
 
     public function reservations(): HasMany {

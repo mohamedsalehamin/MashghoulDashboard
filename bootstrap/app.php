@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\EnsureLocationSet;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\ValidateSignature;
@@ -91,6 +92,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localeSessionRedirect' => LocaleSessionRedirect::class,
             'localeCookieRedirect' => LocaleCookieRedirect::class,
             'localeViewPath' => LaravelLocalizationViewPath::class,
+            'ensureLocationSet' => EnsureLocationSet::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

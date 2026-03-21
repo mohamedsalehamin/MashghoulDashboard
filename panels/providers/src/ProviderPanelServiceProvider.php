@@ -14,7 +14,7 @@ use App\ProviderPanel\Filament\Pages\RequestPasswordReset;
 use App\ProviderPanel\Filament\Pages\TermsAndConditionsPage;
 use App\CatalogModule\Resources\ReservationResource;
 use App\CatalogModule\Resources\ReservationResource\Widgets\ReservationStats;
-use App\ProviderPanel\Filament\Widgets\ProfileUrlWidget;
+
 
 
 
@@ -24,6 +24,8 @@ use App\ProviderPanel\Filament\Resources\RateResource;
 use App\ProviderPanel\Filament\Resources\SeatResource;
 use App\ProviderPanel\Filament\Resources\ServiceResource;
 use App\ProviderPanel\Filament\Resources\WalletResource;
+use App\ProviderPanel\Filament\Widgets\ActiveSubscriptionOverview;
+use App\ProviderPanel\Filament\Widgets\ProfileSetupNotice;
 use BezhanSalleh\FilamentLanguageSwitch\FilamentLanguageSwitchPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -107,11 +109,13 @@ class ProviderPanelServiceProvider extends PanelProvider
                 // SetTheme::class,
             ])
             ->widgets([
+                ProfileSetupNotice::class,
+                ActiveSubscriptionOverview::class,
                 ReservationStats::class,
-                ProfileUrlWidget::class,
             ])
             ->resources([
-
+                \App\ProviderPanel\Filament\Resources\PlanResource::class,
+                \App\ProviderPanel\Filament\Resources\SubscriptionResource::class,
                 \App\ProviderPanel\Filament\Resources\ReservationResource::class,
                 CustomerResource::class,
                 ServiceResource::class,
@@ -123,6 +127,7 @@ class ProviderPanelServiceProvider extends PanelProvider
             ->darkMode(false)
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\EnsureProviderHasActiveSubscription::class,
             ]);
     }
 }

@@ -11,20 +11,24 @@ use App\Notifications\ReservationCanceledFromPatientNotification;
 use App\Notifications\ReservationScheduledNotification;
 use App\Notifications\ReservationStatusChangedNotification;
 use Cknow\Money\Money;
+use Money\Currency;
+use Money\Money as BaseMoney;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 
 class Subscription extends Model {
-    use HasFactory, Transactionable;
+    use HasFactory, LogsActivity, Transactionable;
 
     protected $guarded = ['id'];
     protected $casts = [
         'meta_data' => 'array',
+        'features' => 'array',
         'status' => SubscriptionsStatusEnum::class,
-
     ];
 
     protected static function boot() {
@@ -38,14 +42,52 @@ class Subscription extends Model {
         });
     }
 
-    public function scopeBelongsToAuthUser($builder) {
-        return $builder->where('user_id', doctor()?->user?->id);
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->dontSubmitEmptyLogs()
+            ->logOnly(['end_date', 'start_date'])
+            ->logOnlyDirty();
     }
 
-    public function price(): Attribute {
+    public function scopeBelongsToAuthUser($builder)
+    {
+        $provider = provider();
+        return $builder->where('user_id', $provider?->user_id);
+    }
 
+    public function scopeActive($builder)
+    {
+        return $builder->where('status', \App\DefaultPanel\Enum\SubscriptionsStatusEnum::PROCESSING)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now());
+    }
+
+    public function planPrice()
+    {
+        return $this->belongsTo(PlanPrice::class);
+    }
+
+    public function price(): Attribute
+    {
         return Attribute::make(
-            get: fn($value) => Money::parse($value)
+            get: function ($value) {
+                if ($value === null || $value === '') {
+                    return Money::parse(0);
+                }
+
+                // New subscriptions store minor units (Plan::createSubscriptionForProvider uses planPrice->price->getAmount()).
+                // Money::parse(9900) treats that as major units → wrong display (e.g. 9,900.00 vs 99.00).
+                // Legacy rows may store major decimal (e.g. 99) — use parse for small values.
+                $amount = (int) round((float) $value);
+                $currency = config('money.defaultCurrency', 'SAR');
+
+                if ($amount >= 100) {
+                    return Money::convert(new BaseMoney((string) $amount, new Currency($currency)));
+                }
+
+                return Money::parse($value);
+            }
         );
     }
 
@@ -55,8 +97,21 @@ class Subscription extends Model {
     }
 
 
-    public function plan() {
+    public function plan()
+    {
         return $this->belongsTo(Plan::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === \App\DefaultPanel\Enum\SubscriptionsStatusEnum::PROCESSING
+            && $this->start_date <= now()
+            && $this->end_date >= now();
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->end_date < now();
     }
 
 }

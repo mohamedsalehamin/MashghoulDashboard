@@ -8,6 +8,7 @@ use App\CatalogModule\Models\Reservation\Rate;
 use App\DefaultPanel\Actions\Shared\Authentication\UpdateUserPassword;
 use App\DefaultPanel\Requests\Api\Provider\UpdatePasswordRequest;
 use App\DefaultPanel\Resources\Api\Provider\ProviderAccountResources;
+use App\DefaultPanel\Resources\Api\Provider\ProviderSubscriptionResource;
 use App\UsersModule\Models\Provider as ProviderModel;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,17 @@ class ProfileServices {
 
     public function index() {
         return Api::isOk(__("Provider information"), ProviderAccountResources::make(auth()->user()));
+    }
+
+    /**
+     * Current subscription only (same payload as `subscription` fields on GET profile).
+     */
+    public function subscription()
+    {
+        return Api::isOk(
+            __('validation.api.subscription_details'),
+            ProviderSubscriptionResource::subscriptionPayload(auth()->user())
+        );
     }
 
     public function updatePassword(UpdatePasswordRequest $request) {

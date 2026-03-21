@@ -413,7 +413,7 @@ class Cart extends CoreCart {
     }
 
     function format($value) {
-        return Money::parse($value)->format();
+        return Money::parse($value)->formatByDecimal();
     }
 
     public

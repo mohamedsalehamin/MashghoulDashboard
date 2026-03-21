@@ -22,6 +22,7 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Contracts\Support\Htmlable;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Forms\Components\SelectFontAwesomeIcon;
+use App\DefaultPanel\Lib\FontawesomeIcons;
 use App\DefaultPanel\Settings\GeneralSettings;
 use Filament\Support\Enums\Width;
 class ManageGeneral extends SettingsPage {
@@ -162,6 +163,7 @@ class ManageGeneral extends SettingsPage {
                         ->label('')
                         ->schema([
                             SelectFontAwesomeIcon::make('icon')
+                                ->options(FontawesomeIcons::toSelect())
                                 ->searchable()
                                 ->allowHtml(),
 
@@ -172,8 +174,23 @@ class ManageGeneral extends SettingsPage {
                         ])
 
                 ])
+                    ->collapsible(),
+                Section::make(__('forms.sections.code_injection'))->schema([
+                    Textarea::make('code_before_end_head_tag')
+                        ->label(__('forms.fields.code_before_end_head_tag'))
+                        ->rows(5)
+                        ->helperText(__('forms.helpers.code_before_end_head_tag')),
+                    Textarea::make('code_after_body_tag')
+                        ->label(__('forms.fields.code_after_body_tag'))
+                        ->rows(5)
+                        ->helperText(__('forms.helpers.code_after_body_tag')),
+                    Textarea::make('code_before_end_body_tag')
+                        ->label(__('forms.fields.code_before_end_body_tag'))
+                        ->rows(5)
+                        ->helperText(__('forms.helpers.code_before_end_body_tag')),
+                ])
                     ->collapsible()
-//                    ->collapsed()
+                    ->collapsed()
             ]);
     }
 

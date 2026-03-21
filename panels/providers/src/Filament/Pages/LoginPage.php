@@ -2,6 +2,7 @@
 
 namespace App\ProviderPanel\Filament\Pages;
 
+use App\Models\User;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Component;
@@ -22,6 +23,7 @@ use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\SimplePage;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use libphonenumber\PhoneNumberType;
@@ -50,6 +52,14 @@ class LoginPage extends SimplePage {
             redirect()->intended(Filament::getUrl());
         }
 
+        if (request()->query('subscription') === 'activated') {
+            Notification::make()
+                ->title(__('site.join.subscription_activated_login_title'))
+                ->body(__('site.join.subscription_activated_login_body'))
+                ->success()
+                ->send();
+        }
+
         $this->form->fill();
     }
 
@@ -73,7 +83,9 @@ class LoginPage extends SimplePage {
         }
 
         $data = $this->form->getState();
-        if (!Filament::auth()->attempt($this->getCredentialsFromFormData($data), $data['remember'] ?? false)) {
+        $credentials = $this->getCredentialsFromFormData($data);
+
+        if (! $this->attemptAuthentication($credentials, $data['remember'] ?? false)) {
             $this->throwFailureValidationException();
         }
 
@@ -141,7 +153,6 @@ class LoginPage extends SimplePage {
                 type: PhoneNumberType::MOBILE,
                 lenient: true
             )
-            ->unique(ignoreRecord: true)
             ->displayNumberFormat(PhoneInputNumberType::E164);
     }
 
@@ -203,6 +214,65 @@ class LoginPage extends SimplePage {
             'phone' => $data['phone'],
             'password' => $data['password'],
         ];
+    }
+
+    /**
+     * Attempt authentication, trying multiple phone formats to handle DB storage variations.
+     */
+    protected function attemptAuthentication(array $credentials, bool $remember): bool {
+        if (Filament::auth()->attempt($credentials, $remember)) {
+            return true;
+        }
+
+        $phone = $credentials['phone'] ?? '';
+        $password = $credentials['password'] ?? '';
+
+        if (empty($phone) || empty($password)) {
+            return false;
+        }
+
+        $phoneVariants = $this->getPhoneLookupVariants($phone);
+        $user = User::whereIn('phone', $phoneVariants)->first();
+
+        if (! $user) {
+            return false;
+        }
+
+        if (Hash::check($password, $user->password)) {
+            Filament::auth()->login($user, $remember);
+
+            return true;
+        }
+
+        // Legacy: passwords were stored as plaintext because setPasswordAttribute bypassed the "hashed" cast.
+        if (! Hash::isHashed($user->password) && hash_equals((string) $user->password, (string) $password)) {
+            $user->password = $password;
+            $user->save();
+            Filament::auth()->login($user, $remember);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array<string>
+     */
+    protected function getPhoneLookupVariants(string $phone): array {
+        $variants = [$phone, ltrim($phone, '+')];
+
+        try {
+            $parsed = phone($phone);
+            $e164 = $parsed->formatE164();
+            $variants[] = $e164;
+            $variants[] = ltrim($e164, '+');
+            $variants[] = preg_replace('/\D/', '', $e164);
+        } catch (\Throwable) {
+            // ignore parse errors
+        }
+
+        return array_values(array_unique(array_filter($variants)));
     }
 
     public function content(Schema $schema): Schema

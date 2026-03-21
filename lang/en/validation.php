@@ -181,6 +181,8 @@ return [
         'insufficient_wallet_balance' => 'Insufficient wallet balance',
 
         "overdue_wallet_balance" => 'Overdue wallet balance',
+        'no_active_subscription' => 'No active subscription. Please renew your plan from the provider portal or complete payment.',
+        'subscription_details' => 'Subscription details',
     ],
     /*
     |--------------------------------------------------------------------------
@@ -193,11 +195,15 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'country_id' => 'Country',
+    ],
     'translatable_required.missing' => 'The :attribute field is required in :locales.',
     'tabby' => [
         'not_available'=>'Sorry, Tabby is unable to approve this purchase. Please use an alternative payment method for your order.',
         'order_amount_too_high'=>'This purchase is above your current spending limit with Tabby, try a smaller cart or use another payment method',
         'order_amount_too_low'=>'The purchase amount is below the minimum amount required to use Tabby, try adding more items or use another payment method	',
+        'redirect_cancel' => 'You aborted the payment. Please retry or choose another payment method.',
+        'redirect_failure' => 'Payment was rejected. Please try again or choose another payment method.',
     ]
 ];

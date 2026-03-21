@@ -61,6 +61,7 @@ class Reservation extends Model {
 
     protected $casts = [
         'date' => 'date',
+        'from' => 'datetime',
         'meta_data' => 'array',
         'status' => ReservationStatus::class,
     ];

@@ -37,7 +37,7 @@ class ProviderResources extends JsonResource {
             ],
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list']??[])->where('status', 1)),
             'complete_order_text' => $this->user?->options?->texts[app()->getLocale()]??'',
-            "share_link" => route('site.share_provider', str_replace(" ", "&", $this->getTranslation('name', 'en') ?? $this->name)),
+            'share_link' => route('site.provider.show', $this->id),
         ];
     }
 }

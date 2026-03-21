@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\CatalogModule\Models\Reservation;
+use App\CatalogModule\Models\Subscription;
 use App\DefaultPanel\Actions\CaptureTabbyPayment;
+use App\DefaultPanel\Actions\CancelReservationOnPaymentFailureAction;
 use Tabby\Services\TabbyService;
 use Tabby\Exceptions\TabbyApiException;
 
@@ -284,27 +286,43 @@ class TabbyController extends Controller
             $transaction = Transaction::where('meta_data->invoiceId', $paymentId)->first();
 
             if (!$transaction) {
+                if ($request->isMethod('GET')) {
+                    return redirect()->route('site.booking.checkout.error', ['reason' => 'tabby_cancel']);
+                }
                 return response()->json(['error' => 'Transaction not found'], 404);
             }
 
             $transaction->update([
                 'status' => ReservationPaymentStatus::CANCELED->value,
-                'meta_data' => array_merge($transaction->meta_data, [
+                'meta_data' => array_merge($transaction->meta_data ?? [], [
                     'canceled_at' => now()->toIso8601String(),
                     'cancel_response' => $request->all()
                 ])
             ]);
 
-            // Update reservation status
+            // Cancel reservation to free slot and refund wallet (both web and mobile)
             if ($transaction->transactionable && $transaction->transactionable instanceof Reservation) {
-                $transaction->transactionable->update([
-                    'status' => ReservationStatus::CANCELED->value
-                ]);
+                CancelReservationOnPaymentFailureAction::run($transaction->transactionable);
+            }
+
+            // Web (GET): redirect to error page
+            if ($request->isMethod('GET')) {
+                if ($transaction->transactionable instanceof Subscription) {
+                    return redirect()->route('site.join.payment-failed');
+                }
+                $providerId = $transaction->transactionable?->reservable_id ?? null;
+                return redirect()->route('site.booking.checkout.error', array_filter([
+                    'reason' => 'tabby_cancel',
+                    'provider_id' => $providerId,
+                ]));
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
         } catch (\Exception $e) {
             Log::error('Tabby cancel webhook error: ' . $e->getMessage());
+            if ($request->isMethod('GET')) {
+                return redirect()->route('site.booking.checkout.error', ['reason' => 'tabby_cancel']);
+            }
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }
@@ -316,27 +334,43 @@ class TabbyController extends Controller
             $transaction = Transaction::where('meta_data->invoiceId', $paymentId)->first();
 
             if (!$transaction) {
+                if ($request->isMethod('GET')) {
+                    return redirect()->route('site.booking.checkout.error', ['reason' => 'tabby_failure']);
+                }
                 return response()->json(['error' => 'Transaction not found'], 404);
             }
 
             $transaction->update([
                 'status' => ReservationPaymentStatus::CANCELED->value,
-                'meta_data' => array_merge($transaction->meta_data, [
+                'meta_data' => array_merge($transaction->meta_data ?? [], [
                     'failed_at' => now()->toIso8601String(),
                     'failure_response' => $request->all()
                 ])
             ]);
 
-            // Update reservation status
+            // Cancel reservation to free slot and refund wallet (both web and mobile)
             if ($transaction->transactionable && $transaction->transactionable instanceof Reservation) {
-                $transaction->transactionable->update([
-                    'status' => ReservationStatus::CANCELED->value
-                ]);
+                CancelReservationOnPaymentFailureAction::run($transaction->transactionable);
+            }
+
+            // Web (GET): redirect to error page
+            if ($request->isMethod('GET')) {
+                if ($transaction->transactionable instanceof Subscription) {
+                    return redirect()->route('site.join.payment-failed');
+                }
+                $providerId = $transaction->transactionable?->reservable_id ?? null;
+                return redirect()->route('site.booking.checkout.error', array_filter([
+                    'reason' => 'tabby_failure',
+                    'provider_id' => $providerId,
+                ]));
             }
 
             return response()->json(['status' => ReservationPaymentStatus::CANCELED->value]);
         } catch (\Exception $e) {
             Log::error('Tabby failure webhook error: ' . $e->getMessage());
+            if ($request->isMethod('GET')) {
+                return redirect()->route('site.booking.checkout.error', ['reason' => 'tabby_failure']);
+            }
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }

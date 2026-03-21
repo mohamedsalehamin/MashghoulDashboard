@@ -5,96 +5,165 @@ use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
 
 $settings = new GeneralSettings();
-$landing_settings = new LandingSettings();
-$pages = collect($settings->app_pages)->mapWithKeys(function ($page, $pageName) {
-    return [$pageName => Page::find($page)];
 
-});
+$locationSet = session()->has('location_set') && session('location_set') === true;
+$shouldShowLocationModal = ! $locationSet && session()->get('show_location_modal') === true;
+
+
+$locale = app()->getLocale();
+$isRtl = $locale === 'ar';
+$assetBase = asset('assets/site');
 ?>
 <!doctype html>
-<html lang="{{app()->getLocale()}}" dir="{{app()->getLocale() == 'ar'?'rtl':'ltr'}}">
+<html lang="{{ $locale }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
 <head>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
-    <meta name="description" content="التطبيق الأول في السعودية"/>
-    <title>مشغول</title>
-    <!-- Animate File Css Template -->
-    <link rel="stylesheet" href="{{asset('assets/css/animate.min.css')}}"/>
-    <!-- owl carousel Css File Template  -->
-    <link rel="stylesheet" href="{{asset('assets/css/owl.carousel.min.css')}}"/>
-    <!-- FontAwesome Css File Template  -->
-    <link rel="stylesheet" href="{{asset('assets/css/all.min.css')}}"/>
-    <!-- Bootstrap Css File Template  -->
-    <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}"/>
-    <!-- Main Css File Template -->
-    <link rel="stylesheet" href="{{asset('assets/css/style.css')}}"/>
-    <style>.iti{    width: 100%;}</style>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="{{ $metaDescription ?? '' }}">
+    @if(!empty($metaKeywords ?? ''))
+    <meta name="keywords" content="{{ $metaKeywords }}">
+    @endif
+    @if($isRtl)
+        <link rel="stylesheet" href="{{ $assetBase }}/css/bootstrap.rtl.min.css">
+    @else
+        <link rel="stylesheet" href="{{ $assetBase }}/css/bootstrap.min.css">
+    @endif
+    <link rel="stylesheet" href="{{ $assetBase }}/css/all.min.css">
+    <link rel="stylesheet" href="{{ $assetBase }}/css/animate.css">
+    <link rel="stylesheet" href="{{ $assetBase }}/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="{{ $assetBase }}/css/main.css">
+    <title>{{ $title ?? __('site.heading.home') }} - {{ config('app.name', 'Mashghol') }}</title>
+
+    @stack('meta')
     @stack("css")
     @livewireStyles
-    
-    <!-- Snap Pixel Code -->
-<script type='text/javascript'>
-(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
-{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
-a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
-r.src=n;var u=t.getElementsByTagName(s)[0];
-u.parentNode.insertBefore(r,u);})(window,document,
-'https://sc-static.net/scevent.min.js');
-
-snaptr('init', '7a764719-fac8-4705-ad5f-1b4e2ad1936a', {});
-
-snaptr('track', 'PAGE_VIEW');
-
-</script>
-<!-- End Snap Pixel Code -->
+    @if(!empty($settings->code_before_end_head_tag))
+    {!! $settings->code_before_end_head_tag !!}
+    @endif
 </head>
 <body>
+@if(!empty($settings->code_after_body_tag))
+{!! $settings->code_after_body_tag !!}
+@endif
+@include('site.components.new.header')
 
+<main>
+    @yield('content')
+</main>
 
+@include('site.components.new.footer')
 
-<div class="sidebar_pagebody">
-    @include('site.components.sidebar')
-    <main id="bodyWrap">
-        @yield('content')
-        @include('site.components.footer')
-
-
-    </main>
-
+<div class="floating-icons">
+    <div class="up-btn"><i class="fas fa-arrow-up"></i></div>
+    @if(isset($settings))
+        @php
+            $linkItem = collect($settings->social_links ?? [])->firstWhere('icon', 'whatsapp');
+            $whatsappNumber = $settings->app_whatsapp ?? (is_array($linkItem) ? ($linkItem['link'] ?? null) : null);
+            $whatsappNumber = $whatsappNumber ? preg_replace('/\D/', '', $whatsappNumber) : null;
+        @endphp
+        @if(!empty($settings->enabled_whatsapp_icon) && $whatsappNumber)
+            <a href="https://wa.me/{{ $whatsappNumber }}" class="whatsapp-icon" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>
+        @endif
+    @endif
 </div>
 @livewireScripts
 
 
 @livewire('livewire-ui-modal')
+{{-- Favorite toggle success modal --}}
+<div class="modal fade custom-bootstrap-modal" id="favorite-modal" tabindex="-1" aria-labelledby="favoriteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-header d-flex flex-column align-items-center position-relative pb-0">
+                <h3 class="modal-title mb-2" id="favoriteModalLabel">{{ __('site.heading.favorites') }}</h3>
+                <p class="modal-subtitle" id="favorite-modal-message"></p>
+            </div>
+            <div class="modal-footer d-flex flex-row justify-content-center gap-3 pt-0">
+                <button type="button" class="btn btn-green modal-confirm px-5" data-bs-dismiss="modal">{{ __('site.buttons.ok') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- jQuery 3.6.4 -->
-<script src="{{asset('assets/js/jquery-3.6.4.min.js')}}"></script>
+@if($shouldShowLocationModal)
+    <!-- Location selector modal (non-closable) -->
+    <div
+        class="modal fade"
+        id="locationModal"
+        tabindex="-1"
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+    >
+        <div class="modal-dialog modal-dialog-centered" style="max-width:75%; width:75%;height:60vh; margin: 1.75rem auto;">
+            <div class="modal-content" style="height:60vh;">
+                <div class="modal-body p-0" style="max-height:90vh; overflow:auto;">
+                    @include('site.new.partials.location-selector', ['inModal' => true])
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Popper JS (for Bootstrap tooltips and popovers) -->
-<script src="{{asset('assets/js/popper.min.js')}}"></script>
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var el = document.getElementById('locationModal');
+                if (!el) return;
+                var savedLat = localStorage.getItem('user_latitude');
+                var savedLng = localStorage.getItem('user_longitude');
+                var hasLocalLocation = !!savedLat && !!savedLng;
 
-<!-- Bootstrap JS (requires Popper.js) -->
-<script src="{{asset('assets/js/bootstrap.bundle.min.js')}}"></script>
+                // If localStorage already has a location, sync it to session first.
+                if (hasLocalLocation) {
+                    var csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    if (csrf) {
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route('site.set-location.save') }}';
+                        form.style.display = 'none';
 
-<!-- Waypoints (for counter) -->
-<script src="{{asset('assets/js/jquery.waypoints.min.js')}}"></script>
+                        var tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrf;
+                        form.appendChild(tokenInput);
 
-<!-- Owl Carousel plugin -->
-<script src="{{asset('assets/js/owl.carousel.min.js')}}"></script>
+                        var latInput = document.createElement('input');
+                        latInput.type = 'hidden';
+                        latInput.name = 'latitude';
+                        latInput.value = savedLat;
+                        form.appendChild(latInput);
 
-<!-- ScrollrevealMin JS (for animations) -->
-<script src="{{asset('assets/js/scrollreveal.min.js')}}"></script>
+                        var lngInput = document.createElement('input');
+                        lngInput.type = 'hidden';
+                        lngInput.name = 'longitude';
+                        lngInput.value = savedLng;
+                        form.appendChild(lngInput);
 
-<!-- WOW.js (for reveal animations) -->
-<script src="{{asset('assets/js/wow.min.js')}}"></script>
+                        document.body.appendChild(form);
+                        form.submit();
+                        return;
+                    }
+                }
 
-<!-- Main Plugin JS (optional custom plugin file) -->
-<script src="{{asset('assets/js/plugin.js')}}"></script>
-{{--<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>--}}
+                // Force a non-closable modal: static backdrop + disable keyboard.
+                var modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: 'static', keyboard: false });
+                modal.show();
+            });
+        </script>
+    @endpush
+@endif
+<script src="{{ $assetBase }}/js/jquery.min.js"></script>
+<script src="{{ $assetBase }}/js/bootstrap.min.js"></script>
+<script src="{{ $assetBase }}/js/wow.min.js"></script>
+<script src="{{ $assetBase }}/js/swiper-bundle.min.js"></script>
+<script src="{{ $assetBase }}/js/main.js"></script>
+@stack('scripts')
 
-<!-- Focus plugin -->
-<script defer src="https://unpkg.com/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
 @stack("scripts")
+@if(!empty($settings->code_before_end_body_tag))
+{!! $settings->code_before_end_body_tag !!}
+@endif
 </body>
 </html>

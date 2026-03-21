@@ -8,15 +8,19 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
 use App\DefaultPanel\Traits\Publishable;
+use Illuminate\Database\Eloquent\Builder;
 
 class Banner extends Model implements HasMedia {
     use  Publishable, HasTranslations,InteractsWithMedia, HasFactory;
     protected array $translatable = ['name','image'];
     protected $fillable = [
         'status',
+        'placement',
         'object_type',
         'object_id',
     ];
 
-
+    public function scopePlacement(Builder $query, string $placement): Builder {
+        return $query->where('placement', $placement);
+    }
 }

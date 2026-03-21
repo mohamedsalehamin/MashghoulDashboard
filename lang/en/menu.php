@@ -83,6 +83,7 @@ return [
     'reports' => 'Reports',
     'customer_payments' => 'Customer payments',
     'customerspayment' => 'Customers payment',
+    'subscription_payments' => 'Subscription payments',
     'locations' => 'Locations',
     'cities' => 'Cities',
     'analysis' => 'Analysis',

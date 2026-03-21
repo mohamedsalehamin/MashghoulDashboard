@@ -11,6 +11,7 @@ use App\CatalogModule\Resources\ConsultingReservationResource\Widgets\Reservatio
 use App\CatalogModule\Resources\MedicalTestReservationResource\Widgets\LabReservationsCountChart;
 use App\CatalogModule\Resources\MedicalTestReservationResource\Widgets\LabReservationsTotalsChart;
 use App\CatalogModule\Widgets\CustomersChart;
+use App\CatalogModule\Widgets\PlanSubscriptionStats;
 use App\CatalogModule\Widgets\ReservationsCountChart;
 use App\CatalogModule\Widgets\ReservationsTotalsChart;
 use App\ContentModule\ContentPlugin;
@@ -84,6 +85,8 @@ class DefaultPanelServiceProvider extends PanelProvider {
 
                 NavigationGroup::make()
                     ->label(fn(): string => __('menu.locations')),
+                NavigationGroup::make()
+                    ->label(fn(): string => __('menu.payments')),
                 NavigationGroup::make()
                     ->label(fn(): string => __('menu.reports')),
                 NavigationGroup::make()
@@ -161,6 +164,7 @@ class DefaultPanelServiceProvider extends PanelProvider {
                 // SetTheme::class,
             ])
             ->widgets([
+                PlanSubscriptionStats::class,
                 CustomersChart::class,
                 ReservationsTotalsChart::class,
                 ReservationsCountChart::class,

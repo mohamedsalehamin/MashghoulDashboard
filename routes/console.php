@@ -24,3 +24,8 @@ Schedule::command('app:send-gift-for-customer-whose-birthday-today')->daily();
 
 // Capture Tabby pending transactions every 4 minutes
 Schedule::command('app:capture-pending-transactions --hours=2')->everyFourMinutes();
+
+Schedule::command('sitemap:generate')->daily();
+
+// Provider subscription notifications: 3 days before + 1 day after expiry
+Schedule::command('app:provider-subscription-notifications')->daily();

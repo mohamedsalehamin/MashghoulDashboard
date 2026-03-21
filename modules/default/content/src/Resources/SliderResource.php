@@ -60,6 +60,14 @@ class SliderResource extends Resource implements HasShieldPermissions {
                 ->label(__('forms.fields.image_ar'))
                 ->collection('ar')
                 ->required(),
+            Select::make('placement')
+                ->label(__('sections.banner_placement'))
+                ->options([
+                    'website' => __('sections.banner_placement_website'),
+                    'app' => __('sections.banner_placement_app'),
+                ])
+                ->default('app')
+                ->required(),
             Select::make("object_type")
                 ->live()
                 ->options([
@@ -96,6 +104,9 @@ class SliderResource extends Resource implements HasShieldPermissions {
             ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
+                TextColumn::make('placement')
+                    ->label(__('sections.banner_placement'))
+                    ->formatStateUsing(fn($state) => $state === 'website' ? __('sections.banner_placement_website') : __('sections.banner_placement_app')),
                 SpatieMediaLibraryImageColumn::make('image')->collection(app()->getLocale()),
                 IconColumn::make('status')
                     ->boolean()
@@ -111,6 +122,12 @@ class SliderResource extends Resource implements HasShieldPermissions {
 
             ])
             ->filters([
+                SelectFilter::make('placement')
+                    ->label(__('sections.banner_placement'))
+                    ->options([
+                        'website' => __('sections.banner_placement_website'),
+                        'app' => __('sections.banner_placement_app'),
+                    ]),
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])

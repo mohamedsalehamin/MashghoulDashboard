@@ -16,7 +16,9 @@ use App\ContentModule\Resources\PageResource\Pages\CreatePage;
 use App\ContentModule\Resources\PageResource\Pages\EditPage;
 use App\ContentModule\Resources\PageResource\Pages\ListPages;
 use Filament\Forms;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Width;
@@ -51,6 +53,13 @@ class PageResource extends Resource {
                                 'xl' => 2,
                             ])
                             ->translateLabel(),
+                        TextInput::make('slug')
+                            ->label(__('forms.fields.slug'))
+                            ->placeholder(__('forms.placeholders.slug_auto'))
+                            ->columnSpan([
+                                'xl' => 2,
+                            ])
+                            ->translateLabel(),
                         RichEditor::make('description')
                             ->required()
                             ->columnSpan([
@@ -63,7 +72,26 @@ class PageResource extends Resource {
                             ->offColor('danger')
 
                     ])
-            ]);
+                    ->columns(2),
+                Section::make(__('sections.seo_meta'))
+                    ->schema([
+                        Textarea::make('meta_description')
+                            ->label(__('forms.fields.meta_description'))
+                            ->rows(3)
+                            ->columnSpan(['xl' => 2])
+                            ->translateLabel(),
+                        TagsInput::make('meta_keywords')
+                            ->label(__('forms.fields.meta_keywords'))
+                            ->separator(',')
+                            ->splitKeys([',', 'Enter'])
+                            ->placeholder(__('forms.placeholders.meta_keywords_tags'))
+                            ->columnSpan(['xl' => 2])
+                            ->translateLabel(),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table {
@@ -71,6 +99,7 @@ class PageResource extends Resource {
             ->columns([
                 TextColumn::make('id')->searchable(),
                 TextColumn::make('title')->searchable(),
+                TextColumn::make('slug')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('status')
                     ->boolean()
                     ->action(

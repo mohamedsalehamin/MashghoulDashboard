@@ -74,7 +74,7 @@ return [
     'allergen' => 'مسبب حساسية',
     'managers' => 'المديرين',
     'manager' => 'مدير',
-    'operators' => 'المشغلين',
+    'operators' => 'مقدمي الخدمات',
     'operator' => 'مشغل',
     'banners' => 'البانرات',
     'banner' => 'بانر',
@@ -120,7 +120,8 @@ return [
 
     'customer_reviews' => 'آراء العملاء',
     'customerreview' => 'رأي عميل',
-    'customer_payments' => 'المدفوعات',
+    'customer_payments' => 'مدفوعات العملاء',
+    'subscription_payments' => 'مدفوعات الاشتراكات',
     'reports' => 'التقارير',
     'locations' => 'المواقع',
     'plans' => 'الباقات',

@@ -1,0 +1,352 @@
+/**
+ * Provider panel /plans page — styles aligned with NewFrontEnd join-us.html
+ * Scoped under .mashghoul-provider-plans to avoid affecting Filament UI.
+ */
+
+.mashghoul-provider-plans.join-us-page {
+    font-family: "DIN Next LT Arabic", "Cairo", system-ui, sans-serif;
+    color: #001233;
+}
+
+.mashghoul-provider-plans .login-main-title {
+    color: #001233;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .mashghoul-provider-plans .login-main-title {
+        font-size: 26px;
+    }
+}
+
+.mashghoul-provider-plans .desc-tabs {
+    border-bottom: 2px solid #eee;
+    margin-bottom: 25px;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+}
+
+.mashghoul-provider-plans .desc-tabs .nav-item {
+    margin-bottom: -2px;
+}
+
+.mashghoul-provider-plans .desc-tabs .nav-link {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 15px 25px;
+    margin-inline-end: 30px;
+    font-size: 18px;
+    color: #001233;
+    opacity: 1;
+    transition: 0.3s;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.mashghoul-provider-plans .desc-tabs .nav-link:hover {
+    border-color: transparent;
+    opacity: 0.8;
+}
+
+.mashghoul-provider-plans .desc-tabs .nav-link.active {
+    opacity: 1;
+    color: #001233;
+    background: none;
+    border-bottom: 2px solid #a3d55f;
+}
+
+@media screen and (max-width: 600px) {
+    .mashghoul-provider-plans .desc-tabs .nav-link {
+        font-size: 16px;
+        margin-inline-end: 20px;
+    }
+}
+
+/* Payment methods — one row (3 or 2 columns) on desktop */
+.mashghoul-provider-plans .payment-card .payment-methods {
+    display: grid;
+    gap: 15px;
+    align-items: stretch;
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-methods.payment-methods--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mashghoul-provider-plans .payment-card .payment-methods.payment-methods--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+    .mashghoul-provider-plans
+        .payment-card
+        .payment-methods.payment-methods--three,
+    .mashghoul-provider-plans
+        .payment-card
+        .payment-methods.payment-methods--two {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(0, 47, 135, 0.05);
+    padding: 15px 20px;
+    border-radius: 20px;
+    min-height: 60px;
+    min-width: 0;
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item:hover:not(:disabled) {
+    border-color: #a3d55f;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item:has(input[type="radio"]:checked) {
+    border: 1px solid #a3d55f !important;
+    background-color: #fcfdf9;
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item .method-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item .check-circle {
+    margin-inline-end: 15px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item
+    .check-circle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 10px;
+    height: 10px;
+    background-color: #a3d55f;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item:has(input[type="radio"]:checked)
+    .check-circle {
+    border-color: #a3d55f;
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item:has(input[type="radio"]:checked)
+    .check-circle::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.mashghoul-provider-plans
+    .payment-card
+    .payment-method-item
+    input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item .method-name {
+    font-size: 16px;
+    color: #001233;
+    flex-grow: 1;
+    font-weight: 500;
+    padding-inline-end: 10px;
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item .method-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.mashghoul-provider-plans .payment-card .payment-method-item .method-icons img {
+    border-radius: 4px;
+    max-height: 28px;
+    width: auto;
+}
+
+/* Plans grid — plain CSS so layout works inside Filament (Tailwind JIT does not scan this Blade file) */
+.mashghoul-provider-plans .plans-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+    align-items: stretch;
+}
+
+.mashghoul-provider-plans .plans-grid > .plans-grid__item {
+    min-width: 0;
+}
+
+@media (min-width: 640px) {
+    .mashghoul-provider-plans .plans-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .mashghoul-provider-plans .plans-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 2rem;
+    }
+}
+
+/* Package cards */
+.mashghoul-provider-plans .package-card {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 47, 135, 0.1);
+    background: #fff7ed;
+    border-radius: 20px;
+    padding-block: 48px;
+    padding-inline: 0;
+    height: 100%;
+    /* display: flex; */
+    /* flex-direction: column; */
+}
+
+.mashghoul-provider-plans .package-card.feature-package {
+    background: #fdb874;
+    color: #000;
+}
+
+.mashghoul-provider-plans .package-card.feature-package .package-title {
+    color: #fff;
+    border-bottom-color: rgba(255, 255, 255, 0.35);
+}
+
+.mashghoul-provider-plans .package-card.feature-package .package-price,
+.mashghoul-provider-plans .package-card.feature-package .package-features-title,
+.mashghoul-provider-plans .package-card.feature-package .package-feature {
+    color: #fff;
+}
+
+.mashghoul-provider-plans .package-card.feature-package .package-feature i {
+    color: #fff;
+}
+
+.mashghoul-provider-plans .package-card .package-title {
+    color: #001233;
+    font-size: 20px;
+    display: inline-block;
+    border-bottom: 1px solid #a3d55f;
+    padding-block: 12px;
+    padding-inline: 16px 2rem;
+    margin-inline: 1rem;
+}
+
+.mashghoul-provider-plans .package-card .package-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-inline: 20px;
+}
+
+.mashghoul-provider-plans .package-card .package-price {
+    margin-bottom: 24px;
+    font-size: 24px;
+    color: #001233;
+    font-weight: 500;
+}
+
+.mashghoul-provider-plans .package-card .package-period {
+    font-size: 15px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.mashghoul-provider-plans .package-card.feature-package .package-period {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.mashghoul-provider-plans .package-features-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #001233;
+}
+
+.mashghoul-provider-plans
+    .package-card.feature-package
+    .package-features-title {
+    color: #fff;
+}
+
+.mashghoul-provider-plans .package-card ul.list-unstyled {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mashghoul-provider-plans .package-feature {
+    font-size: 16px;
+    line-height: 2;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.mashghoul-provider-plans .package-feature i {
+    color: #000;
+    margin-inline-end: 8px;
+}
+
+/* Subscribe buttons use Filament primary (Tailwind) — colors come from blade utilities */
+.mashghoul-provider-plans .provider-plan-subscribe-btn {
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #ffedd5;
+    color: #000;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.mashghoul-provider-plans .provider-plan-subscribe-btn:hover {
+    background: #fdb874;
+}
+
+.mashghoul-provider-plans .provider-plan-subscribe-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

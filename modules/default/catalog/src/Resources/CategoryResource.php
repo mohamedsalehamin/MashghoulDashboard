@@ -56,10 +56,16 @@ class CategoryResource extends Resource implements HasShieldPermissions {
                 Section::make(__("sections.basic_information"))
                     ->schema([
                         TextInput::make('name')
-                            ->required(),
+                            ->required()
+                            ->translateLabel(),
+                        TextInput::make('slug')
+                            ->label(__('forms.fields.slug'))
+                            ->placeholder(__('forms.placeholders.slug_auto'))
+                            ->translateLabel(),
 
                         SpatieMediaLibraryFileUpload::make('image_ar')->collection('ar')->image()->required(),
                         SpatieMediaLibraryFileUpload::make('image_en')->collection('en')->image()->required(),
+                        SpatieMediaLibraryFileUpload::make('icon')->collection('icon')->label(__('forms.fields.icon'))->image(),
 
                         Select::make("parent_id")
                             ->label(__('forms.fields.category_parent_id'))

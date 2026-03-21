@@ -37,6 +37,10 @@ class GeneralSettings extends Settings {
     public array $social_links = [];
     public array $working_days = [];
 
+    public ?string $code_before_end_head_tag = null;
+    public ?string $code_after_body_tag = null;
+    public ?string $code_before_end_body_tag = null;
+
     public static function group(): string {
         return 'general';
     }

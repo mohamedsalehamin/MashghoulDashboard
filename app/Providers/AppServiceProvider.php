@@ -36,6 +36,8 @@ use MyFatoorah\Library\API\Payment\MyFatoorahPayment;
 use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
 use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 use App\DefaultPanel\Lib\Cart;
+use App\Http\Responses\Auth\PanelLoginResponse;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse as LoginResponseContract;
 use App\DefaultPanel\Notifications\Notification;
 use App\DefaultPanel\Settings\DeveloperSetting;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -46,6 +48,9 @@ class AppServiceProvider extends ServiceProvider {
      * Register any application services.
      */
     public function register(): void {
+        // Panel login: always redirect to panel dashboard (prevents redirect to set-location)
+        $this->app->bind(LoginResponseContract::class, PanelLoginResponse::class);
+
         // Register custom service providers
         $this->app->register(DefaultPanelServiceProvider::class);
         $this->app->register(ProviderPanelServiceProvider::class);
@@ -81,8 +86,18 @@ class AppServiceProvider extends ServiceProvider {
             $switch->locales(['ar', 'en']);
         });
         $settings = new DeveloperSetting();
-        view()->share('settings', new GeneralSettings());
+        $generalSettings = new GeneralSettings();
+        view()->share('settings', $generalSettings);
 //        config()->set("app.debug", $settings->debug_mode);
+
+        // Share social_links and pages for site views (tmoono-style Livewire support)
+        view()->composer(['site.*', 'site.new.*', 'site.new.account.*',  'livewire.site.*'], function ($view) use ($generalSettings) {
+            $pages = collect($generalSettings->app_pages ?? [])->mapWithKeys(function ($pageId, $pageName) {
+                return [$pageName => Page::find($pageId)];
+            })->filter();
+            $view->with('social_links', $generalSettings->social_links ?? [])
+                ->with('pages', $pages);
+        });
 
        
         // Register filament-panels views namespace for custom views

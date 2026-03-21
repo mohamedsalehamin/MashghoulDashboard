@@ -2,6 +2,7 @@
 
 namespace App\ContentModule\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,9 +15,13 @@ class Slider extends Model implements HasMedia {
     protected array $translatable = ['name','image'];
     protected $fillable = [
         'status',
+        'placement',
         'object_type',
         'object_id',
     ];
 
-
+    public function scopePlacement(Builder $query, string $placement): Builder
+    {
+        return $query->where('placement', $placement);
+    }
 }

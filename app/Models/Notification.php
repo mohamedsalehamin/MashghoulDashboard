@@ -33,4 +33,21 @@ class Notification extends DatabaseNotification {
         );
     }
 
+    /**
+     * URL for the customer site (e.g. booking details) when opening a notification from the site.
+     */
+    protected function siteUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, array $attributes) {
+                $decoded = json_decode($attributes['data'], true);
+                $viewData = $decoded['viewData'] ?? [];
+                if ((data_get($viewData, 'entity_type')) === 'reservation') {
+                    return route('site.booking.show', (int) $viewData['entity_id']);
+                }
+                return null;
+            }
+        );
+    }
+
 }

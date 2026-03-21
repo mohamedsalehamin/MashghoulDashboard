@@ -71,24 +71,24 @@ class ReservationCommissionResource extends Resource {
 
                 TextColumn::make('reservation.price')
                     ->label(__("forms.fields.reservation_total"))
-                    ->formatStateUsing(fn($record) => \Cknow\Money\Money::parse($record->reservation->as_cart->getNetProfitTotal())->format())
-                    ->searchable(),
+                    ->state(fn($record) => \Cknow\Money\Money::parse($record->reservation->as_cart->getNetProfitTotal())->format())
+                    ->searchable(false),
 
                 TextColumn::make('percentage')
-                    ->formatStateUsing(fn($record) => $record->percentage . '%')
+                    ->state(fn($record) => $record->percentage . '%')
                     ->label(__('forms.fields.provider_commission_percentage'))
-                    ->searchable(),
+                    ->searchable(false),
 
 
                 TextColumn::make('amount')
                     ->label(__('forms.fields.commission_total'))
-                    ->searchable(),
+                    ->state(fn($record) => $record->amount?->format())
+                    ->searchable(false),
 
 
                 TextColumn::make('doctor_total_gross_profit')
                     ->label(__('forms.fields.total_gross_profit'))
-                    ->state(fn($record) => $record->profit())
-//                    ->money()
+                    ->state(fn($record) => $record->profit()?->format())
                     ->searchable(false),
                 TextColumn::make('status')
                     ->badge()

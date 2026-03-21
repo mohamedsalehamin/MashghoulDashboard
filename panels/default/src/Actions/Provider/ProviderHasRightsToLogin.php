@@ -19,7 +19,8 @@ class ProviderHasRightsToLogin {
      */
     public function handle() {
         $this->hasRoleManager()
-            ->inBlackList();
+            ->inBlackList()
+            ->hasActiveSubscription();
     }
 
     /**
@@ -27,7 +28,7 @@ class ProviderHasRightsToLogin {
      */
     public function hasRoleManager(): static {
         if (!auth()->user()->hasRole(\App\UsersModule\Models\Users\Provider::ROLE)) {
-            throw new APIException(__('validation.api.invalid_credentials'));
+            throw new APIException(__('validation.api.invalid_credentials'), 0, null, 'invalid_credentials');
         }
         return $this;
     }
@@ -37,8 +38,27 @@ class ProviderHasRightsToLogin {
      */
     public function inBlackList(): static {
         if (!auth()->user()->active->value) {
-            throw new APIException(__('panel.messages.your_account_not_activated'));
+            throw new APIException(__('panel.messages.your_account_not_activated'), 0, null, 'account_inactive');
         }
+        return $this;
+    }
+
+    /**
+     * Provider portal and mobile app require an active subscription (same as web panel middleware).
+     *
+     * @throws Exception
+     */
+    public function hasActiveSubscription(): static {
+        $provider = Provider::query()->where('user_id', auth()->id())->first();
+
+        if (! $provider) {
+            throw new APIException(__('validation.api.invalid_credentials'), 0, null, 'invalid_credentials');
+        }
+
+        if (! $provider->hasActiveSubscription()) {
+            throw new APIException(__('validation.api.no_active_subscription'), 0, null, 'no_active_subscription');
+        }
+
         return $this;
     }
 

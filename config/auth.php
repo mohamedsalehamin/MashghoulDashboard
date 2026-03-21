@@ -42,7 +42,7 @@ return [
         ],
         'site' => [
             'driver' => 'session',
-            'provider' => 'patients',
+            'provider' => 'customers',
         ],
     ],
 
@@ -68,9 +68,9 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'patients' => [
+        'customers' => [
             'driver' => 'eloquent',
-            'model' => \App\UsersModule\Models\User\Patient::class,
+            'model' => \App\UsersModule\Models\Users\Customer::class,
         ],
 
         // 'users' => [

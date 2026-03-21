@@ -7,6 +7,10 @@ use App\CatalogModule\Models\Transaction;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\CatalogModule\Models\Reservation;
+use App\CatalogModule\Models\Subscription;
+use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
+use App\DefaultPanel\Enum\UserStatus;
+use App\Models\User;
 use Tabby\Services\TabbyService;
 use Tabby\Exceptions\TabbyApiException;
 use Illuminate\Support\Facades\Log;
@@ -65,6 +69,12 @@ class CaptureTabbyPayment
                 $transaction->transactionable->update([
                     'status' => ReservationStatus::PENDING->value
                 ]);
+            }
+
+            if ($transaction->transactionable instanceof Subscription) {
+                $subscription = $transaction->transactionable;
+                $subscription->update(['status' => SubscriptionsStatusEnum::PROCESSING]);
+                User::where('id', $subscription->user_id)->update(['active' => UserStatus::ACTIVE]);
             }
 
             return response()->json([

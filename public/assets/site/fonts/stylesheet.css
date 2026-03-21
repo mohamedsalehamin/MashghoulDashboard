@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'DIN Next LT Arabic';
+    src: url('subset-DINNextLTArabic-Medium.woff2') format('woff2'),
+        url('subset-DINNextLTArabic-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DIN Next LT Arabic';
+    src: url('subset-DINNextLTArabic-Regular.woff2') format('woff2'),
+        url('subset-DINNextLTArabic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

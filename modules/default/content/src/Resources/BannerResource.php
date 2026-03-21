@@ -60,6 +60,14 @@ class BannerResource extends Resource implements HasShieldPermissions {
                 ->label(__('forms.fields.image_ar'))
                 ->collection('ar')
                 ->required(),
+            Select::make('placement')
+                ->label(__('sections.banner_placement'))
+                ->options([
+                    'website' => __('sections.banner_placement_website'),
+                    'app' => __('sections.banner_placement_app'),
+                ])
+                ->default('app')
+                ->required(),
             Select::make("object_type")
                 ->live()
                 ->options([
@@ -97,6 +105,9 @@ class BannerResource extends Resource implements HasShieldPermissions {
             ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
+                TextColumn::make('placement')
+                    ->label(__('sections.banner_placement'))
+                    ->formatStateUsing(fn($state) => $state === 'hero' ? __('sections.banner_placement_hero') : __('sections.banner_placement_category')),
                 TextColumn::make('name'),
                 IconColumn::make('status')
                     ->boolean()
@@ -112,6 +123,12 @@ class BannerResource extends Resource implements HasShieldPermissions {
 
             ])
             ->filters([
+                SelectFilter::make('placement')
+                    ->label(__('sections.banner_placement'))
+                    ->options([
+                        'hero' => __('sections.banner_placement_hero'),
+                        'category' => __('sections.banner_placement_category'),
+                    ]),
                 SelectFilter::make('status')
                     ->options(ModelStatus::class)
             ])

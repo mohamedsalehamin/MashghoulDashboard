@@ -46,14 +46,18 @@ use Spatie\Permission\Models\Role;
 use App\Policies\WithdrawalRequestPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\SeatPolicy;
+use App\Policies\SubscriptionPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\RatePolicy;
+use App\Policies\SubscriptionPaymentPolicy;
 use App\UsersModule\Models\WithdrawalRequest;
 use App\CatalogModule\Models\Service;
 use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\UsersModule\Models\Users\Customer;
 use App\Models\Notification;
+use App\ReportsModule\Models\SubscriptionPayment;
+
 class AuthServiceProvider extends ServiceProvider {
     /**
      * The model to policy mappings for the application.
@@ -73,11 +77,13 @@ class AuthServiceProvider extends ServiceProvider {
         Reservation::class=>ReservationPolicy::class,
         JoinRequest::class=>JoinRequestPolicy::class,
         WithdrawalRequest::class => WithdrawalRequestPolicy::class,
-        
+        Slider::class => SliderPolicy::class,        
         Service::class => ServicePolicy::class,
         Seat::class => SeatPolicy::class,
         Customer::class => CustomerPolicy::class,
         Notification::class => NotificationPolicy::class,
+        SubscriptionPayment::class => SubscriptionPaymentPolicy::class,
+
         // Rate::class => RatePolicy::class,
     ];
 

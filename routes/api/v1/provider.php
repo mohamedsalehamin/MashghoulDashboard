@@ -15,6 +15,7 @@ Route::prefix('v1/providers')->group(function () {
     Route::post('auth/otp/verify', [AuthServices::class, 'verifySMSCode']);
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('profile', [ProfileServices::class, 'index']);
+        Route::get('subscription', [ProfileServices::class, 'subscription']);
         Route::get('profile/rates', [ProfileServices::class, 'rates']);
         Route::post('profile/rates/{rate}/reply', [ProfileServices::class, 'reply']);
         Route::put('profile/password', [ProfileServices::class, 'updatePassword']);

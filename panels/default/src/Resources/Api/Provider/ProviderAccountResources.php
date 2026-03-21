@@ -34,6 +34,7 @@ class ProviderAccountResources extends JsonResource {
             'unread_notifications_count'=>$this->unreadNotifications()->count(),
             'preferred_language' => $this->settings['preferred_language'] ?? 'ar',
             "phone_verified" => (int)!is_null($this->phone_verified_at),
+            ...ProviderSubscriptionResource::subscriptionPayload($this->resource),
         ];
     }
 }

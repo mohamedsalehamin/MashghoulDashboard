@@ -1,20 +1,18 @@
 <?php
 
+use App\CatalogModule\Models\Subscription;
 use App\CatalogModule\Models\Transaction;
+use App\CatalogModule\Models\Reservation;
 use App\ContentModule\Models\Category;
-use App\DefaultPanel\Actions\AddPointToCustomerAction;
-use App\DefaultPanel\Actions\AddReservationCommissionAction;
+use App\DefaultPanel\Actions\CancelReservationOnPaymentFailureAction;
 use App\DefaultPanel\Actions\OrderPaidAction;
-use App\DefaultPanel\Actions\PayTransactionViaWallet;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
-use App\DefaultPanel\Enum\ReservationStatus;
-use App\DefaultPanel\Lib\Firebase;
-use App\DefaultPanel\Settings\GeneralSettings;
-use App\Mail\SendEmailNotification;
-use App\Notifications\ReservationCreatedSuccessfullyNotification;
+use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
+use App\DefaultPanel\Enum\UserStatus;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Route;
 use MyFatoorah\Library\API\Payment\MyFatoorahPaymentStatus;
-use MyFatoorah\Library\PaymentMyfatoorahApiV2;
 use App\Http\Controllers\Webhook\TabbyController;
 
 
@@ -22,21 +20,61 @@ use App\Http\Controllers\Webhook\TabbyController;
 Route::any('webhooks/myfatoorah/transactions/callback', function (MyFatoorahPaymentStatus $myfatoorahApiV2) {
     $response = $myfatoorahApiV2->getPaymentStatus(request()->get('Id'), 'PaymentId');
     $transaction = Transaction::where('meta_data->invoiceId', $response->InvoiceId)->first();
+
+    if (!$transaction) {
+        return redirect()->route('site.booking.completed.failed');
+    }
+
     if ($response->InvoiceStatus == 'Paid') {
         if ($transaction->status != ReservationPaymentStatus::PAID) {
             $transaction->update([
                 'status' => ReservationPaymentStatus::PAID,
-                'meta_data' => array_merge($transaction->meta_data, [...collect($response)->toArray(), 'method' => $response->focusTransaction->PaymentGateway, 'paid_at' => now()]),
+                'meta_data' => array_merge($transaction->meta_data ?? [], [...collect($response)->toArray(), 'method' => $response->focusTransaction->PaymentGateway, 'paid_at' => now()]),
             ]);
 
-            OrderPaidAction::run($transaction->transactionable);
+            $transactionable = $transaction->transactionable;
 
+            if ($transactionable instanceof Reservation) {
+                OrderPaidAction::run($transactionable);
+                session()->flash('reservation_id', $transactionable->id);
+                return redirect()->route('site.booking.completed');
+            }
 
+            if ($transactionable instanceof Subscription) {
+                $transactionable->update(['status' => SubscriptionsStatusEnum::PROCESSING]);
+                User::where('id', $transactionable->user_id)->update(['active' => UserStatus::ACTIVE]);
+                $loginUrl = Filament::getPanel('lab-panel')->getLoginUrl();
+
+                return redirect()->to($loginUrl . '?subscription=activated');
+            }
         }
-        session()->flash('reservation_id', $transaction->transactionable->id);
-        return redirect()->route('checkout.success');
+
+        // Already paid, redirect based on type
+        $transactionable = $transaction->transactionable;
+        if ($transactionable instanceof Reservation) {
+            session()->flash('reservation_id', $transactionable->id);
+            return redirect()->route('site.booking.completed');
+        }
+        if ($transactionable instanceof Subscription) {
+            User::where('id', $transactionable->user_id)->update(['active' => UserStatus::ACTIVE]);
+            $loginUrl = Filament::getPanel('lab-panel')->getLoginUrl();
+
+            return redirect()->to($loginUrl . '?subscription=activated');
+        }
+        return redirect()->route('site.booking.completed');
     }
-    return redirect()->route('checkout.fail');
+
+    // Payment failed: mark transaction canceled, cancel reservation to free slot
+    $transaction->update(['status' => ReservationPaymentStatus::CANCELED->value]);
+    if ($transaction->transactionable && $transaction->transactionable instanceof Reservation) {
+        CancelReservationOnPaymentFailureAction::run($transaction->transactionable);
+    }
+
+    if ($transaction->transactionable instanceof Subscription) {
+        return redirect()->route('site.join.payment-failed');
+    }
+
+    return redirect()->route('site.booking.completed.failed');
 })->name('webhooks.myfatoorah.transactions.callback');
 Route::get('categories/arrange', function () {
     foreach (request()->get("list") as $record) {

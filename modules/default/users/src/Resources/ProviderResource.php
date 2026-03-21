@@ -31,6 +31,7 @@ use App\UsersModule\Resources\ProviderResource\Pages\ListProviders;
 use App\UsersModule\Resources\ProviderResource\Pages\WalletPage;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -147,24 +148,6 @@ class ProviderResource extends Resource {
                             ->multiple()
                             ->collection("images")
                             ->required(),
-                        SpatieMediaLibraryFileUpload::make('portfolio')
-                            ->collection('portfolio')
-                            ->multiple()
-                            ->reorderable()
-                            ->label(__('forms.fields.portfolio'))
-                            ->helperText(__('forms.helpers.portfolio_upload'))
-                            ->acceptedFileTypes([
-                                'image/jpeg', 
-                                'image/png', 
-                                'image/webp', 
-                                'image/gif', 
-                                'video/mp4', 
-                                'video/mpeg', 
-                                'audio/mpeg', 
-                                'audio/mp3', 
-                                'audio/wav'
-                            ])
-                            ->nullable(),
                         SpatieMediaLibraryFileUpload::make('commercial_register')
                             ->collection("commercial_register")
                             ->nullable(),
@@ -223,6 +206,60 @@ class ProviderResource extends Resource {
                     ])
                         ->relationship('provider')
 
+                ]),
+                Tab::make(__('sections.portfolio_gallery'))->schema([
+                    Group::make()->schema([
+                        Repeater::make('portfolio_albums')
+                            ->statePath('meta_data.portfolio_albums')
+                            ->label(__('forms.fields.portfolio'))
+                            ->addActionLabel(__('forms.fields.add_album'))
+                            ->reorderable()
+                            ->defaultItems(0)
+                            ->collapsible()
+                            ->schema([
+                                Hidden::make('album_id')
+                                    ->default(fn () => \Illuminate\Support\Str::random(12))
+                                    ->dehydrated(),
+                                Tabs::make('')->tabs([
+                                    Tab::make(__('panel.languages.arabic'))->schema([
+                                        TextInput::make('title.ar')
+                                            ->label(__('forms.fields.album_title')),
+                                    ]),
+                                    Tab::make(__('panel.languages.english'))->schema([
+                                        TextInput::make('title.en')
+                                            ->label(__('forms.fields.album_title')),
+                                    ]),
+                                ])->columnSpanFull(),
+                                SpatieMediaLibraryFileUpload::make('media')
+                                    ->collection('portfolio')
+                                    ->multiple()
+                                    ->reorderable()
+                                    ->customProperties(function ($file, \Filament\Schemas\Components\Utilities\Get $get) {
+                                        $albumId = $get('album_id');
+                                        return ['album_id' => $albumId ?? \Illuminate\Support\Str::random(12)];
+                                    })
+                                    ->filterMediaUsing(function ($media, \Filament\Schemas\Components\Utilities\Get $get) {
+                                        $albumId = $get('album_id');
+                                        if (!$albumId) {
+                                            return $media->filter(fn ($m) => false);
+                                        }
+                                        return $media->filter(fn ($m) => ($m->getCustomProperty('album_id') ?? '') === $albumId);
+                                    })
+                                    ->acceptedFileTypes([
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp',
+                                        'image/gif',
+                                        'video/mp4',
+                                        'video/mpeg',
+                                        'audio/mpeg',
+                                        'audio/mp3',
+                                        'audio/wav'
+                                    ])
+                                    ->nullable(),
+                            ])
+                            ->columns(1),
+                    ])->relationship('provider'),
                 ]),
                 Tab::make(__("sections.bank_account_information"))->schema([
                     Group::make()->schema([

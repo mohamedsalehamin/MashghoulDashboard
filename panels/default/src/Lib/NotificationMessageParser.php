@@ -36,9 +36,7 @@ class NotificationMessageParser {
     }
 
     public function parse() {
-        return $this->customerMessage ?? $this->adminMessage;
-
-
+        return $this->doctorMessage ?? $this->customerMessage ?? $this->adminMessage;
     }
 
 }

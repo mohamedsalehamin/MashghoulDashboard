@@ -1,6 +1,16 @@
 <?php
 return [
+    'sections' => [
+        'code_injection' => 'Code injection',
+        'plan_billing' => 'Subscription & billing',
+    ],
+    'help' => [
+        'is_free_plan' => 'When enabled, providers can subscribe without payment (prices can stay at 0 SAR).',
+        'commission_percent' => 'Enter the platform commission as a percentage (0–100), e.g. 5 for 5%.',
+    ],
     'fields' => [
+        'is_free_plan' => 'Free plan',
+        'commission_percent' => 'Commission',
         'e_invoice_url'=>'E Invoice',
         "db_row_id"=>"DB Row ID",
         "export_products"=>"Export products",
@@ -61,6 +71,9 @@ return [
         "message_type"=>'Message type',
         "app_whatsapp"=>'App whatsapp',
         "provider_name"=>"Provider name",
+        'code_before_end_head_tag' => 'Code before end of head tag',
+        'code_after_body_tag' => 'Code after body tag',
+        'code_before_end_body_tag' => 'Code before end of body tag',
         "seat_name"=>"Seat name",
         'services_count'=>"Services count",
         "services"=>"Services",
@@ -259,6 +272,7 @@ return [
         'source'=> 'source',
         'days_count'=>'days count',
         'reservation_id'=>'reservation id',
+        'subscription_id'=>'subscription id',
         'view_file'=>'view file',
         'file'=>'file',
         'percentage'=>'percentage',
@@ -343,7 +357,7 @@ return [
         'tenant_id' => 'tenant',
         'subscriber_name' => 'subscriber name',
         'plan_name' => 'plan name',
-        'features' => 'features',
+        'features' => 'Features',
         'image_en' => 'image en',
         'image_ar' => 'image ar',
         'receipt'=>'receipt',
@@ -374,6 +388,9 @@ return [
         'main_specialization' => 'main specialization',
         'category_name' => 'category name',
         'publish_date' => 'publish date',
+        'slug' => 'URL slug',
+        'meta_description' => 'Meta description (SEO)',
+        'meta_keywords' => 'Meta keywords (SEO)',
         'rejection_reason' => 'rejection reason',
         'receipt' => 'receipt',
         'notes' => 'notes',
@@ -387,6 +404,8 @@ return [
         'existing_customer' => 'existing customer',
         'select_customer' => 'select customer',
         'portfolio' => 'Portfolio',
+        'add_album' => 'Add album',
+        'album_title' => 'Album title',
     ],
     'tooltip' => [
         'order_limit_per_item' => 'After exceeding the limit, the customer will not pay until approved by one of the branch managers',
@@ -407,6 +426,8 @@ return [
         "accept"=>'Accept',
         "reject"=>'Reject',
         'activities'=>'Activities',
+        'subscribe' => 'Subscribe',
+        'subscribe_via_wallet' => 'Subscribe via wallet',
         "transfer"=>"Transfer",
         "reduction"=>'reduction',
         'add' => 'Add',
@@ -428,6 +449,13 @@ return [
 
     'helpers' => [
         'portfolio_upload' => 'Upload images, videos, and audio files for your portfolio',
+        'code_before_end_head_tag' => 'Injected before closing </head> (e.g. Google verification, analytics)',
+        'code_after_body_tag' => 'Injected right after opening <body> tag',
+        'code_before_end_body_tag' => 'Injected before closing </body> (e.g. tracking scripts)',
+    ],
+    'placeholders' => [
+        'slug_auto' => 'Leave empty to generate from title',
+        'meta_keywords_tags' => 'Add a keyword then comma or Enter',
     ],
 
     'import_seats' => [

@@ -20,6 +20,8 @@ class Coupon extends Model {
     protected $casts = [
         'discount_type' => CouponTypes::class,
         'meta_data' => 'array',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function formattedValue() {

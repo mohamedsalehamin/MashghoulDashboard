@@ -6,6 +6,7 @@ namespace App\UsersModule\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Reservation\Rate;
+use App\CatalogModule\Models\Subscription;
 use App\CatalogModule\Models\Seat;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
@@ -20,10 +21,13 @@ use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Sitemap\Contracts\Sitemapable;
+use Spatie\Sitemap\Tags\Url;
 use Spatie\Translatable\HasTranslations;
 use Theamostafa\Wallet\Traits\HasWallet;
 
-class Provider extends Model implements HasMedia {
+class Provider extends Model implements HasMedia, Sitemapable
+{
     use InteractsWithMedia, HasWallet, HasTranslations;
     use Favoriteable;
     use HasSpatial;
@@ -83,6 +87,22 @@ class Provider extends Model implements HasMedia {
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function subscriptions() {
+        return $this->hasMany(Subscription::class, 'user_id', 'user_id');
+    }
+
+    public function activeSubscription() {
+        return $this->hasOne(Subscription::class, 'user_id', 'user_id')
+            ->where('status', \App\DefaultPanel\Enum\SubscriptionsStatusEnum::PROCESSING)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->latest();
+    }
+
+    public function hasActiveSubscription(): bool {
+        return $this->activeSubscription()->exists();
     }
 
     public function reservations(): MorphMany {
@@ -147,10 +167,27 @@ class Provider extends Model implements HasMedia {
         return (float)$this->rate()->avg('rate') ?? 0;
     }
 
-    public function getReservationFeesIncludeTaxesAttribute(): float|int|string {
+    public function getReservationFeesIncludeTaxesAttribute(): float|int|string
+    {
         $taxes = $this->city->state->country->taxes;
         $reservationFees = (new GeneralSettings())->reservations_fess;
         $taxes = $reservationFees / 100 * $taxes;
+
         return $taxes + $reservationFees;
+    }
+
+    public function toSitemapTag(): Url|string|array
+    {
+        $baseUrl = rtrim(config('app.url'), '/');
+        $locales = array_keys(config('laravellocalization.supportedLocales', ['ar' => [], 'en' => []]));
+        $urls = [];
+        foreach ($locales as $locale) {
+            $urls[] = Url::create("{$baseUrl}/{$locale}/providers/{$this->id}")
+                ->setLastModificationDate($this->updated_at ? \Carbon\Carbon::parse($this->updated_at) : now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.7);
+        }
+
+        return $urls;
     }
 }

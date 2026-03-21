@@ -12,11 +12,19 @@ use Filament\Pages\SettingsPage;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Illuminate\Contracts\Support\Htmlable;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\Width;
+use Illuminate\Support\HtmlString;
+use App\ContentModule\Models\Page;
+use App\ContentModule\Resources\BannerResource;
 
 class ManageLanding extends SettingsPage {
     use HasPageShield;
@@ -35,120 +43,125 @@ class ManageLanding extends SettingsPage {
                 FileUpload::make('logos.en')
                     ->label(__('forms.fields.logo_in_english'))
                     ->required(),
-                Section::make("header")
-                    ->label(__("sections.header"))
+                Section::make("app_download")
+                    ->label(__("sections.app_download"))
                     ->schema([
                         Tabs::make()->schema([
                             Tab::make(__("panel.languages.arabic"))->schema([
                                 TextInput::make('title')
-                                    ->label(__('forms.fields.title'))
-                                    ->required(),
-                                Textarea::make('description')
-                                    ->label(__('forms.fields.description'))
+                                    ->label(__('forms.fields.address'))
                                     ->required(),
                                 FileUpload::make('image')->label(__("forms.fields.image")),
-                            ])->statePath("header.ar"),
+                                Textarea::make('description')
+                                    ->label(__('forms.fields.description'))
+                                    ->required()
+                            ])->statePath("app_download.ar"),
 
                             Tab::make(__("panel.languages.english"))->schema([
                                 TextInput::make('title')
-                                    ->label(__('forms.fields.title'))
-                                    ->required(),
-                                Textarea::make('description')
-                                    ->label(__('forms.fields.description'))
+                                    ->label(__('forms.fields.address'))
                                     ->required(),
                                 FileUpload::make('image')->label(__("forms.fields.image")),
-                            ])->statePath("header.en"),
-                        ])
-
-                    ])->statePath('content'),
-                Section::make("about_us")
-                    ->label(__("sections.about_us"))
-                    ->schema([
-                        Tabs::make()->schema([
-                            Tab::make(__("panel.languages.arabic"))->schema([
-                                Textarea::make('about')
+                                Textarea::make('description')
                                     ->label(__('forms.fields.description'))
                                     ->required()
-                            ])->statePath("about.ar"),
-
-                            Tab::make(__("panel.languages.english"))->schema([
-                                Textarea::make('about')
-                                    ->label(__('forms.fields.description'))
-                                    ->required()
-                            ])->statePath("about.en")
+                            ])->statePath("app_download.en")
                         ])
                         ,
 
                     ])->statePath('content'),
-                Section::make("our_features")
-                    ->label(__("sections.our_features"))
+                
+                
+                Section::make("testimonials")
+                    ->label(__("sections.testimonials"))
                     ->schema([
-                        Tabs::make()->schema([
-
-                            Tab::make(__("panel.languages.arabic"))->schema([
-                                Repeater::make('features')->schema([
-                                    TextInput::make('title')
-                                        ->label(__('forms.fields.title'))
-                                        ->required(),
-                                    Textarea::make('description')
-                                        ->label(__('forms.fields.description'))
-                                        ->required(),
-                                    FileUpload::make('image')->label(__("forms.fields.image")),
-
-
-                                    Repeater::make('pros')->schema([
-                                        TextInput::make('title')
+                        Repeater::make('testimonials')
+                            ->label('')
+                            ->schema([
+                                Tabs::make()->schema([
+                                    Tab::make(__('panel.languages.arabic'))->schema([
+                                        TextInput::make('name_ar')
+                                            ->label(__('sections.testimonial_name'))
+                                            ->required(),
+                                        Textarea::make('text_ar')
+                                            ->label(__('sections.testimonial_content')),
+                                    ]),
+                                    Tab::make(__('panel.languages.english'))->schema([
+                                        TextInput::make('name_en')
+                                            ->label(__('sections.testimonial_name'))
+                                            ->required(),
+                                        Textarea::make('text_en')
+                                            ->label(__('sections.testimonial_content')),
+                                    ]),
+                                ])->columnSpanFull(),
+                                FileUpload::make('avatar')
+                                    ->label(__('sections.testimonial_avatar'))
+                                    ->image(),
+                                Select::make('rating')
+                                    ->label(__('sections.testimonial_rating'))
+                                    ->options([
+                                        1 => '1',
+                                        2 => '2',
+                                        3 => '3',
+                                        4 => '4',
+                                        5 => '5',
                                     ])
-                                ])
-                                    ->statePath("features.ar"),
-                            ]),
-                            Tab::make(__("panel.languages.english"))->schema([
-                                Repeater::make('features')->schema([
-                                    TextInput::make('title')
-                                        ->label(__('forms.fields.title'))
-                                        ->required(),
-                                    Textarea::make('description')
-                                        ->label(__('forms.fields.description'))
-                                        ->required(),
-                                    FileUpload::make('image')->label(__("forms.fields.image")),
-
-
-                                    Repeater::make('pros')->schema([
-                                        TextInput::make('title')
+                                    ->default(5)
+                                    ->required(),
+                                DatePicker::make('date')
+                                    ->label(__('sections.testimonial_date'))
+                                    ->required(),
+                                Select::make('type')
+                                    ->label(__('sections.testimonial_type'))
+                                    ->options([
+                                        'text' => __('sections.testimonial_type_text'),
+                                        'image' => __('sections.testimonial_type_image'),
+                                        'video' => __('sections.testimonial_type_video'),
+                                        'audio' => __('sections.testimonial_type_audio'),
                                     ])
-                                ])
-                                    ->statePath("features.en")
-
-                            ]),
-
-
-                        ]),
+                                    ->default('text')
+                                    ->live()
+                                    ->required(),
+                                FileUpload::make('media')
+                                    ->label(__('sections.testimonial_media'))
+                                    ->visible(fn(Get $get) => $get('type') === 'image')
+                                    ->acceptedFileTypes(['image/*']),
+                                FileUpload::make('media')
+                                    ->label(__('sections.testimonial_media'))
+                                    ->visible(fn(Get $get) => $get('type') === 'video')
+                                    ->acceptedFileTypes(['video/*']),
+                                FileUpload::make('media')
+                                    ->label(__('sections.testimonial_media'))
+                                    ->visible(fn(Get $get) => $get('type') === 'audio')
+                                    ->acceptedFileTypes(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/x-mpeg']),
+                            ])
+                            ->columns(2)
+                            ->collapsible()
+                            ->itemLabel(fn(array $state): ?string => $state['name_ar'] ?? $state['name_en'] ?? null),
                     ])->statePath('content'),
-                Section::make("footer")
-                    ->label(__("sections.footer"))
+
+                Section::make('site_pages')
+                    ->label(__('sections.site_pages'))
                     ->schema([
-                        Tabs::make()->schema([
-                            Tab::make(__("panel.languages.arabic"))->schema([
-                                TextInput::make('title')
-                                    ->label(__('forms.fields.title'))
-                                    ->required(),
-                                Textarea::make('description')
-                                    ->label(__('forms.fields.description'))
-                                    ->required(),
-                            ])->statePath("footer.ar"),
-
-                            Tab::make(__("panel.languages.english"))->schema([
-                                TextInput::make('title')
-                                    ->label(__('forms.fields.title'))
-                                    ->required(),
-                                Textarea::make('description')
-                                    ->label(__('forms.fields.description'))
-                                    ->required(),
-                            ])->statePath("footer.en"),
-                        ])
-
-
-                    ])->statePath('content'),
+                        Fieldset::make(__('sections.site_pages'))
+                            ->schema([
+                                Select::make('about_us')
+                                    ->label(__('forms.fields.about_us'))
+                                    ->options(Page::pluck('title', 'id')->toArray())
+                                    ->searchable(),
+                                Select::make('terms_and_conditions')
+                                    ->label(__('forms.fields.terms_and_conditions'))
+                                    ->options(Page::pluck('title', 'id')->toArray())
+                                    ->searchable(),
+                                Select::make('privacy_policy')
+                                    ->label(__('forms.fields.privacy_policy'))
+                                    ->options(Page::pluck('title', 'id')->toArray())
+                                    ->searchable(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->statePath('content.site_pages')
+                    ->collapsible(),
 
             ]);
     }

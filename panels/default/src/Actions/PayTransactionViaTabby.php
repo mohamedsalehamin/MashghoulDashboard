@@ -554,11 +554,12 @@ class PayTransactionViaTabby
             ], $additionalData)
         ]);
         
-        if ($transaction->transactionable) {
+        if ($transaction->transactionable instanceof Reservation) {
             $transaction->transactionable->update([
-                'status' => ReservationStatus::CANCELED->value
+                'status' => ReservationStatus::CANCELED->value,
             ]);
         }
+        // Subscriptions: do not apply reservation status; leave subscription row unchanged here.
     }
     
     /**
