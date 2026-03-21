@@ -69,12 +69,6 @@ class ManageGeneral extends SettingsPage {
                         ->suffix(__("forms.suffixes.sar"))
                         ->required(),
 
-                    TextInput::make('app_percentage')
-                        ->suffix(__("forms.suffixes.percentage"))
-                        ->type('number')
-                        ->step(0.01)
-                        ->required(),
-
                     Toggle::make('enabled_free_fees_in_first_reservation'),
                     Toggle::make('enabled_whatsapp_icon'),
 

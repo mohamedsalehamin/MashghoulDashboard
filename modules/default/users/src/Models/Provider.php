@@ -70,7 +70,9 @@ class Provider extends Model implements HasMedia, Sitemapable
     }
 
     public function scopeEnabled($builder) {
-        return $builder->whereHas("user", fn($q) => $q->where('active', 1));
+        return $builder
+            ->whereHas('user', fn ($q) => $q->where('active', 1))
+            ->whereHas('activeSubscription');
     }
 
     public function city() {

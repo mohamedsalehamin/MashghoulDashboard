@@ -48,7 +48,9 @@ class ProvidersServices {
             'lng' => request()->get('longitude', 0),
         ];
         $provider = Provider::withDistanceSphere('location', new Point($user_location['lat'], $user_location['lng']))
-            ->where('id', $provider->id)->first();
+            ->enabled()
+            ->where('id', $provider->id)
+            ->firstOrFail();
         return Api::isOk(__("provider information"), ProviderResource::make($provider));
     }
 

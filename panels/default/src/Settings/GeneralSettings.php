@@ -21,7 +21,6 @@ class GeneralSettings extends Settings {
     public string $tax_number;
     public string $commercial_register;
     public float $reservations_fess;
-    public string $app_percentage;
     public string $reservation_flow;
     public string $enabled_free_fees_in_first_reservation;
     public string $enabled_whatsapp_icon;
