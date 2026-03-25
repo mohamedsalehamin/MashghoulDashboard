@@ -36,13 +36,12 @@ class BuildCartInstanceAction {
         $cart->clear();
 
         $this->applyServiceToCart($request, $cart);
-        $cart->applyCoupon($request->get('coupon_code'));
-
         $cart->applyTaxes($this->getTaxesPercentageBasedOnProviderCountry($request->route('provider')));
         $this->applyWalletToCart($cart, $request);
         $this->applyPointsToCart($cart, $request);
 
         $this->applyReservationFeesBasedOnTerms($cart);
+        $cart->applyCoupon($request->get('coupon_code'));
 
 
         return $cart;

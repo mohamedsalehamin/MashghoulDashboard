@@ -196,6 +196,12 @@
                             <span class="value">{{ $totals['products_total'] ?? '0' }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
+                        @if(!empty($totals['reservation_fees']) && $totals['reservation_fees'] != '0.00')
+                        <div class="data-item">
+                            <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.reservation_fees') }}</span>
+                            <span class="value">{{ $totals['reservation_fees'] ?? '0' }} <i class="icon-saudi_riyal"></i></span>
+                        </div>
+                        @endif
                         @if(!empty($totals['discount']) && $totals['discount'] != '0.00')
                         <div class="data-item">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.discount_code') }}</span>
@@ -206,12 +212,6 @@
                         <div class="data-item">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.total_cost') }}</span>
                             <span class="value">{{ $totals['subtotal'] ?? '0' }} <i class="icon-saudi_riyal"></i></span>
-                        </div>
-                        @endif
-                        @if(!empty($totals['reservation_fees']) && $totals['reservation_fees'] != '0.00')
-                        <div class="data-item">
-                            <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.reservation_fees') }}</span>
-                            <span class="value">{{ $totals['reservation_fees'] ?? '0' }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
                     </div>

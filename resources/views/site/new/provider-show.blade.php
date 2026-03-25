@@ -90,32 +90,110 @@
         </div>
 
         @if($hasCoupons)
+        @push('css')
+        <style>
+        .coupon-provider-section .coupon-swiper-outer {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 40px;
+        }
+        .coupon-provider-section .provider-coupons-swiper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-inline: 0;
+            padding-inline: 0;
+            padding-bottom: 40px;
+            overflow: hidden;
+        }
+        .coupon-provider-section .provider-coupons-swiper .swiper-wrapper {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .coupon-provider-section .provider-coupons-swiper .swiper-slide {
+            height: auto;
+            box-sizing: border-box;
+        }
+        /* Pagination must live INSIDE .swiper so Swiper 11 updates bullets on drag/touch (external el breaks sync). */
+        .coupon-provider-section .provider-coupons-swiper .coupon-provider-pagination.swiper-pagination {
+            position: absolute;
+            left: 0;
+            right: 0;
+            width: 100%;
+            top: auto;
+            bottom: 0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            z-index: 3;
+            pointer-events: auto;
+        }
+        .coupon-provider-section .provider-coupons-swiper .coupon-provider-pagination .swiper-pagination-bullet {
+            opacity: 0.45;
+            background: var(--bs-secondary-color, #adb5bd);
+        }
+        .coupon-provider-section .provider-coupons-swiper .coupon-provider-pagination .swiper-pagination-bullet-active {
+            opacity: 1;
+            background: #002f87;
+            transform: scale(1.15);
+        }
+        </style>
+        @endpush
         <div class="coupon-provider-section mt-5 mb-5">
             <div class="container">
-                <h3 class="data-card-title  mb-4">{{ __('site.heading.provider_coupons') }}</h3>
-                <div class="row">
-                @foreach($availableCoupons as $coupon)
-                    <div class="col-lg-6">
-                        <div class="data-card">
-                            <div class="data-list services-data-list mb-2">
-                                <div class="data-item   ">
-                                    <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
-                                        {{ __('site.heading.discount_value') }}</span>
-                                    <span class="value">{{ $coupon['display_value'] }}@if($coupon['discount_type'] === 'fixed') <i class="icon-saudi_riyal"></i>@endif</span>
-                                </div>
-                                <div class="data-item">
-                                    <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
-                                        {{ __('site.heading.expiration_date') }}</span>
-                                    <span class="value">{{ $coupon['end_date'] }}</span>
+                <h3 class="data-card-title mb-4">{{ __('site.heading.provider_coupons') }}</h3>
+                <div class="coupon-swiper-outer">
+                    <div class="provider-coupons-swiper products-swiper swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($availableCoupons as $coupon)
+                            <div class="swiper-slide">
+                                <div class="data-card h-100">
+                                    <div class="data-list services-data-list mb-2">
+                                        <div class="data-item">
+                                            <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
+                                                {{ __('site.heading.discount_value') }}</span>
+                                            <span class="value">{{ $coupon['display_value'] }}@if($coupon['discount_type'] === 'fixed') <i class="icon-saudi_riyal"></i>@endif</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
+                                                {{ __('site.heading.expiration_date') }}</span>
+                                            <span class="value">{{ $coupon['end_date'] }}</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
+                                                {{ __('site.heading.coupon_applies_to') }}</span>
+                                            <span class="value">{{ $coupon['applies_to'] ?? '—' }}</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="label"><i class="fa-solid fa-angles-left text-green ms-2"></i>
+                                                {{ __('site.heading.coupon_min_order') }}</span>
+                                            <span class="value">
+                                                @if(!empty($coupon['min_order_amount']))
+                                                    {{ $coupon['min_order_amount'] }} <i class="icon-saudi_riyal"></i>
+                                                    @if(!empty($coupon['min_order_type_label']))
+                                                        <span class="text-muted small d-inline-block ms-1">({{ $coupon['min_order_type_label'] }})</span>
+                                                    @endif
+                                                @else
+                                                    {{ __('site.coupon_min_order.no_minimum') }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between mt-4 border-top pt-3">
+                                        <span class="text-danger">{{ __('site.heading.terms_and_conditions') }}</span>
+                                        <button type="button" class="btn btn-blue py-2 px-5 fz16 copy-coupon-btn" data-code="{{ $coupon['code'] }}" data-copy-text="{{ __('site.buttons.copy') }}" data-copied-text="{{ __('forms.fields.copied') }}">{{ __('site.buttons.copy') }}</button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between mt-4 border-top pt-3">
-                                <span class="text-danger">{{ __('site.heading.terms_and_conditions') }}</span>
-                                <button type="button" class="btn btn-blue py-2 px-5 fz16 copy-coupon-btn" data-code="{{ $coupon['code'] }}" data-copy-text="{{ __('site.buttons.copy') }}" data-copied-text="{{ __('forms.fields.copied') }}">{{ __('site.buttons.copy') }}</button>
-                                </div>
+                            @endforeach
                         </div>
+                        <div id="coupon-provider-swiper-pagination" class="swiper-pagination coupon-provider-pagination" aria-live="polite"></div>
                     </div>
-                @endforeach
                 </div>
             </div>
         </div>
@@ -458,6 +536,63 @@ document.addEventListener('DOMContentLoaded', function() {
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Swiper === 'undefined') {
+        return;
+    }
+    document.querySelectorAll('.coupon-provider-section .coupon-swiper-outer').forEach(function(outer) {
+        var swiperEl = outer.querySelector('.provider-coupons-swiper');
+        var pagEl = swiperEl ? swiperEl.querySelector('.coupon-provider-pagination') : null;
+        if (!swiperEl || !pagEl) {
+            return;
+        }
+        function syncCouponPaginationBullets(sw) {
+            var bullets = pagEl.querySelectorAll('.swiper-pagination-bullet');
+            if (!bullets.length) {
+                return;
+            }
+            var idx = typeof sw.realIndex === 'number' ? sw.realIndex : sw.activeIndex;
+            bullets.forEach(function (b, i) {
+                var isOn = i === idx;
+                b.classList.toggle('swiper-pagination-bullet-active', isOn);
+                if (isOn) {
+                    b.setAttribute('aria-current', 'true');
+                } else {
+                    b.removeAttribute('aria-current');
+                }
+            });
+        }
+        new Swiper(swiperEl, {
+            slidesPerView: 1,
+            spaceBetween: 16,
+            watchOverflow: true,
+            watchSlidesProgress: true,
+            pagination: {
+                el: pagEl,
+                clickable: true,
+                type: 'bullets',
+                dynamicBullets: false
+            },
+            breakpoints: {
+                992: { slidesPerView: 2, spaceBetween: 20 }
+            },
+            on: {
+                init: function (sw) {
+                    syncCouponPaginationBullets(sw);
+                },
+                slideChange: function (sw) {
+                    syncCouponPaginationBullets(sw);
+                },
+                slideChangeTransitionEnd: function (sw) {
+                    try {
+                        if (sw.pagination && typeof sw.pagination.update === 'function') {
+                            sw.pagination.update();
+                        }
+                    } catch (e) { /* noop */ }
+                    syncCouponPaginationBullets(sw);
+                }
+            }
+        });
+    });
     document.querySelectorAll('.copy-coupon-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var code = this.getAttribute('data-code');

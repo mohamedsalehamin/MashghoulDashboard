@@ -738,8 +738,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const newTotal = basePrice + totalExtras;
 
                     // Keep the SA icon and store current total for grand total calculation
-                    const iconHtml = priceElement.innerHTML.match(/<i.*?<\/i>/);
-                    priceElement.innerHTML = `${newTotal} ${iconHtml ? iconHtml[0] : ''}`;
+                    const iconHtml = priceElement.innerHTML.match(/<i[^>]*>[\s\S]*?<\/i>/);
+                    priceElement.innerHTML = `${formatMoneyMinorUnits(newTotal)} ${iconHtml ? iconHtml[0] : ''}`;
                     priceElement.setAttribute('data-current', newTotal);
                 }
 
@@ -751,6 +751,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // Money amounts in data-* attributes are minor units (e.g. halalas); display as decimal SAR.
+    function formatMoneyMinorUnits(amount) {
+        const n = parseInt(amount, 10);
+        if (isNaN(n)) return '0.00';
+        return (n / 100).toFixed(2);
+    }
+
     // --- Grand Total Calculation Logic ---
     function updateGrandTotal() {
         let grandTotal = 0;
@@ -760,7 +767,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (card && card.classList.contains('service-card')) {
                 const priceElement = card.querySelector('.service-price');
                 if (priceElement) {
-                    const current = parseInt(priceElement.getAttribute('data-current')) || parseInt(priceElement.getAttribute('data-base')) || 0;
+                    const current = parseInt(priceElement.getAttribute('data-current'), 10) || parseInt(priceElement.getAttribute('data-base'), 10) || 0;
                     grandTotal += current;
                 }
             }
@@ -768,8 +775,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const grandTotalElement = document.querySelector('.booking-total');
         if (grandTotalElement) {
-            const iconHtml = grandTotalElement.innerHTML.match(/<i.*?<\/i>/);
-            grandTotalElement.innerHTML = `${grandTotal} ${iconHtml ? iconHtml[0] : '<i class="icon-saudi_riyal"></i>'}`;
+            const iconHtml = grandTotalElement.innerHTML.match(/<i[^>]*>[\s\S]*?<\/i>/);
+            grandTotalElement.innerHTML = `${formatMoneyMinorUnits(grandTotal)} ${iconHtml ? iconHtml[0] : '<i class="icon-saudi_riyal"></i>'}`;
         }
 
         // Provider booking bar: show when services selected, populate add-to-cart form
@@ -783,8 +790,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (checkedServices.length > 0) {
                 bookingBar.classList.remove('d-none');
                 if (totalEl) {
-                    const icon = totalEl.innerHTML.match(/<i.*?<\/i>/);
-                    totalEl.innerHTML = grandTotal + (icon ? ' ' + icon[0] : ' <i class="icon-saudi_riyal"></i>');
+                    const icon = totalEl.innerHTML.match(/<i[^>]*>[\s\S]*?<\/i>/);
+                    totalEl.innerHTML = formatMoneyMinorUnits(grandTotal) + (icon ? ' ' + icon[0] : ' <i class="icon-saudi_riyal"></i>');
                 }
                 let primarySeatId = null;
                 const servicesData = [];
@@ -894,8 +901,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const base = el.getAttribute('data-base');
                 if (base) {
                     el.setAttribute('data-current', base);
-                    const iconHtml = el.innerHTML.match(/<i[^>]*>.*?<\/i>/);
-                    el.innerHTML = base + ' ' + (iconHtml ? iconHtml[0] : '<i class="icon-saudi_riyal"></i>');
+                    const iconHtml = el.innerHTML.match(/<i[^>]*>[\s\S]*?<\/i>/);
+                    el.innerHTML = formatMoneyMinorUnits(base) + ' ' + (iconHtml ? iconHtml[0] : '<i class="icon-saudi_riyal"></i>');
                 }
             });
             updateGrandTotal();

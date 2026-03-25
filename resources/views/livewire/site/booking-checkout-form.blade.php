@@ -131,8 +131,8 @@
                     <h3 class="data-card-title mb-4">{{ __('site.heading.loyalty_points') }}</h3>
                     <p class="coupon-hint">{{ __('site.heading.your_points_balance') }} <span class="points fw-bold">{{ $userPointsBalance ?? 0 }}</span> {{ __('site.heading.you_can_pay_with_points') }}</p>
                     <div class="input-action-wrapper d-flex gap-2">
-                        <input type="number" class="form-control" placeholder="{{ __('site.placeholder.enter_points') }}" wire:model="points" {{ (!empty($totals['points_discount'] ?? null) && $totals['points_discount'] != '0.00') ? 'readonly' : '' }}>
-                        @if(!empty($totals['points_discount'] ?? null) && $totals['points_discount'] != '0.00')
+                        <input type="number" class="form-control" placeholder="{{ __('site.placeholder.enter_points') }}" wire:model="points" {{ $pointsApplied ? 'readonly' : '' }}>
+                        @if($pointsApplied)
                         <button type="button" class="btn btn-outline-secondary action-btn" wire:click="removePoints" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="removePoints">{{ __('site.buttons.remove') }}</span>
                             <span wire:loading wire:target="removePoints"><span class="spinner-border spinner-border-sm"></span></span>
@@ -156,8 +156,8 @@
                     <h3 class="data-card-title mb-4">{{ __('site.heading.wallet_balance') }}</h3>
                     <p class="coupon-hint">{{ __('site.heading.your_wallet_balance') }} <span class="points fw-bold">{{ number_format($userWalletBalance ?? 0, 2) }}</span> <i class="icon-saudi_riyal"></i></p>
                     <div class="input-action-wrapper d-flex gap-2">
-                        <input type="number" step="0.01" class="form-control" placeholder="{{ __('site.placeholder.enter_wallet') }}" wire:model="wallet" {{ (!empty($totals['wallet_discount'] ?? null) && $totals['wallet_discount'] != '0.00') ? 'readonly' : '' }}>
-                        @if(!empty($totals['wallet_discount'] ?? null) && $totals['wallet_discount'] != '0.00')
+                        <input type="number" step="0.01" class="form-control" placeholder="{{ __('site.placeholder.enter_wallet') }}" wire:model="wallet" {{ $walletApplied ? 'readonly' : '' }}>
+                        @if($walletApplied)
                         <button type="button" class="btn btn-outline-secondary action-btn" wire:click="removeWallet" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="removeWallet">{{ __('site.buttons.remove') }}</span>
                             <span wire:loading wire:target="removeWallet"><span class="spinner-border spinner-border-sm"></span></span>
@@ -196,16 +196,16 @@
                             <span class="value">{{ $totals['products_total'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
+                        <div class="data-item border-0 p-0">
+                            <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.reservation_fees') }}</span>
+                            <span class="value">{{ $totals['reservation_fees'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
+                        </div>
                         @if(!empty($totals['discount'] ?? null) && $totals['discount'] != '0.00')
                         <div class="data-item border-0 p-0">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.discount_code') }}</span>
                             <span class="value">-{{ $totals['discount'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
-                        <div class="data-item border-0 p-0">
-                            <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.reservation_fees') }}</span>
-                            <span class="value">{{ $totals['reservation_fees'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
-                        </div>
                         @if(!empty($totals['points_discount'] ?? null) && $totals['points_discount'] != '0.00')
                         <div class="data-item border-0 p-0">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.points_balance') }}</span>
@@ -216,6 +216,12 @@
                         <div class="data-item border-0 p-0">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.wallet_discount') }}</span>
                             <span class="value">-{{ $totals['wallet_discount'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
+                        </div>
+                        @endif
+                        @if(!empty($totals['taxes'] ?? null) && $totals['taxes'] != '0.00')
+                        <div class="data-item border-0 p-0">
+                            <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.fields.taxes') }}</span>
+                            <span class="value">{{ $totals['taxes'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
                     </div>

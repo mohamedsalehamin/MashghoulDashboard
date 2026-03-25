@@ -58,6 +58,45 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->label(__('forms.fields.coupon_code'))
                         ->required(),
 
+                    Select::make('scope')
+                        ->label(__('forms.fields.coupon_scope') ?? 'Coupon scope')
+                        ->options([
+                            Coupon::SCOPE_GENERAL => __('forms.fields.coupon_scope_general') ?? 'General',
+                            Coupon::SCOPE_PROVIDERS => __('forms.fields.coupon_scope_providers') ?? 'Providers',
+                        ])
+                        ->default(Coupon::SCOPE_GENERAL)
+                        ->live(),
+
+                    Select::make('requested_by')
+                        ->label(__('forms.fields.coupon_requested_by') ?? 'Requested by')
+                        ->options([
+                            Coupon::REQUESTED_BY_ADMIN => __('forms.fields.coupon_requested_by_admin') ?? 'Management (Admin)',
+                            Coupon::REQUESTED_BY_PROVIDER => __('forms.fields.coupon_requested_by_provider') ?? 'Provider',
+                        ])
+                        ->default(Coupon::REQUESTED_BY_ADMIN)
+                        ->live(),
+
+                    Select::make('provider_id')
+                        ->label(__('forms.fields.provider') ?? 'Provider')
+                        ->searchable()
+                        ->preload()
+                        ->options(fn () => Provider::query()->pluck('name', 'id'))
+                        ->visible(fn ($get) => $get('requested_by') === Coupon::REQUESTED_BY_PROVIDER)
+                        ->required(fn ($get) => $get('requested_by') === Coupon::REQUESTED_BY_PROVIDER),
+
+                    Select::make('apply_target')
+                        ->label(__('forms.fields.coupon_apply_target') ?? 'Apply target')
+                        ->options([
+                            Coupon::APPLY_TARGET_ALL_ITEMS => __('forms.fields.coupon_apply_target_all_items') ?? 'All services and products',
+                            Coupon::APPLY_TARGET_ALL_ITEMS_WITHOUT_DISCOUNT => __('forms.fields.coupon_apply_target_all_items_without_discount') ?? 'All services and products (without discount)',
+                            Coupon::APPLY_TARGET_SERVICES_ONLY => __('forms.fields.coupon_apply_target_services_only') ?? 'Services only',
+                            Coupon::APPLY_TARGET_SERVICES_WITHOUT_DISCOUNT => __('forms.fields.coupon_apply_target_services_without_discount') ?? 'Services only (without discount)',
+                            Coupon::APPLY_TARGET_PRODUCTS_ONLY => __('forms.fields.coupon_apply_target_products_only') ?? 'Products only',
+                            Coupon::APPLY_TARGET_PRODUCTS_WITHOUT_DISCOUNT => __('forms.fields.coupon_apply_target_products_without_discount') ?? 'Products only (without discount)',
+                        ])
+                        ->visible(fn ($get) => $get('requested_by') === Coupon::REQUESTED_BY_PROVIDER)
+                        ->required(fn ($get) => $get('requested_by') === Coupon::REQUESTED_BY_PROVIDER),
+
                     Select::make('discount_type')
                         ->live()
                         ->options(CouponTypes::class)
@@ -93,6 +132,15 @@ class CouponResource extends Resource implements HasShieldPermissions {
                         ->numeric()
                         ->required()
                         ->default(1),
+
+                    Select::make('meta_data.min_order_value_type')
+                        ->label(__('forms.fields.min_order_value_type') ?? 'Min order value type')
+                        ->options([
+                            'cart_total' => __('forms.fields.min_order_value_type_cart_total') ?? 'Cart total',
+                            'eligible_base' => __('forms.fields.min_order_value_type_eligible_base') ?? 'Eligible base',
+                        ])
+                        ->default('cart_total')
+                        ->live(),
                     TextInput::make('meta_data.max_discount')
                         ->label(__('forms.fields.max_discount'))
                         ->visible(fn($get) => $get('discount_type') == CouponTypes::PERCENTAGE)

@@ -27,7 +27,7 @@ class CartDetailsRequest extends FormRequest {
             "seat_id" => ['required', 'exists:seats,id'],
             'services' => ['required', 'array'],
             'services.*.id' => ['required', Rule::exists('seat_service', 'service_id')->where('seat_id', $this->get('seat_id')),],
-            'coupon_code' => ['nullable', 'exists:coupons,code', new IsValidCoupon($this->cart()->getServicesTotalIncludeProducts())],
+            'coupon_code' => ['nullable', 'exists:coupons,code', new IsValidCoupon()],
         ];
     }
 

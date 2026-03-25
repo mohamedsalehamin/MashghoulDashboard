@@ -17,6 +17,9 @@ use Str;
 class Cart extends CoreCart {
     private $orderId;
 
+    /** @var string|null Last applyCoupon() failure for UI / API messages */
+    protected ?string $lastCouponFailureMessage = null;
+
     public function getSession() {
         return $this->sessionKey;
     }
@@ -28,6 +31,10 @@ class Cart extends CoreCart {
 
     function removeCartCoupon() {
         $this->removeConditionsByType("coupon");
+    }
+
+    public function getLastCouponFailureMessage(): ?string {
+        return $this->lastCouponFailureMessage;
     }
 
     function applyItem(Service $service, $price, $qty = 1, $attributes = [], $conditions = []) {
@@ -46,28 +53,156 @@ class Cart extends CoreCart {
         );
     }
 
+    /**
+     * Same numeric base as cost rows services_total + products_total (excludes reservation fee and coupon).
+     */
+    protected function eligibleBaseServicesPlusProductsMatchingDisplayedTotals(): float {
+        $services = (float) $this->getSubTotalWithoutConditions(false);
+        $products = (float) ($this->getProductsTotal() ?? 0);
+
+        return $services + $products;
+    }
+
     function applyCoupon($code): bool {
 
         !$this->getConditionsByType("coupon")->count() ?: $this->removeConditionsByType("coupon");
-        $coupon = Coupon::where('code', trim($code))->first();
-        if (!$coupon) {
+        $this->lastCouponFailureMessage = null;
+        $code = trim((string) $code);
+        if ($code === '') {
             return false;
         }
-        $total = $coupon->discount_value;
-        if ($coupon->discount_type->value == 'percentage') {
-            $discount = $this->getServicesTotalIncludeProducts() / 100 * $total;
-            $total = min($discount, $coupon->meta_data['max_discount'] ?? $discount);
+        $coupon = Coupon::where('code', $code)->first();
+        if (!$coupon) {
+            $this->lastCouponFailureMessage = __('validation.api.coupon_code_not_found');
+            return false;
         }
 
-        $coupon_value = $coupon->formattedValue();
+        $user = auth()->user();
+        if ($user && $coupon->isUserExceedUsageTimes($user)) {
+            $this->lastCouponFailureMessage = __('validation.api.coupon_code_exceeds_the_number_of_usages_times');
+            return false;
+        }
+        if (!$coupon->isAvailableToUse()) {
+            $this->lastCouponFailureMessage = __('validation.api.coupon_code_is_expired');
+            return false;
+        }
+
+        $providerId = session('cart_provider_id');
+        if ($coupon->scope === Coupon::SCOPE_PROVIDERS) {
+            if (empty($providerId) || !$coupon->providers()->where('providers.id', $providerId)->exists()) {
+                $this->lastCouponFailureMessage = __('validation.api.coupon_not_valid_for_this_provider');
+                return false;
+            }
+        }
+        if ($coupon->requested_by === Coupon::REQUESTED_BY_PROVIDER) {
+            if (empty($providerId)) {
+                $this->lastCouponFailureMessage = __('validation.api.coupon_code_not_found');
+                return false;
+            }
+            if (!empty($coupon->provider_id) && (int) $coupon->provider_id !== (int) $providerId) {
+                $this->lastCouponFailureMessage = __('validation.api.coupon_not_valid_for_this_provider');
+                return false;
+            }
+        }
+
+        // Flatten runtime: services and nested products are separate logical entities for coupon base calculations.
+        $servicesBase = 0.0;
+        $servicesBaseNoSale = 0.0;
+        $productsBase = 0.0;
+        $productsBaseNoSale = 0.0;
+
+        foreach ($this->getContent() as $item) {
+            $service = $item['associatedModel'] ?? null;
+            if ($service) {
+                $serviceOnSale = isset($service->sale_price, $service->price)
+                    && $service->sale_price?->getAmount() > 0
+                    && $service->sale_price?->getAmount() < $service->price?->getAmount();
+                $qty = (float) ($item['quantity'] ?? 1);
+                $serviceEffective = (float) ($item['price'] ?? 0) * max(1.0, $qty);
+                $servicesBase += $serviceEffective;
+                if (!$serviceOnSale) {
+                    $servicesBaseNoSale += $serviceEffective;
+                }
+            }
+
+            $products = collect($item['attributes']['products'] ?? []);
+            foreach ($products as $product) {
+                $qty = (int) ($product->quantity ?? $product['quantity'] ?? 1);
+                $qty = max(1, $qty);
+                $productOnSale = isset($product->sale_price, $product->price)
+                    && $product->sale_price?->getAmount() > 0
+                    && $product->sale_price?->getAmount() < $product->price?->getAmount();
+                $productEffective = $productOnSale
+                    ? (float) $product->sale_price->formatByDecimal()
+                    : (float) $product->price->formatByDecimal();
+                $line = $productEffective * $qty;
+                $productsBase += $line;
+                if (!$productOnSale) {
+                    $productsBaseNoSale += $line;
+                }
+            }
+        }
+
+        $feesBase = (float) $this->getReservationFees();
+        // Same numbers as cost breakdown: services_total + products_total (excludes reservation fee).
+        $servicesPlusProductsForTotals = $this->eligibleBaseServicesPlusProductsMatchingDisplayedTotals();
+        // Cart total for min-order checks: services + products + reservation fee (before coupon).
+        $cartTotalBase = $servicesPlusProductsForTotals + $feesBase;
+
+        $eligibleBase = 0.0;
+        if ($coupon->requested_by === Coupon::REQUESTED_BY_ADMIN) {
+            $eligibleBase = $feesBase;
+        } else {
+            // Provider coupons: % / fixed discount applies to services & products only (not reservation fee).
+            // Fee is still added in cart before the coupon condition; min order can use cartTotalBase incl. fee.
+            $applyTarget = $coupon->apply_target ?: Coupon::APPLY_TARGET_ALL_ITEMS;
+            $eligibleBase = match ($applyTarget) {
+                Coupon::APPLY_TARGET_SERVICES_ONLY => $servicesBase,
+                Coupon::APPLY_TARGET_SERVICES_WITHOUT_DISCOUNT => $servicesBaseNoSale,
+                Coupon::APPLY_TARGET_PRODUCTS_ONLY => $productsBase,
+                Coupon::APPLY_TARGET_PRODUCTS_WITHOUT_DISCOUNT => $productsBaseNoSale,
+                Coupon::APPLY_TARGET_ALL_ITEMS_WITHOUT_DISCOUNT => ($servicesBaseNoSale + $productsBaseNoSale),
+                // Align with إجمالي قيمة الخدمات + إجمالي المنتجات (not رسوم الحجز).
+                default => $servicesPlusProductsForTotals,
+            };
+        }
+
+        if ($eligibleBase <= 0) {
+            $this->lastCouponFailureMessage = $coupon->messageWhenEligibleBaseIsZero();
+            return false;
+        }
+
+        $min = (float) ($coupon->meta_data['min_order_value'] ?? 0);
+        if ($min > 0) {
+            $type = (string) ($coupon->meta_data['min_order_value_type'] ?? 'cart_total');
+            $baseForMin = $type === 'eligible_base' ? $eligibleBase : $cartTotalBase;
+            if ($baseForMin < $min) {
+                $this->lastCouponFailureMessage = __('validation.api.coupon_code_min_order_value', ['value' => $min]);
+                return false;
+            }
+        }
+
+        $discountAmount = (float) $coupon->discount_value;
+        if ($coupon->discount_type->value === 'percentage') {
+            $discount = $eligibleBase / 100 * $discountAmount;
+            $cap = $coupon->meta_data['max_discount'] ?? null;
+            $discountAmount = min($discount, $cap !== null ? (float) $cap : $discount);
+        }
+        $discountAmount = min($discountAmount, $eligibleBase);
+        if ($discountAmount <= 0) {
+            $this->lastCouponFailureMessage = __('validation.api.coupon_discount_not_applicable');
+            return false;
+        }
+
         $conditionData = [
             'name' => $coupon->code,
             'type' => "coupon",
             'target' => "subtotal",
-            'value' => "-" . $total,
-            'order' => 1,
+            'value' => "-" . $discountAmount,
+            // After reservation fees (order 2) so subtotal chain matches cost breakdown order.
+            'order' => 4,
             'attributes' => [
-                'original_value' => "-" . $total,
+                'original_value' => "-" . $discountAmount,
             ]
         ];
         $conditionData['attributes'] = $conditionData;
@@ -84,7 +219,8 @@ class Cart extends CoreCart {
             'type' => "reservation_fees",
             'target' => "subtotal",
             'value' => $fees,
-            'order' => 3,
+            // Before coupon (order 4) so discount applies after fees in the subtotal chain.
+            'order' => 2,
             'attributes' => [
                 'original_value' => $fees,
             ]
@@ -438,7 +574,17 @@ class Cart extends CoreCart {
 
     public
     function discount() {
-        return $this->getConditionsByType('coupon')?->first()?->getCalculatedValue($this->getContent()->sum(fn(ItemCollection $item) => $item->getPriceSumWithConditions(true)));
+        $cond = $this->getConditionsByType('coupon')?->first();
+        if (!$cond) {
+            return 0;
+        }
+        $v = (string) $cond->getValue();
+        // Fixed SAR amount from applyCoupon — do not re-derive via getCalculatedValue(services-only sum).
+        if (! str_contains($v, '%')) {
+            return abs((float) preg_replace('/[^\d.-]/', '', $v));
+        }
+
+        return $cond->getCalculatedValue($this->getContent()->sum(fn (ItemCollection $item) => $item->getPriceSumWithConditions(true)));
     }
 
     public
@@ -473,9 +619,45 @@ class Cart extends CoreCart {
         return (float)$this->getConditionsByType('points')?->first()?->getValue();
     }
 
+    /**
+     * Key order for formatted totals (API JSON / clients): services & products, then reservation fees,
+     * then coupon discount, then subtotal and remaining lines — matches site cost breakdown order.
+     *
+     * @return list<string>
+     */
+    protected function totalsOutputKeyOrder(): array {
+        return [
+            'services_total',
+            'products_total',
+            'reservation_fees',
+            'reservation_fees_include_taxes',
+            'reservation_fees_taxes',
+            'discount',
+            'subtotal',
+            'taxes',
+            'wallet_discount',
+            'points_discount',
+            'total_without_reservation_fees_include_taxes',
+            'total',
+        ];
+    }
+
     public
     function formattedTotals(): array {
-        return array_map([$this, 'format'], $this->totals());
+        $raw = $this->totals();
+        $ordered = [];
+        foreach ($this->totalsOutputKeyOrder() as $key) {
+            if (array_key_exists($key, $raw)) {
+                $ordered[$key] = $this->format($raw[$key]);
+            }
+        }
+        foreach ($raw as $key => $value) {
+            if (!array_key_exists($key, $ordered)) {
+                $ordered[$key] = $this->format($value);
+            }
+        }
+
+        return $ordered;
     }
 
     public
@@ -509,10 +691,10 @@ class Cart extends CoreCart {
         return [
             'services_total' => $this->getSubTotalWithoutConditions(),
             "products_total" => $this->getProductsTotal(),
-            "discount" => $this->discount(),
             "reservation_fees" => $this->getReservationFees(),
             'reservation_fees_include_taxes' => $this->getReservationFeesIncludeTaxes(),
             'reservation_fees_taxes' => $this->getReservationFeesTaxes(),
+            "discount" => $this->discount(),
             "subtotal" => $this->getSubTotal(),
             "taxes" => $this->getConditionsByType("taxes")?->first()?->getCalculatedValue($this->getSubTotal()),
             'wallet_discount' => $this->walletDiscount(),

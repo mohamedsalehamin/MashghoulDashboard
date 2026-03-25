@@ -26,16 +26,17 @@ class BuildCartForWebCheckoutAction
     {
         $cart = app('cart');
         $cart->clear();
+        session(['cart_provider_id' => $provider->id]);
 
         $services = collect($data['services'] ?? []);
         $this->applyServicesToCart($services, $cart);
-        if (!empty($data['coupon_code'])) {
-            $cart->applyCoupon($data['coupon_code']);
-        }
         $cart->applyTaxes($provider->city?->state?->country?->taxes ?? 0);
         $this->applyWalletToCart($cart, $data);
         $this->applyPointsToCart($cart, $data);
         $this->applyReservationFees($cart);
+        if (!empty($data['coupon_code'])) {
+            $cart->applyCoupon($data['coupon_code']);
+        }
 
         return $cart;
     }

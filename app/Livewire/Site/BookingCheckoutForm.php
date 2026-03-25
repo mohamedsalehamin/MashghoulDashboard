@@ -44,6 +44,8 @@ class BookingCheckoutForm extends Component
     public ?string $pointsError = null;
     public ?string $walletError = null;
     public bool $couponApplied = false;
+    public bool $pointsApplied = false;
+    public bool $walletApplied = false;
     public ?string $tabbyError = null;
 
     public ?int $userPointsBalance = null;
@@ -70,6 +72,46 @@ class BookingCheckoutForm extends Component
             $this->userPointsBalance = (int) ($user->getTotalPointsBalance() ?? 0);
             $this->userWalletBalance = (float) ($user->balance ?? 0);
         }
+
+        $this->syncDiscountInputsFromSessionCart();
+    }
+
+    /**
+     * After a full page reload Livewire resets coupon/points/wallet fields, but the session cart
+     * may still hold applied conditions from the previous request — hydrate inputs and flags.
+     */
+    protected function syncDiscountInputsFromSessionCart(): void
+    {
+        if ((int) session('cart_provider_id') !== (int) $this->getProviderModel()->id) {
+            return;
+        }
+
+        $cart = app('cart');
+
+        $coupon = $cart->getConditionsByType('coupon')->first();
+        if ($coupon) {
+            $this->couponCode = (string) $coupon->getName();
+            $this->couponApplied = true;
+        }
+
+        $walletCond = $cart->getConditionsByType('wallet')->first();
+        if ($walletCond) {
+            $this->wallet = (string) $this->positiveConditionAmount($walletCond->getValue());
+            $this->walletApplied = true;
+        }
+
+        $pointsCond = $cart->getConditionsByType('points')->first();
+        if ($pointsCond) {
+            $this->points = (string) $this->positiveConditionAmount($pointsCond->getValue());
+            $this->pointsApplied = true;
+        }
+    }
+
+    protected function positiveConditionAmount(mixed $value): float
+    {
+        $n = (float) preg_replace('/[^\d.-]/', '', (string) $value);
+
+        return abs($n);
     }
 
     public function updatedDate($value)
@@ -154,12 +196,14 @@ class BookingCheckoutForm extends Component
     public function applyPoints()
     {
         $this->resetDiscountErrors();
+        $this->pointsApplied = false;
         $this->applyDiscounts();
     }
 
     public function removePoints()
     {
         $this->points = '';
+        $this->pointsApplied = false;
         $this->resetDiscountErrors();
         $this->applyDiscounts();
     }
@@ -167,12 +211,14 @@ class BookingCheckoutForm extends Component
     public function applyWallet()
     {
         $this->resetDiscountErrors();
+        $this->walletApplied = false;
         $this->applyDiscounts();
     }
 
     public function removeWallet()
     {
         $this->wallet = '';
+        $this->walletApplied = false;
         $this->resetDiscountErrors();
         $this->applyDiscounts();
     }
@@ -192,8 +238,11 @@ class BookingCheckoutForm extends Component
             $cart = (new BuildCartForWebCheckoutAction)->handle($providerModel, $data);
             $this->totals = $cart->formattedTotals();
             $this->couponApplied = !empty(trim($this->couponCode)) && $cart->getConditionsByType('coupon')->count() > 0;
+            $this->pointsApplied = $cart->getConditionsByType('points')->count() > 0;
+            $this->walletApplied = $cart->getConditionsByType('wallet')->count() > 0;
             if (!empty(trim($this->couponCode)) && !$this->couponApplied) {
-                $this->couponError = __('validation.api.coupon_code_not_found');
+                $this->couponError = $cart->getLastCouponFailureMessage()
+                    ?? __('validation.api.coupon_code_not_found');
             }
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
@@ -213,6 +262,8 @@ class BookingCheckoutForm extends Component
     {
         $cart = app('cart');
         $this->totals = $cart->formattedTotals();
+        $this->pointsApplied = $cart->getConditionsByType('points')->count() > 0;
+        $this->walletApplied = $cart->getConditionsByType('wallet')->count() > 0;
     }
 
     public function checkout()

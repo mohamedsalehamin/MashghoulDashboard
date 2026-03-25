@@ -152,6 +152,9 @@ class ProviderController extends Controller
                     ? $c->formattedValue()
                     : \Cknow\Money\Money::parse($c->discount_value)->format(),
                 'end_date' => $c->end_date?->format('d/m/Y'),
+                'applies_to' => $c->appliesToLabel(),
+                'min_order_amount' => $c->minOrderAmountFormatted(),
+                'min_order_type_label' => $c->minOrderTypeLabel(),
             ])
             ->toArray();
     }

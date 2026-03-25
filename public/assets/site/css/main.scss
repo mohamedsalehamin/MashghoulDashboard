@@ -3702,6 +3702,16 @@ footer {
   margin-bottom: 40px;
   width: 50%;
 
+  > .d-flex {
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    > form {
+      flex-shrink: 0;
+    }
+  }
+
   @media screen and (max-width: 600px) {
     padding: 16px 20px;
     border-radius: 15px;
@@ -3721,12 +3731,16 @@ footer {
 
 .booking-price-info {
   text-align: start;
+  flex: 1 1 auto;
+  min-width: 0;
 
   .booking-total {
     font-size: 28px;
     font-weight: 700;
     color: #fff;
     line-height: 1.2;
+    white-space: nowrap;
+    unicode-bidi: isolate;
 
     i {
       font-weight: normal;
