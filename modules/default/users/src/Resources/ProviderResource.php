@@ -34,6 +34,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -259,6 +260,35 @@ class ProviderResource extends Resource {
                                     ->nullable(),
                             ])
                             ->columns(1),
+                    ])->relationship('provider'),
+                ]),
+                Tab::make(__('sections.seo_meta'))->schema([
+                    Group::make()->schema([
+                        Tabs::make('seo_languages')
+                            ->tabs([
+                                Tab::make(__('panel.languages.arabic'))
+                                    ->schema([
+                                        Textarea::make('meta_description.ar')
+                                            ->label(__('forms.fields.meta_description'))
+                                            ->rows(3),
+                                        TagsInput::make('meta_keywords.ar')
+                                            ->label(__('forms.fields.meta_keywords'))
+                                            ->separator(',')
+                                            ->splitKeys([',', 'Enter'])
+                                            ->placeholder(__('forms.placeholders.meta_keywords_tags')),
+                                    ]),
+                                Tab::make(__('panel.languages.english'))
+                                    ->schema([
+                                        Textarea::make('meta_description.en')
+                                            ->label(__('forms.fields.meta_description'))
+                                            ->rows(3),
+                                        TagsInput::make('meta_keywords.en')
+                                            ->label(__('forms.fields.meta_keywords'))
+                                            ->separator(',')
+                                            ->splitKeys([',', 'Enter'])
+                                            ->placeholder(__('forms.placeholders.meta_keywords_tags')),
+                                    ]),
+                            ]),
                     ])->relationship('provider'),
                 ]),
                 Tab::make(__("sections.bank_account_information"))->schema([

@@ -26,7 +26,9 @@
                         <li><a href="{{ route('site.home') }}">{{ __('site.heading.home') }}</a></li>
                         <li><a href="{{ route('site.categories') }}">{{ __('site.heading.categories') }}</a></li>
                         <li><a href="{{ route('site.blog') }}">{{ __('site.heading.articles') }}</a></li>
-                        <li><a href="{{ route('site.join') }}">{{ __('site.heading.join_us_as_a_provider') }}</a></li>
+                        @if(!auth()->guard('site')->check())
+                            <li><a href="{{ route('site.join') }}">{{ __('site.heading.join_us_as_a_provider') }}</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>
@@ -39,7 +41,9 @@
                         <li><a href="{{ route('site.page', $privacySlug) }}">{{ __('site.heading.privacy_policy') }}</a></li>
                         <li><a href="{{ route('site.faqs') }}">{{ __('site.heading.faqs') }}</a></li>
                         <li><a href="{{ route('site.contact') }}">{{ __('site.heading.contact_us') }}</a></li>
-                        <li><a href="{{ route('site.join') }}">{{ __('site.heading.join_us_as_a_provider') }}</a></li>
+                        @if(!auth()->guard('site')->check())
+                            <li><a href="{{ route('site.join') }}">{{ __('site.heading.join_us_as_a_provider') }}</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>

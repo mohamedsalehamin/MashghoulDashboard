@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\UsersModule\Models\Provider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -63,6 +64,13 @@ class ProviderController extends Controller
             ])
             ->findOrFail($provider);
 
+        $locale = app()->getLocale();
+        $title = $provider->getTranslation('name', $locale);
+        $metaDescription = $provider->getTranslation('meta_description', $locale)
+            ?: Str::limit(strip_tags((string) $provider->getTranslation('bio', $locale)), 160);
+        $metaKeywords = $provider->getTranslation('meta_keywords', $locale) ?: '';
+        $metaKeywords = is_array($metaKeywords) ? implode(', ', $metaKeywords) : (string) $metaKeywords;
+
         $seats = $provider->seats->map(function ($seat) {
             $services = $seat->services->map(function ($svc) use ($seat) {
                 $svc->pivot_service_group_id = $svc->pivot?->service_group_id;
@@ -107,6 +115,9 @@ class ProviderController extends Controller
             'portfolio' => $portfolio,
             'isFavorited' => $isFavorited,
             'shareLink' => $shareLink,
+            'title' => $title,
+            'metaDescription' => $metaDescription,
+            'metaKeywords' => $metaKeywords,
         ]));
     }
 

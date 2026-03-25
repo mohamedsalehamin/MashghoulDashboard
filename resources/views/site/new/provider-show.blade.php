@@ -335,7 +335,7 @@
                                 @foreach($rate['replies'] ?? [] as $reply)
                                 <div class="nested-reply mt-3">
                                     <div class="rating-header d-flex justify-content-between align-items-center mb-2">
-                                        <div class="rating-label fw-bold text-dark">{{ $reply['user'] ?? __('panel.provider') }}</div>
+                                        <div class="rating-label fw-bold text-dark">{{ $providerName ?? __('panel.provider') }}</div>
                                         <div class="rate-date">{{ $reply['created_at'] ?? '' }}</div>
                                     </div>
                                     <p class="rating-comment text-muted mb-0">{{ $reply['comment'] ?? '' }}</p>

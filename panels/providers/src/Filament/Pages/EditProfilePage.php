@@ -19,6 +19,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -240,6 +241,35 @@ class EditProfilePage extends Page {
                                 ->columns(1),
                         ])->relationship('provider'),
                     ]),
+                    Tab::make(__('sections.seo_meta'))->schema([
+                        Group::make()->schema([
+                            Tabs::make('seo_languages')
+                                ->tabs([
+                                    Tab::make(__('panel.languages.arabic'))
+                                        ->schema([
+                                            Textarea::make('meta_description.ar')
+                                                ->label(__('forms.fields.meta_description'))
+                                                ->rows(3),
+                                            TagsInput::make('meta_keywords.ar')
+                                                ->label(__('forms.fields.meta_keywords'))
+                                                ->separator(',')
+                                                ->splitKeys([',', 'Enter'])
+                                                ->placeholder(__('forms.placeholders.meta_keywords_tags')),
+                                        ]),
+                                    Tab::make(__('panel.languages.english'))
+                                        ->schema([
+                                            Textarea::make('meta_description.en')
+                                                ->label(__('forms.fields.meta_description'))
+                                                ->rows(3),
+                                            TagsInput::make('meta_keywords.en')
+                                                ->label(__('forms.fields.meta_keywords'))
+                                                ->separator(',')
+                                                ->splitKeys([',', 'Enter'])
+                                                ->placeholder(__('forms.placeholders.meta_keywords_tags')),
+                                        ]),
+                                ]),
+                        ])->relationship('provider'),
+                    ]),
                     Tab::make(__("sections.bank_account_information"))->schema([
                         Group::make()->schema([
                             TextInput::make('bank_name'),
@@ -311,7 +341,7 @@ class EditProfilePage extends Page {
         ]);
         $this->form->model->options()->update(collect($data['options'])->only(['texts', 'reservations_fees', 'reservation_flow', 'enabled_free_fees_in_first_reservation'])->toArray());
         $this->form->model->provider()->update([
-            ...collect($this->record['provider'])->only(['name', 'bio', 'city_id', 'meta_data'])->toArray(),
+            ...collect($this->record['provider'])->only(['name', 'bio', 'city_id', 'meta_data', 'meta_description', 'meta_keywords'])->toArray(),
             'location' => (new Point($this->record['provider']['location']['lat'], $this->record['provider']['location']['lng']))->toSqlExpression($this->form->model->getConnection()),
 
         ]);

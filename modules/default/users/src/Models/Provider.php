@@ -34,7 +34,7 @@ class Provider extends Model implements HasMedia, Sitemapable
     use SoftDeletes;
 
     protected $guarded = ['id'];
-    protected array $translatable = ['name', 'bio'];
+    protected array $translatable = ['name', 'bio', 'meta_description', 'meta_keywords'];
 
     protected $casts = [
         'location' => Point::class,
