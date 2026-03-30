@@ -17,6 +17,7 @@ return [
         'products_without_discount' => 'Products (non-sale only)',
     ],
     'no_location' => 'Provider location is not set',
+    'no_working_hours' => 'No working hours',
     'contact_us_success' => 'Your message has been sent successfully',
     'thank_you_your_request_sent' => 'Thank you, your request has been sent.',
     'join' => [

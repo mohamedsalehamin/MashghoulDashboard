@@ -90,13 +90,21 @@ class AppServiceProvider extends ServiceProvider {
         view()->share('settings', $generalSettings);
 //        config()->set("app.debug", $settings->debug_mode);
 
-        // Share social_links and pages for site views (tmoono-style Livewire support)
-        view()->composer(['site.*', 'site.new.*', 'site.new.account.*',  'livewire.site.*'], function ($view) use ($generalSettings) {
+        // Share social_links, pages, and header categories for site views (tmoono-style Livewire support)
+        view()->composer(['site.*', 'site.new.*', 'site.new.account.*', 'livewire.site.*'], function ($view) use ($generalSettings) {
             $pages = collect($generalSettings->app_pages ?? [])->mapWithKeys(function ($pageId, $pageName) {
                 return [$pageName => Page::find($pageId)];
             })->filter();
             $view->with('social_links', $generalSettings->social_links ?? [])
                 ->with('pages', $pages);
+
+            // Header nav category dropdown: Route::view() pages (e.g. account) do not pass $categories from a controller.
+            if (! array_key_exists('categories', $view->getData())) {
+                $view->with(
+                    'categories',
+                    Category::parent()->enabled()->orderBy('sort')->get()
+                );
+            }
         });
 
        

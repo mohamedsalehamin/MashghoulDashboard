@@ -17,6 +17,7 @@ return [
         'products_without_discount' => 'المنتجات (غير المخفضة فقط)',
     ],
     'no_location' => 'لم يتم تحديد موقع مقدم الخدمة',
+    'no_working_hours' => 'لا توجد أوقات عمل',
     'contact_us_success' => 'تم إرسال الرسالة بنجاح',
     'thank_you_your_request_sent' => 'تم إرسال طلبكم بنجاح.',
     'join' => [

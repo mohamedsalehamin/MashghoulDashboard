@@ -200,12 +200,27 @@ class ProviderResource extends Resource {
                             ->defaultLocation([24.7136, 46.6753])
                             ->draggable()
                             ->clickable(),
-                        Section::make("working_times")
+                        Section::make(__('sections.working_times'))
                             ->schema(GeneralSettings::daysListSchema())
                             ->statePath('meta_data.days_list'),
 
                     ])
                         ->relationship('provider')
+                        ->mutateRelationshipDataBeforeSaveUsing(function (array $data, Group $component): array {
+                            $livewire = $component->getLivewire();
+                            $providerFromForm = data_get($livewire->data ?? [], 'provider', []);
+                            $incomingMeta = $providerFromForm['meta_data'] ?? null;
+                            if (! is_array($incomingMeta)) {
+                                return $data;
+                            }
+                            $record = $component->getCachedExistingRecord();
+                            $data['meta_data'] = array_replace_recursive(
+                                $record?->meta_data ?? [],
+                                $incomingMeta
+                            );
+
+                            return $data;
+                        })
 
                 ]),
                 Tab::make(__('sections.portfolio_gallery'))->schema([

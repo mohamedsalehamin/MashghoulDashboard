@@ -95,10 +95,11 @@ $assetBase = asset('assets/site');
         aria-hidden="true"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
+        style="overflow:hidden;"
     >
-        <div class="modal-dialog modal-dialog-centered" style="max-width:75%; width:75%;height:60vh; margin: 1.75rem auto;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:80%; width:80%;height:60vh; margin: 1.75rem auto;">
             <div class="modal-content" style="height:60vh;">
-                <div class="modal-body p-0" style="max-height:90vh; overflow:auto;">
+                <div class="modal-body p-0" style="max-height:90vh;">
                     @include('site.new.partials.location-selector', ['inModal' => true])
                 </div>
             </div>

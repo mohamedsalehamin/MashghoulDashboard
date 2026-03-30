@@ -406,6 +406,7 @@ return [
         'portfolio' => 'Portfolio',
         'add_album' => 'Add album',
         'album_title' => 'Album title',
+        'media' => 'Media',
     ],
     'tooltip' => [
         'order_limit_per_item' => 'After exceeding the limit, the customer will not pay until approved by one of the branch managers',

@@ -420,6 +420,7 @@ return [
         'portfolio' => 'معرض الأعمال',
         'add_album' => 'إضافة ألبوم',
         'album_title' => 'عنوان الألبوم',
+        'media' => 'الوسائط',
     ],
     'hints' => [
         'price_include_taxes' => 'السعر شامل شاملة الضريبة ونسبة التطبيق'
