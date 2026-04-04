@@ -663,6 +663,9 @@ return [
         ]
         ],
         'messages' => [
+            'checkout_login_required' => 'Please sign in again to complete your booking.',
+            'checkout_payment_failed' => 'Payment could not be started. Please try again or choose another payment method.',
+            'checkout_payment_redirect_missing' => 'We could not redirect you to the payment page. Please try again or contact support if this continues.',
             'profile_updated' => 'Profile updated successfully.',
             'profile_updated_success' => 'Changes saved successfully.',
             'withdrawal_transfer_notice' => 'The transfer may take 72 hours and the requested balance will be frozen.',

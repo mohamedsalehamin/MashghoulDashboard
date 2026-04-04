@@ -14,6 +14,12 @@
 </div>
 <!-- End Breadcrumb -->
 
+@if(session('error'))
+<div class="container my-3">
+    <div class="alert alert-danger mb-0" role="alert">{{ session('error') }}</div>
+</div>
+@endif
+
 <div class="booking-details-section pb-64">
     <div class="container">
         @livewire('site.booking-checkout-form', [

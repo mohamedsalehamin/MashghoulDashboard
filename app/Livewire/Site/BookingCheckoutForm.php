@@ -6,6 +6,7 @@ use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
 use App\UsersModule\Models\Provider;
 use App\DefaultPanel\Actions\BuildCartForWebCheckoutAction;
+use App\DefaultPanel\Actions\CancelReservationOnPaymentFailureAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Actions\AddReservationCommissionAction;
@@ -281,6 +282,14 @@ class BookingCheckoutForm extends Component
         $this->checkoutLoader = true;
 
         try {
+            $customerId = auth()->guard('site')->id();
+            if (! $customerId) {
+                $this->checkoutLoader = false;
+                session()->flash('error', __('site.messages.checkout_login_required'));
+
+                return;
+            }
+
             $data = $this->buildCheckoutData([
                 'date' => $this->date,
                 'from' => $this->timeFrom,
@@ -300,7 +309,7 @@ class BookingCheckoutForm extends Component
             $toDt = $dateObj->copy()->setTimeFromTimeString($this->timeTo);
 
             $reservation = $providerModel->reservations()->create([
-                'user_id' => auth()->id(),
+                'user_id' => $customerId,
                 'seat_id' => $this->seat['id'],
                 'date' => $fromDt,
                 'from' => $fromDt,
@@ -325,29 +334,55 @@ class BookingCheckoutForm extends Component
                 $paymentResponse = $reservation->pay($total, $this->paymentMethod);
                 if ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
                     $this->checkoutLoader = false;
+
                     return $paymentResponse;
                 }
                 if ($paymentResponse instanceof \Illuminate\Http\JsonResponse) {
-                    $data = json_decode($paymentResponse->getContent(), true);
-                    $url = $data['redirect_url'] ?? $data['data']['invoiceURL'] ?? $data['data']['invoice_url'] ?? null;
-                    if (!empty($url)) {
+                    $payload = json_decode($paymentResponse->getContent(), true) ?? [];
+                    $url = $payload['redirect_url'] ?? $payload['data']['invoiceURL'] ?? $payload['data']['invoice_url'] ?? null;
+                    if (! empty($url)) {
                         $this->checkoutLoader = false;
+
                         return redirect($url);
                     }
-                    if (isset($data['status']) && ($data['status'] === 'error' || $data['status'] === 400)) {
-                        $this->tabbyError = $data['message'] ?? __('site.messages.payment_failed');
-                        return null;
+                    if (isset($payload['status']) && ($payload['status'] === 'error' || $payload['status'] === 400)) {
+                        try {
+                            CancelReservationOnPaymentFailureAction::run($reservation);
+                        } catch (\Throwable $e) {
+                            //
+                        }
+                        $this->tabbyError = $payload['message'] ?? __('site.messages.checkout_payment_failed');
+                        $this->checkoutLoader = false;
+
+                        return;
                     }
                 }
-                // MyFatoorah returns Transaction with meta_data.invoiceURL
+                // MyFatoorah returns Transaction model with meta_data (invoiceURL, etc.)
                 if (is_object($paymentResponse) && method_exists($paymentResponse, 'getAttribute')) {
                     $meta = $paymentResponse->meta_data ?? [];
-                    $url = $meta['invoiceURL'] ?? $meta['InvoiceURL'] ?? $meta['invoice_url'] ?? null;
-                    if (!empty($url)) {
+                    if (is_string($meta)) {
+                        $meta = json_decode($meta, true) ?? [];
+                    }
+                    $url = $meta['invoiceURL'] ?? $meta['InvoiceURL'] ?? $meta['invoice_url'] ?? $meta['PaymentURL'] ?? $meta['paymentURL'] ?? null;
+                    if (! empty($url)) {
                         $this->checkoutLoader = false;
+
                         return redirect($url);
                     }
                 }
+
+                // Amount due but no redirect URL — cancel pending reservation and surface error
+                try {
+                    CancelReservationOnPaymentFailureAction::run($reservation);
+                } catch (\Throwable $e) {
+                    // logged inside action
+                }
+                $this->checkoutLoader = false;
+                $msg = __('site.messages.checkout_payment_redirect_missing');
+                $this->tabbyError = $msg;
+                session()->flash('error', $msg);
+
+                return;
             }
 
             if ($isFeesOnly && $total == 0) {

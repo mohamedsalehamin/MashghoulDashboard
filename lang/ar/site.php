@@ -687,6 +687,9 @@ return [
         ]
         ],
         'messages' => [
+            'checkout_login_required' => 'يرجى تسجيل الدخول مرة أخرى لإتمام الحجز.',
+            'checkout_payment_failed' => 'تعذر بدء الدفع. حاول مرة أخرى أو اختر طريقة دفع أخرى.',
+            'checkout_payment_redirect_missing' => 'تعذر توجيهك لصفحة الدفع. أعد المحاولة أو تواصل مع الدعم إذا استمرت المشكلة.',
             'profile_updated' => 'تم تحديث الملف الشخصي',
             'profile_updated_success' => 'تم حفظ التغييرات بنجاح.',
             'withdrawal_transfer_notice' => 'عملية التحويل قد تستغرق 72 ساعة ولا يمكنك استخدام الرصيد المطلوب لحين الانتهاء من الطلب',
