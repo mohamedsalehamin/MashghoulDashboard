@@ -3,6 +3,8 @@ return [
     'sections' => [
         'code_injection' => 'Code injection',
         'plan_billing' => 'Subscription & billing',
+        'seat_assignments' => 'Seat assignments',
+        'products' => 'Products',
     ],
     'help' => [
         'is_free_plan' => 'When enabled, providers can subscribe without payment (prices can stay at 0 SAR).',

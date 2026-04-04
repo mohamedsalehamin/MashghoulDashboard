@@ -51,7 +51,7 @@ use Illuminate\Database\Eloquent\Model;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class ServiceResource extends Resource {
     use HasTranslationLabel, Translatable;
@@ -65,11 +65,17 @@ class ServiceResource extends Resource {
         return $schema
             ->components([
                 Section::make(__("sections.basic_information"))->schema([
-
                     Select::make('provider_id')
-                        ->label(__('forms.fields.provider_name'))
-                        ->options(fn() => Provider::pluck('name', 'id'))
-                        ->required(),
+                    ->live()
+                    ->label(__('forms.fields.provider_name'))
+                    ->relationship(
+                        'provider',
+                        'name',
+                        fn (Builder $query) => $query->latest('id'),
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                     TextInput::make('title')
                         ->label(__('forms.fields.service_name'))
                         ->required(),
@@ -99,7 +105,7 @@ class ServiceResource extends Resource {
                 ])->columnSpan(2),
                 Section::make(__('forms.sections.seat_assignments'))->schema([
                     Repeater::make('seat_assignments')
-                        ->label('')
+                        ->label(__('forms.sections.seat_assignments'))
                         ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
                         ->schema([
@@ -124,11 +130,11 @@ class ServiceResource extends Resource {
                                 ->nullable(),
                         ]),
                 ])->columnSpan(1)->collapsible(),
-                Section::make('products')->schema([
+                Section::make(__("forms.sections.products"))->schema([
                     Repeater::make('products')
                         ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
-                        ->label('')
+                        ->label(__("forms.sections.products"))
                         ->schema([
                             SpatieMediaLibraryFileUpload::make('avatar')
                                 ->nullable(),
@@ -149,7 +155,9 @@ class ServiceResource extends Resource {
                             ->maxValue(fn($get) => $get('price')),
                         ])
                         ->relationship('products'),
-                ])->columnSpan(1),
+                ])
+                
+                ->columnSpan(1),
 
             ])->columns(3);
     }

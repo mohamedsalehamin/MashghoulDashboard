@@ -14,8 +14,8 @@ use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {
     $suffix = "{$reservation->id}_" . date("Y_m_d");
     
-    // Define custom font directory
-    $fontDir = storage_path('fonts');
+    // Tajawal TTFs ship in resources/fonts/mpdf (see OFL license in Google Fonts repo).
+    $fontDir = resource_path('fonts/mpdf');
     $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
     $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
     
@@ -32,16 +32,6 @@ Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Mo
                 'R' => 'Tajawal-Regular.ttf',
                 'B' => 'Tajawal-Bold.ttf',
                 'L' => 'Tajawal-Light.ttf',
-                'useOTL' => 0xFF,
-                'useKashida' => 75,
-            ],
-            'dinlight' => [
-                'R' => 'din-light.ttf',
-                'useOTL' => 0xFF,
-                'useKashida' => 75,
-            ],
-            'dinbold' => [
-                'R' => 'din-bold.ttf',
                 'useOTL' => 0xFF,
                 'useKashida' => 75,
             ],

@@ -59,7 +59,7 @@
         <p class="text-muted mb-3">{{ __('site.heading.choose_date_time') }}</p>
         <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
             @foreach($nextDays as $day)
-            <button type="button" class="btn {{ $date === $day['date'] ? 'btn-blue' : 'btn-outline-secondary' }} px-3 py-2 rounded-4 {{ $day['disable'] ? 'disabled opacity-50' : '' }}"
+            <button type="button" class="btn d-flex flex-column align-items-center justify-content-center {{ $date === $day['date'] ? 'btn-blue' : 'btn-outline-secondary' }} px-3 py-2 rounded-4 {{ $day['disable'] ? 'disabled opacity-50' : '' }}"
                 wire:click="$set('date', '{{ $day['date'] }}')"
                 {{ $day['disable'] ? 'disabled' : '' }}>
                 <div class="small">{{ $day['title'] }}</div>

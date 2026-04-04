@@ -3048,14 +3048,6 @@ footer .social-icons a:hover i {
   margin-bottom: 40px;
   width: 50%;
 }
-.booking-bar > .d-flex {
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-.booking-bar > .d-flex > form {
-  flex-shrink: 0;
-}
 @media screen and (max-width: 600px) {
   .booking-bar {
     padding: 16px 20px;
@@ -3077,16 +3069,12 @@ footer .social-icons a:hover i {
 
 .booking-price-info {
   text-align: start;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 .booking-price-info .booking-total {
   font-size: 28px;
   font-weight: 700;
   color: #fff;
   line-height: 1.2;
-  white-space: nowrap;
-  unicode-bidi: isolate;
 }
 .booking-price-info .booking-total i {
   font-weight: normal;
@@ -3304,6 +3292,12 @@ footer .social-icons a:hover i {
 .booking-section {
   padding-top: 20px;
   border-top: 1px solid rgba(0, 47, 135, 0.24);
+}
+.booking-section .booking-date-pill.btn {
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.125rem;
 }
 
 .time-slots-grid {
@@ -3835,12 +3829,6 @@ footer .social-icons a:hover i {
 .book-success-card .success-icon-wrapper .success-check-icon {
   font-size: 52px;
   color: #A3D55F;
-}
-.book-success-card .success-icon-wrapper.text-danger {
-  background-color: rgba(220, 53, 69, 0.15);
-}
-.book-success-card .success-icon-wrapper.text-danger .success-check-icon {
-  color: #dc3545;
 }
 .book-success-card .success-title {
   font-size: 28px;

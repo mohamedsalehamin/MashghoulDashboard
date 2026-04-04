@@ -70,7 +70,13 @@ class SeatResource extends Resource {
                 Select::make('provider_id')
                     ->live()
                     ->label(__('forms.fields.provider_name'))
-                    ->options(fn() => Provider::pluck('name', 'id'))
+                    ->relationship(
+                        'provider',
+                        'name',
+                        fn (Builder $query) => $query->latest('id'),
+                    )
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 TextInput::make('title')
                     ->label(__('forms.fields.title'))

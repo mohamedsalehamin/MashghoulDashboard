@@ -2,12 +2,10 @@
 
 namespace App\CatalogModule\Resources\ServiceResource\Pages;
 
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 use App\CatalogModule\Resources\ServiceResource;
-use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Enums\Width;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
 
 class ViewService extends ViewRecord
 {

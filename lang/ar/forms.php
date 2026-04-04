@@ -3,6 +3,7 @@ return [
     'sections' => [
         'service_groups' => 'مجموعات الخدمات',
         'seat_assignments' => 'ربط الخدمات بالكراسي',
+        'products' => 'المنتجات',
         'code_injection' => 'حقن الأكواد',
         'plan_billing' => 'الاشتراك والفوترة',
     ],
