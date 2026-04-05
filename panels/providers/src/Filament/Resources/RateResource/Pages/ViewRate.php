@@ -4,6 +4,7 @@ namespace App\ProviderPanel\Filament\Resources\RateResource\Pages;
 
 use App\CatalogModule\Models\Reservation\Rate;
 use App\ProviderPanel\Filament\Resources\RateResource;
+use App\ProviderPanel\Filament\Resources\ReservationResource;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -106,11 +107,11 @@ class ViewRate extends ViewRecord
                             ->label(__('panel.customer'))
                             ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-'),
 
-                        TextEntry::make('reservation.reservation_number')
+                        TextEntry::make('reservation.id')
                             ->label(__('panel.reservation'))
                             ->placeholder('-')
-                            ->url(fn($record) => $record->reservation_id
-                                ? route('filament.providers.resources.reservations.view', $record->reservation_id)
+                            ->url(fn ($record) => $record->reservation_id
+                                ? ReservationResource::getUrl('view', ['record' => $record->reservation_id])
                                 : null),
 
                         TextEntry::make('created_at')

@@ -34,11 +34,13 @@ use App\Filament\Imports\ServicesImporter;
 use App\UsersModule\Models\Provider;
 use Closure;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Support\HtmlString;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -67,6 +69,7 @@ class SeatResource extends Resource {
     public static function form(Schema $schema): Schema {
         return $schema
             ->components([
+                
                 Select::make('provider_id')
                     ->live()
                     ->label(__('forms.fields.provider_name'))
@@ -75,9 +78,40 @@ class SeatResource extends Resource {
                         'name',
                         fn (Builder $query) => $query->latest('id'),
                     )
-                    ->searchable()
+                    // Provider name is Spatie JSON: search both locales (plain `name` LIKE misses Arabic).
+                    ->searchable(['name->ar', 'name->en'])
+                    ->getOptionLabelFromRecordUsing(function (Model $record): string {
+                        if (! $record instanceof Provider) {
+                            return '';
+                        }
+
+                        return (string) ($record->getTranslation('name', app()->getLocale())
+                            ?: $record->getTranslation('name', 'ar')
+                            ?: $record->getTranslation('name', 'en')
+                            ?: '');
+                    })
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function ($state, $set, Get $get): void {
+                        if (! $state) {
+                            $set('meta_data.days_list', []);
+
+                            return;
+                        }
+                        $provider = Provider::find($state);
+                        if (! $provider) {
+                            $set('meta_data.days_list', []);
+
+                            return;
+                        }
+                        $expected = GeneralSettings::defaultSeatDaysListFromProvider($provider);
+                        $expectedNames = collect($expected)->pluck('day_name')->sort()->values()->all();
+                        $existing = $get('meta_data.days_list') ?? [];
+                        $existingNames = collect($existing)->pluck('day_name')->filter()->sort()->values()->all();
+                        if ($existingNames !== $expectedNames) {
+                            $set('meta_data.days_list', $expected);
+                        }
+                    }),
                 TextInput::make('title')
                     ->label(__('forms.fields.title'))
                     ->required(),
@@ -104,21 +138,52 @@ class SeatResource extends Resource {
                         ]),
                 ])->collapsible(),
 
-                Section::make("working_times")->schema([
-                    Repeater::make('working_times')
-                        ->statePath('meta_data.days_list')
-                        ->label('')
-                        ->minItems(1)
-                        ->maxItems(2)
-                        ->schema(GeneralSettings::daysListSchema())
-
-                ]),
+                Section::make(__('sections.working_times'))
+                    ->schema(fn (Get $get) => static::adminSeatWorkingDaysSchema($get))
+                    ->statePath('meta_data.days_list'),
 
                 Toggle::make('status')->default(1)
                     ->onColor('success')
                     ->offColor('danger')
 
             ])->columns(1);
+    }
+
+    /**
+     * Admin seat form: only weekdays that are active on the selected provider profile.
+     *
+     * @return array<int, mixed>
+     */
+    protected static function adminSeatWorkingDaysSchema(Get $get): array
+    {
+        $pid = $get('provider_id');
+        if (! $pid) {
+            return [
+                Placeholder::make('select_provider_for_hours')
+                    ->label('')
+                    ->content(new HtmlString(
+                        '<p class="text-sm text-gray-600 dark:text-gray-400">'
+                        . e(__('panel.messages.select_provider_for_seat_hours'))
+                        . '</p>'
+                    )),
+            ];
+        }
+
+        $provider = Provider::find($pid);
+        $active = $provider ? GeneralSettings::activeProviderDayNames($provider) : [];
+        if ($active === []) {
+            return [
+                Placeholder::make('no_active_profile_working_days')
+                    ->label('')
+                    ->content(new HtmlString(
+                        '<p class="text-sm text-gray-600 dark:text-gray-400">'
+                        . e(__('panel.messages.no_active_profile_working_days'))
+                        . '</p>'
+                    )),
+            ];
+        }
+
+        return GeneralSettings::daysListSchema($active);
     }
 
     public static function table(Table $table): Table {

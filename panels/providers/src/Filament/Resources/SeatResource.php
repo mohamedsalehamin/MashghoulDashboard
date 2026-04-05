@@ -22,10 +22,12 @@ use App\ProviderPanel\Filament\Resources\SeatResource\Pages\CreateSeat;
 use App\ProviderPanel\Filament\Resources\SeatResource\Pages\EditSeat;
 use App\ProviderPanel\Filament\Resources\SeatResource\Pages\ListSeats;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Illuminate\Support\HtmlString;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -54,9 +56,9 @@ class SeatResource extends Resource {
                     ->label(__('forms.fields.title'))
                     ->required(),
 
-                Section::make('service_groups')->schema([
+                Section::make(__('forms.sections.service_groups'))->schema([
                     Repeater::make('serviceGroups')
-                        ->label('')
+                        ->label(__('forms.sections.service_groups'))
                         ->defaultItems(0)
                         ->addActionLabel(__('panel.actions.add'))
                         ->reorderable(false)
@@ -76,15 +78,25 @@ class SeatResource extends Resource {
                         ]),
                 ])->collapsible(),
 
-                Section::make("working_times")->schema([
-                    Repeater::make('working_times')
-                        ->statePath('meta_data.days_list')
-                        ->label('')
-                        ->minItems(1)
-                        ->maxItems(2)
-                        ->schema(GeneralSettings::daysListSchema())
+                (function () {
+                    $active = GeneralSettings::activeProviderDayNames(provider());
+                    $section = Section::make(__('sections.working_times'));
+                    if ($active === []) {
+                        return $section->schema([
+                            Placeholder::make('no_profile_working_days')
+                                ->label('')
+                                ->content(new HtmlString(
+                                    '<p class="text-sm text-gray-600 dark:text-gray-400">'
+                                    . e(__('panel.messages.no_active_profile_working_days'))
+                                    . '</p>'
+                                )),
+                        ]);
+                    }
 
-                ]),
+                    return $section
+                        ->statePath('meta_data.days_list')
+                        ->schema(GeneralSettings::daysListSchema($active));
+                })(),
 
                 Toggle::make('status')->default(1)
                     ->onColor('success')

@@ -108,10 +108,102 @@ class GeneralSettings extends Settings {
         return $all_durations;
     }
 
-    static public function daysListSchema(): array {
+    /**
+     * Weekdays the provider marked active in profile (edit profile → working times).
+     *
+     * @return list<string> e.g. ['sunday','monday']
+     */
+    public static function activeProviderDayNames(?Provider $provider = null): array
+    {
+        $provider = $provider ?? (function_exists('provider') ? \provider() : null);
+        if (! $provider) {
+            return [];
+        }
+
+        $weekOrder = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        $active = collect($provider->meta_data['days_list'] ?? [])
+            ->filter(fn ($row) => is_array($row) && ! empty($row['status']))
+            ->pluck('day_name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return array_values(array_intersect($weekOrder, $active->all()));
+    }
+
+    /**
+     * Build seat default days_list: only profile-active days, times copied from profile.
+     *
+     * @return list<array{status: bool, day_name: string, from: string, to: string}>
+     */
+    public static function defaultSeatDaysListFromProvider(?Provider $provider = null): array
+    {
+        $provider = $provider ?? (function_exists('provider') ? \provider() : null);
+        $names = self::activeProviderDayNames($provider);
+        if ($names === [] || ! $provider) {
+            return [];
+        }
+
+        $daysList = collect($provider->meta_data['days_list'] ?? []);
+        $out = [];
+        foreach ($names as $index => $dayName) {
+            $row = $daysList->firstWhere('day_name', $dayName);
+            $out[] = [
+                'status' => true,
+                'day_name' => $dayName,
+                'from' => $row['from'] ?? '09:00',
+                'to' => $row['to'] ?? '22:00',
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Keep only days still active on the provider profile; reindex 0..n for the form schema.
+     *
+     * @param  list<array<string, mixed>>  $rawDaysList
+     * @return list<array<string, mixed>>
+     */
+    public static function filterSeatDaysListForProvider(array $rawDaysList, ?Provider $provider = null): array
+    {
+        $provider = $provider ?? (function_exists('provider') ? \provider() : null);
+        $active = self::activeProviderDayNames($provider);
+        if ($active === [] || ! $provider) {
+            return [];
+        }
+
+        $byName = collect(array_values($rawDaysList))->keyBy('day_name');
+        $provDays = collect($provider->meta_data['days_list'] ?? []);
+        $out = [];
+        foreach ($active as $dayName) {
+            $existing = $byName->get($dayName);
+            $prov = $provDays->firstWhere('day_name', $dayName);
+            $out[] = [
+                'status' => (bool) ($existing['status'] ?? true),
+                'day_name' => $dayName,
+                'from' => $existing['from'] ?? $prov['from'] ?? '09:00',
+                'to' => $existing['to'] ?? $prov['to'] ?? '22:00',
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param  list<string>|null  $onlyDayNames  If null, all weekdays. If empty array, returns no schema rows.
+     */
+    static public function daysListSchema(?array $onlyDayNames = null): array {
+        $weekOrder = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        if ($onlyDayNames === null) {
+            $days = $weekOrder;
+        } else {
+            $days = array_values(array_intersect($weekOrder, $onlyDayNames));
+        }
+
         $schema = [];
 
-        foreach (['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $index => $day) {
+        foreach ($days as $index => $day) {
             $schema [] = Group::make([
 
                 Checkbox::make("status")

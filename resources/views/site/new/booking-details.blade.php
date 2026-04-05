@@ -27,6 +27,19 @@
     @if(session('rating_success'))
         <div class="container"><div class="alert alert-success">{{ session('rating_success') }}</div></div>
     @endif
+    @if(!empty($pendingMyfatoorahPaymentUrl))
+        <div class="container mb-4">
+            <div class="alert alert-warning border-0 shadow-sm d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-0" role="status">
+                <div>
+                    <strong class="d-block mb-1">{{ __('site.heading.payment_incomplete') }}</strong>
+                    <span class="small text-muted mb-0">{{ __('site.heading.payment_incomplete_hint') }}</span>
+                </div>
+                <a href="{{ $pendingMyfatoorahPaymentUrl }}"  rel="noopener noreferrer" class="btn btn-green text-nowrap">
+                    {{ __('site.buttons.complete_payment') }}
+                </a>
+            </div>
+        </div>
+    @endif
     <div class="container">
         
         <div class="row mb-4">
@@ -78,7 +91,7 @@
                             <span class="label flex-shrink-0"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.working_hours') }}</span>
                             <div class="d-flex flex-wrap">
                                 @foreach($workingDaysList as $dayHours)
-                                <span class="value">{{ $dayHours }}</span>
+                                <span class="value flex-grow-1">{{ $dayHours }}</span>
                                 @endforeach
                             </div>
                         </div>

@@ -189,19 +189,25 @@ class RateResource extends Resource
             return null;
         }
 
-        return static::getModel()::where(function ($q) use ($provider) {
-            $q->whereHas('reservation', function ($subQ) use ($provider) {
-                $subQ->where('reservable_type', \App\UsersModule\Models\Provider::class)
-                    ->where('reservable_id', $provider->id);
+        // Keep in sync with table()->modifyQueryUsing(): one row per reservation (service only; place is merged in UI).
+        return static::getModel()::query()
+            ->where(function ($q) use ($provider) {
+                $q->whereHas('reservation', function ($subQ) use ($provider) {
+                    $subQ->where('reservable_type', \App\UsersModule\Models\Provider::class)
+                        ->where('reservable_id', $provider->id);
+                })
+                    ->orWhere(function ($subQ) use ($provider) {
+                        $subQ->where('provider_id', $provider->user_id)
+                            ->where('source', 'manual');
+                    });
             })
-            ->orWhere(function ($subQ) use ($provider) {
-                $subQ->where('provider_id', $provider->user_id)
-                    ->where('source', 'manual');
-            });
-        })
-        ->whereNull('parent_id')
-        ->where('is_approved', true)
-        ->count();
+            ->whereNull('parent_id')
+            ->where('is_approved', true)
+            ->where(function ($q) {
+                $q->where('type', 'service')
+                    ->orWhereNull('type');
+            })
+            ->count();
     }
 
     public static function getEloquentQuery(): Builder

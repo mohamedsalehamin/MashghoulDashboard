@@ -8,6 +8,7 @@ use App\DefaultPanel\Lib\Cart;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Exceptions\APIException;
 use App\DefaultPanel\Enum\WalletWithdrawEnum;
+use App\Models\User;
 use App\UsersModule\Models\Provider;
 use Darryldecode\Cart\Exceptions\InvalidConditionException;
 use Illuminate\Http\Request;
@@ -15,6 +16,14 @@ use Illuminate\Support\Collection;
 
 class BuildCartForWebCheckoutAction
 {
+    /**
+     * Web checkout uses the `site` guard (customers). Admin/API may use `web`.
+     */
+    protected function checkoutUser(): ?User
+    {
+        return auth()->guard('site')->user() ?? auth()->user();
+    }
+
     /**
      * Build cart from services array (for web checkout when route provider may not exist).
      *
@@ -73,7 +82,10 @@ class BuildCartForWebCheckoutAction
         if (empty($wallet)) {
             return;
         }
-        $user = auth()->user();
+        $user = $this->checkoutUser();
+        if (! $user) {
+            throw new APIException(__('site.messages.checkout_login_required'));
+        }
         $pendingWithdrawalAmount = $user->withdrawalRequests()
             ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
             ->sum('amount');
@@ -93,7 +105,10 @@ class BuildCartForWebCheckoutAction
         if (empty($points)) {
             return;
         }
-        $user = auth()->user();
+        $user = $this->checkoutUser();
+        if (! $user) {
+            throw new APIException(__('site.messages.checkout_login_required'));
+        }
         if ($cart->getTotal() < (float) $points) {
             throw new APIException(__('validation.api.overdue_points_balance'));
         }
@@ -106,7 +121,9 @@ class BuildCartForWebCheckoutAction
     protected function applyReservationFees(Cart $cart): void
     {
         $settings = new GeneralSettings();
-        if (!$settings->enabled_free_fees_in_first_reservation || auth()->user()->reservations()->count() != 0) {
+        $user = $this->checkoutUser();
+        $reservationCount = $user ? $user->reservations()->count() : 0;
+        if (! $settings->enabled_free_fees_in_first_reservation || $reservationCount != 0) {
             $cart->applyReservationsFees($settings?->reservations_fess ?? 0);
         }
     }

@@ -7,6 +7,8 @@ use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use App\CatalogModule\Resources\PlanResource;
 use App\CatalogModule\Resources\SeatResource;
 use App\CatalogModule\Resources\ServiceResource;
+use App\DefaultPanel\Settings\GeneralSettings;
+use App\UsersModule\Models\Provider;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Enums\Width;
@@ -32,6 +34,12 @@ class EditSeat extends EditRecord
     }
 
     public function mutateFormDataBeforeFill(array $data): array {
+        $data['meta_data'] = $data['meta_data'] ?? [];
+        $data['meta_data']['days_list'] = GeneralSettings::filterSeatDaysListForProvider(
+            $data['meta_data']['days_list'] ?? [],
+            $this->record->provider ?? Provider::find($data['provider_id'] ?? null)
+        );
+
         $data['serviceGroups'] = $this->record->serviceGroups()
             ->orderBy('sort')
             ->orderBy('id')

@@ -4,6 +4,7 @@ namespace App\ProviderPanel\Filament\Resources\SeatResource\Pages;
 
 use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use App\DefaultPanel\Settings\GeneralSettings;
 use App\ProviderPanel\Filament\Resources\SeatResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
@@ -15,6 +16,19 @@ class CreateSeat extends CreateRecord {
 
     /** Snapshot of serviceGroups from the submitted form, used in afterCreate */
     public ?array $serviceGroupsSnapshot = null;
+
+    public function mount(): void
+    {
+        parent::mount();
+        $defaults = GeneralSettings::defaultSeatDaysListFromProvider(provider());
+        if ($defaults !== []) {
+            $this->form->fill([
+                'meta_data' => [
+                    'days_list' => $defaults,
+                ],
+            ]);
+        }
+    }
 
     protected function getHeaderActions(): array {
         return [

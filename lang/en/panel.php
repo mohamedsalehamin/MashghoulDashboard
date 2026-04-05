@@ -27,6 +27,8 @@ return [
         'gift_for_register' => 'Gift for register',
         "gift_for_reservation" => "Gift for reservation no :id",
         "working_day_not_set" => "Working day not set",
+        'no_active_profile_working_days' => 'No active working days in your profile. Open Edit profile and enable the days you work, then set seat hours here.',
+        'select_provider_for_seat_hours' => 'Select a provider first. Seat working hours follow the active days configured on that provider’s profile.',
         'reservation_created_successfully' => 'Reservation created successfully',
         'reservation_status_changed' => 'Reservation status changed to :status ',
         "you_dont_have_enough_money_to_pay" => "Your balance is not enough to pay current operation",

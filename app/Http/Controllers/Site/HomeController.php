@@ -46,6 +46,7 @@ class HomeController extends Controller
                 ->withoutTrashed()
                 ->whereHas('user')
                 ->withDistanceSphere('location', $point)
+                ->withAvg('rate', 'rate')
                 ->orderBy('distance', 'asc')
                 ->limit(10)
                 ->get()

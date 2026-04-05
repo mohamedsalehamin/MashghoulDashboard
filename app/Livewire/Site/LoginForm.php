@@ -25,6 +25,19 @@ class LoginForm extends Component
         return '+' . $this->country_code . preg_replace('/\D/', '', $this->phone ?? '');
     }
 
+    /** Full E.164-style number for OTP step copy (single source of truth with sendOtp / verify). */
+    public function getFullPhoneDisplayProperty(): string
+    {
+        return $this->fullPhone();
+    }
+
+    public function backToPhoneEntry(): void
+    {
+        $this->otpSent = false;
+        $this->codeString = '';
+        $this->resetErrorBag(['code', 'codeString', 'phone']);
+    }
+
     protected function rules(): array
     {
         if ($this->otpSent) {

@@ -9,6 +9,7 @@ use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
 use App\UsersModule\Models\Provider;
 use App\CatalogModule\Models\Reservation;
+use App\CatalogModule\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -172,7 +173,7 @@ class BookingController extends Controller
 
     public function show(int $reservation)
     {
-        $reservation = Reservation::with(['reservable.city', 'seat', 'itemsLine', 'conditions', 'rates', 'transaction'])
+        $reservation = Reservation::with(['reservable.city', 'seat', 'itemsLine', 'conditions', 'rates', 'transaction', 'transactions'])
             ->where('user_id', auth()->guard('site')->id())
             ->findOrFail($reservation);
 
@@ -251,6 +252,8 @@ class BookingController extends Controller
         $serviceRating = $reservation->rates()->where('type', 'service')->first();
         $placeRating = $reservation->rates()->where('type', 'place')->first();
 
+        $pendingMyfatoorahPaymentUrl = $this->pendingMyfatoorahPaymentUrl($reservation);
+
         return view('site.new.booking-details', array_merge($this->sharedData(), [
             'reservation' => $reservation,
             'totals' => $totals,
@@ -264,6 +267,35 @@ class BookingController extends Controller
             'canRate' => $reservation->canRate(),
             'serviceRating' => $serviceRating,
             'placeRating' => $placeRating,
+            'pendingMyfatoorahPaymentUrl' => $pendingMyfatoorahPaymentUrl,
         ]));
+    }
+
+    /**
+     * First MyFatoorah transaction without paid_at (same rule as customer app ReservationDetails).
+     */
+    protected function pendingMyfatoorahPaymentUrl(Reservation $reservation): ?string
+    {
+        /** @var \Illuminate\Support\Collection<int, Transaction> $transactions */
+        $transactions = $reservation->relationLoaded('transactions')
+            ? $reservation->transactions
+            : $reservation->transactions()->get();
+
+        foreach ($transactions as $transaction) {
+            $meta = $transaction->meta_data ?? [];
+            $gateway = $meta['gateway'] ?? $meta['method'] ?? null;
+            if ($gateway !== 'myfatoorah') {
+                continue;
+            }
+            if (! empty($meta['paid_at'])) {
+                continue;
+            }
+            $url = $meta['invoiceURL'] ?? $meta['InvoiceURL'] ?? $meta['invoice_url'] ?? $meta['PaymentURL'] ?? $meta['paymentURL'] ?? null;
+            if (is_string($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                return $url;
+            }
+        }
+
+        return null;
     }
 }
