@@ -90,7 +90,7 @@ class Reservation extends Model {
                     $originalValue !== $newValue
                     && $newValue === ReservationStatus::COMPLETED->value
                     && ! $reservation->commission()->exists()
-                    && (($reservation->meta_data['reservation_flow'] ?? null) !== 'fees')
+                    && $reservation->shouldApplyReservationCommission()
                 ) {
                     AddReservationCommissionAction::run($reservation);
                 }
@@ -105,6 +105,29 @@ class Reservation extends Model {
             ], $reservation->status);
         });
 
+    }
+
+    /**
+     * Same rule as customer checkout (CartServices): fee-only providers do not accrue this commission.
+     * Uses live provider profile {@see User::options()} when available; otherwise snapshot in meta_data.
+     */
+    public function isFeesOnlyReservationFlow(): bool
+    {
+        $reservable = $this->reservable;
+        if ($reservable && method_exists($reservable, 'user')) {
+            $reservable->loadMissing(['user.options']);
+            $flow = $reservable->user?->options?->reservation_flow;
+            if ($flow !== null && $flow !== '') {
+                return $flow === 'fees';
+            }
+        }
+
+        return ($this->meta_data['reservation_flow'] ?? null) === 'fees';
+    }
+
+    public function shouldApplyReservationCommission(): bool
+    {
+        return ! $this->isFeesOnlyReservationFlow();
     }
 
     public function getDurationAttribute() {
