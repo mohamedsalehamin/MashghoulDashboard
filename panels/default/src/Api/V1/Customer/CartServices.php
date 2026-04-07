@@ -4,7 +4,6 @@ namespace App\DefaultPanel\Api\V1\Customer;
 
 use Illuminate\Http\JsonResponse;
 use App\CatalogModule\Models\Reservation;
-use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\BuildCartInstanceAction;
 use App\DefaultPanel\Actions\OrderPaidAction;
 use App\DefaultPanel\Enum\ReservationStatus;
@@ -75,9 +74,6 @@ class CartServices {
 
         if ($isFeesOnly && $total == 0) {
             OrderPaidAction::run($reservation);
-        }
-        if (!$isFeesOnly) {
-            AddReservationCommissionAction::run($reservation);
         }
         return Api::isOk(__("Reservation created"), ReservationResource::make($reservation));
     }

@@ -48,6 +48,7 @@ class ReservationCommissionResource extends Resource {
             ->modifyQueryUsing(fn($query) => $query
                 ->whereHas('reservation', fn($builder) => $builder
                     ->paid()
+                    ->where('status', ReservationStatus::COMPLETED->value)
                     // ->whereHas("conditions",fn($builder) => $builder->where('type', 'reservation_fees')->where("value", ">", 0))
                 )
                 ->where('amount', ">", 0))

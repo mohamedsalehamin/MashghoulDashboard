@@ -9,7 +9,6 @@ use App\DefaultPanel\Actions\BuildCartForWebCheckoutAction;
 use App\DefaultPanel\Actions\CancelReservationOnPaymentFailureAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
-use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\OrderPaidAction;
 use App\CatalogModule\Models\Reservation;
 use Carbon\Carbon;
@@ -387,9 +386,6 @@ class BookingCheckoutForm extends Component
 
             if ($isFeesOnly && $total == 0) {
                 OrderPaidAction::run($reservation);
-            }
-            if (!$isFeesOnly) {
-                AddReservationCommissionAction::run($reservation);
             }
 
             app('cart')->clear();

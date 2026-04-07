@@ -16,6 +16,7 @@ use App\CatalogModule\Models\Reservation\Revisit;
 use App\CatalogModule\Models\Reservation\Scheduled;
 
 use App\CatalogModule\Models\Reservation\Timeline;
+use App\DefaultPanel\Actions\AddReservationCommissionAction;
 use App\DefaultPanel\Actions\RefundTransaction;
 use App\DefaultPanel\Enum\LabReservationStatus;
 use App\DefaultPanel\Enum\PaymentMethods;
@@ -79,6 +80,20 @@ class Reservation extends Model {
         });
         static::updating(function (Reservation $reservation) {
             if ($reservation->getOriginal('status') != $reservation->status) {
+                // Strict commission: only create when reservation transitions to completed.
+                // Must be idempotent because status can be set multiple times from different flows.
+                $originalStatus = $reservation->getOriginal('status');
+                $originalValue = $originalStatus instanceof ReservationStatus ? $originalStatus->value : (string) $originalStatus;
+                $newValue = $reservation->status instanceof ReservationStatus ? $reservation->status->value : (string) $reservation->status;
+
+                if (
+                    $originalValue !== $newValue
+                    && $newValue === ReservationStatus::COMPLETED->value
+                    && ! $reservation->commission()->exists()
+                    && (($reservation->meta_data['reservation_flow'] ?? null) !== 'fees')
+                ) {
+                    AddReservationCommissionAction::run($reservation);
+                }
 
                 $reservation->customer->notify(new ReservationStatusChangedNotification($reservation));
                 $reservation->reservable->user->notify(new ReservationStatusChangedNotification($reservation));
