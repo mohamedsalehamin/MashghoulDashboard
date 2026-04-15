@@ -9,11 +9,12 @@ class LogoutModal extends Component
 {
     public function logout()
     {
+        $locale = app()->getLocale();
         Auth::guard('site')->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        return $this->redirect(route('site.home'), navigate: true);
+        return $this->redirect("/{$locale}", navigate: true);
     }
 
     public function render()

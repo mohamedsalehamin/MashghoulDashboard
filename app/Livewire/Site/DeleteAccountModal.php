@@ -9,13 +9,14 @@ class DeleteAccountModal extends Component
 {
     public function deleteAccount()
     {
+        $locale = app()->getLocale();
         $user = auth()->guard('site')->user();
         Auth::guard('site')->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
         $user->delete();
 
-        return $this->redirect(route('site.home'), navigate: true);
+        return $this->redirect("/{$locale}", navigate: true);
     }
 
     public function render()

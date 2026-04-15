@@ -49,21 +49,16 @@
                 @php
                     $locationSet = session()->has('location_set') && session('location_set') === true;
                 @endphp
-                @if(! $locationSet && session()->get('show_location_modal') === true)
-                    <button
-                        type="button"
-                        class="header-icon location-icon"
-                        data-bs-toggle="modal"
-                        data-bs-target="#locationModal"
-                        aria-label="{{ __('site.heading.set_location') }}"
-                    >
-                        <i class="fa-light fa-location-dot"></i>
-                    </button>
-                @else
-                    <span class="header-icon location-icon" aria-hidden="true">
-                        <i class="fa-light fa-location-dot"></i>
-                    </span>
-                @endif
+                <button
+                    class="header-icon location-icon"
+                    role="button"
+                    tabindex="0"
+                    data-bs-toggle="modal"
+                    data-bs-target="#locationModal"
+                    aria-label="{{ __('site.heading.set_location') }}"
+                >
+                    <i class="fa-light fa-location-dot"></i>
+                </button>
                 @php
                     $otherLocale = $locale === 'ar' ? 'en' : 'ar';
                     $currentUrl = request()->url();

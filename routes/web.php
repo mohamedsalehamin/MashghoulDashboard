@@ -60,7 +60,7 @@ Livewire::setUpdateRoute(function ($handle) {
 // Localized routes with catch-all page route at the end
 Route::group([
     'prefix' => GlobalLaravelLocalization::setLocale(),
-    'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'ensureLocationSet']
+    'middleware' => ['localeSessionRedirect', 'localeCookieRedirect', 'localizationRedirect', 'localeViewPath', 'ensureLocationSet']
 ], function () {
     Route::get('/', [HomeController::class, 'index'])->name('site.home');
 

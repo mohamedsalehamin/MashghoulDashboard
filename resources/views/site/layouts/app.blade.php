@@ -86,26 +86,37 @@ $assetBase = asset('assets/site');
     </div>
 </div>
 
-@if($shouldShowLocationModal)
-    <!-- Location selector modal (non-closable) -->
-    <div
-        class="modal fade"
-        id="locationModal"
-        tabindex="-1"
-        aria-hidden="true"
+<!-- Location selector modal -->
+<div
+    class="modal fade"
+    id="locationModal"
+    tabindex="-1"
+    aria-hidden="true"
+    @if($shouldShowLocationModal)
         data-bs-backdrop="static"
         data-bs-keyboard="false"
-        style="overflow:hidden;"
-    >
-        <div class="modal-dialog modal-dialog-centered" style="max-width:80%; width:80%;height:60vh; margin: 1.75rem auto;">
-            <div class="modal-content" style="height:60vh;">
-                <div class="modal-body p-0" style="max-height:90vh;">
-                    @include('site.new.partials.location-selector', ['inModal' => true])
-                </div>
+    @endif
+    style="overflow:hidden;"
+>
+    <div class="modal-dialog modal-dialog-centered" style="max-width:80%; width:80%;height:60vh; margin: 1.75rem auto;">
+        <div class="modal-content" style="height:60vh; position:relative;">
+            @if(! $shouldShowLocationModal)
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    style="position:absolute; top:12px; @if($isRtl) left:12px; @else right:12px; @endif z-index: 5;"
+                ></button>
+            @endif
+            <div class="modal-body p-0" style="max-height:90vh;">
+                @include('site.new.partials.location-selector', ['inModal' => true])
             </div>
         </div>
     </div>
+</div>
 
+@if($shouldShowLocationModal)
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
