@@ -4,14 +4,13 @@ namespace App\DefaultPanel\Actions;
 
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
 use App\DefaultPanel\Lib\Cart;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Exceptions\APIException;
-use App\DefaultPanel\Enum\WalletWithdrawEnum;
 use App\Models\User;
 use App\UsersModule\Models\Provider;
 use Darryldecode\Cart\Exceptions\InvalidConditionException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class BuildCartForWebCheckoutAction
@@ -28,6 +27,7 @@ class BuildCartForWebCheckoutAction
      * Build cart from services array (for web checkout when route provider may not exist).
      *
      * @param  array{seat_id: int, services: array, coupon_code?: string, wallet?: string, points?: string}  $data
+     *
      * @throws InvalidConditionException
      * @throws APIException
      */
@@ -43,7 +43,7 @@ class BuildCartForWebCheckoutAction
         $this->applyWalletToCart($cart, $data);
         $this->applyPointsToCart($cart, $data);
         $this->applyReservationFees($cart);
-        if (!empty($data['coupon_code'])) {
+        if (! empty($data['coupon_code'])) {
             $cart->applyCoupon($data['coupon_code']);
         }
 
@@ -62,6 +62,7 @@ class BuildCartForWebCheckoutAction
                 ->get()
                 ->map(function ($product) use ($productsInput) {
                     $qty = (int) ($productsInput->firstWhere('id', $product->id)['quantity'] ?? 1);
+
                     return $product->setAttribute('quantity', max(1, $qty))
                         ->setAttribute('image', $product->getFirstMediaUrl());
                 });
@@ -112,7 +113,7 @@ class BuildCartForWebCheckoutAction
         if ($cart->getTotal() < (float) $points) {
             throw new APIException(__('validation.api.overdue_points_balance'));
         }
-        if ($user->getTotalPointsBalance() < (float) $points) {
+        if ($user->getTotalPoints() < (float) $points) {
             throw new APIException(__('validation.api.insufficient_points_balance'));
         }
         $cart->applyPointsDiscount($points);
@@ -120,7 +121,7 @@ class BuildCartForWebCheckoutAction
 
     protected function applyReservationFees(Cart $cart): void
     {
-        $settings = new GeneralSettings();
+        $settings = new GeneralSettings;
         $user = $this->checkoutUser();
         $reservationCount = $user ? $user->reservations()->count() : 0;
         if (! $settings->enabled_free_fees_in_first_reservation || $reservationCount != 0) {

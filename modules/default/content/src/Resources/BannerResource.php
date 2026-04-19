@@ -2,47 +2,48 @@
 
 namespace App\ContentModule\Resources;
 
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
-use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\CreateAction;
+use App\ContentModule\Models\Banner;
 use App\ContentModule\Models\Category;
+use App\ContentModule\Resources\BannerResource\Pages\CreateBanner;
+use App\ContentModule\Resources\BannerResource\Pages\EditBanner;
 use App\ContentModule\Resources\BannerResource\Pages\ListBanners;
+use App\DefaultPanel\Enum\ModelStatus;
+use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\ContentModule\Models\Banner;
-use App\DefaultPanel\Enum\ModelStatus;
-use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use App\ContentModule\Resources\BannerResource\Pages\CreateBanner;
-use App\ContentModule\Resources\BannerResource\Pages\EditBanner;
-use Spatie\Color\Hsb;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 
-class BannerResource extends Resource implements HasShieldPermissions {
+class BannerResource extends Resource implements HasShieldPermissions
+{
     use HasTranslationLabel;
     use Translatable;
 
     protected static ?string $model = Banner::class;
-    protected static ?int $navigationSort = 1;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-photo';
 
-    public static function form(Schema $schema): Schema {
+    protected static ?int $navigationSort = 1;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
+
+    public static function form(Schema $schema): Schema
+    {
 
         return $schema->components([
             TextInput::make('name')
@@ -68,69 +69,73 @@ class BannerResource extends Resource implements HasShieldPermissions {
                 ])
                 ->default('app')
                 ->required(),
-            Select::make("object_type")
+            Select::make('object_type')
                 ->live()
                 ->options([
-                    'link' => __("forms.fields.external_link"),
-                    'category' => __("forms.fields.category"),
-                    'provider' => __("forms.fields.provider"),
+                    'link' => __('forms.fields.external_link'),
+                    'category' => __('forms.fields.category'),
+                    'provider' => __('forms.fields.provider'),
                 ]),
 
             Select::make('object_id')
-                ->visible(fn($get) => $get('object_type') == 'category')
+                ->visible(fn ($get) => $get('object_type') == 'category')
                 ->label(__('forms.fields.category'))
                 ->options(Category::pluck('name', 'id'))
                 ->required(),
             Select::make('object_id')
-                ->visible(fn($get) => $get('object_type') == 'provider')
+                ->visible(fn ($get) => $get('object_type') == 'provider')
                 ->label(__('forms.fields.provider'))
-                ->options(Provider::pluck('name', 'id'))
+                ->options(fn () => Provider::enabled()->withoutTrashed()->orderBy('id')->pluck('name', 'id'))
                 ->required(),
             TextInput::make('object_id')
-                ->visible(fn($get) => $get('object_type') == 'link')
+                ->visible(fn ($get) => $get('object_type') == 'link')
                 ->label(__('forms.fields.link'))
                 ->url(),
 
             Toggle::make('status')->default(1)
                 ->onColor('success')
                 ->offColor('danger')
-                ->translateLabel()
+                ->translateLabel(),
 
         ])->columns(1);
     }
 
-    public static function table(Table $table): Table {
+    public static function table(Table $table): Table
+    {
         return $table
-            ->modifyQueryUsing(fn($query)=>$query->orderBy("sort"))
+            ->modifyQueryUsing(fn ($query) => $query->orderBy('sort'))
             ->reorderable('sort', true)
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('placement')
                     ->label(__('sections.banner_placement'))
-                    ->formatStateUsing(fn($state) => $state === 'hero' ? __('sections.banner_placement_hero') : __('sections.banner_placement_category')),
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'website' => __('sections.banner_placement_website'),
+                        'app' => __('sections.banner_placement_app'),
+                        default => $state ?? '—',
+                    }),
                 TextColumn::make('name'),
                 IconColumn::make('status')
                     ->boolean()
                     ->action(
                         Action::make('Active')
-                            ->label(fn(Banner $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
-                            ->disabled(fn(Model $record): bool => !filament()->auth()->user()->can('update', $record))
+                            ->label(fn (Banner $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
+                            ->disabled(fn (Model $record): bool => ! filament()->auth()->user()->can('update', $record))
                             ->requiresConfirmation()
-                            ->action(fn(Banner $record) => $record->toggleStatus())
+                            ->action(fn (Banner $record) => $record->toggleStatus())
 
-
-                    )
+                    ),
 
             ])
             ->filters([
                 SelectFilter::make('placement')
                     ->label(__('sections.banner_placement'))
                     ->options([
-                        'hero' => __('sections.banner_placement_hero'),
-                        'category' => __('sections.banner_placement_category'),
+                        'website' => __('sections.banner_placement_website'),
+                        'app' => __('sections.banner_placement_app'),
                     ]),
                 SelectFilter::make('status')
-                    ->options(ModelStatus::class)
+                    ->options(ModelStatus::class),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -146,7 +151,8 @@ class BannerResource extends Resource implements HasShieldPermissions {
             ]);
     }
 
-    public static function getRelations(): array {
+    public static function getRelations(): array
+    {
         return [
             //
         ];
@@ -157,7 +163,8 @@ class BannerResource extends Resource implements HasShieldPermissions {
         return Width::Full;
     }
 
-    public static function getPages(): array {
+    public static function getPages(): array
+    {
         return [
             'index' => ListBanners::route('/'),
             'create' => CreateBanner::route('/create'),
@@ -165,10 +172,13 @@ class BannerResource extends Resource implements HasShieldPermissions {
         ];
     }
 
-    public static function getNavigationGroup(): ?string {
+    public static function getNavigationGroup(): ?string
+    {
         return __('menu.content');
     }
-    public static function getPermissionPrefixes(): array {
+
+    public static function getPermissionPrefixes(): array
+    {
         return [
             'view_any',
             'create',

@@ -2,53 +2,80 @@
 
 namespace App\Livewire\Site;
 
+use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Service;
-use App\UsersModule\Models\Provider;
 use App\DefaultPanel\Actions\BuildCartForWebCheckoutAction;
 use App\DefaultPanel\Actions\CancelReservationOnPaymentFailureAction;
+use App\DefaultPanel\Actions\OrderPaidAction;
 use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
-use App\DefaultPanel\Actions\OrderPaidAction;
-use App\CatalogModule\Models\Reservation;
+use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
 use Livewire\Component;
 
 class BookingCheckoutForm extends Component
 {
     public $provider;
+
     public $seat;
+
     public $cartServices;
+
     public $totals;
+
     public $pointsEarned;
+
     public $reservationFlow;
+
     public $completeOrderText;
+
     public $nextDays;
+
     public $workingDays;
+
     public string $termsUrl = '#';
 
     public string $date = '';
+
     public string $timeFrom = '';
+
     public string $timeTo = '';
+
     public $selectedTimeIndex = null;
+
     public string $paymentMethod = 'myfatoorah';
+
     public string $couponCode = '';
+
     public string $points = '';
+
     public string $wallet = '';
+
     public bool $approveTerms = false;
 
     public array $availableTimes = [];
+
     public bool $dateLoader = false;
+
     public bool $checkoutLoader = false;
+
     public ?string $couponError = null;
+
     public ?string $pointsError = null;
+
     public ?string $walletError = null;
+
     public bool $couponApplied = false;
+
     public bool $pointsApplied = false;
+
     public bool $walletApplied = false;
+
     public ?string $tabbyError = null;
 
     public ?int $userPointsBalance = null;
+
     public ?float $userWalletBalance = null;
 
     protected $listeners = ['refreshTotals' => 'refreshCartTotals'];
@@ -69,7 +96,8 @@ class BookingCheckoutForm extends Component
 
         $user = auth()->guard('site')->user();
         if ($user) {
-            $this->userPointsBalance = (int) ($user->getTotalPointsBalance() ?? 0);
+            // Loyalty balance is sum of non-transferred `points` rows (same as rewards page), not PointsExchange credits.
+            $this->userPointsBalance = (int) ($user->getTotalPoints() ?? 0);
             $this->userWalletBalance = (float) ($user->balance ?? 0);
         }
 
@@ -121,6 +149,7 @@ class BookingCheckoutForm extends Component
             $this->timeFrom = '';
             $this->timeTo = '';
             $this->selectedTimeIndex = null;
+
             return;
         }
         $this->selectedTimeIndex = null;
@@ -132,6 +161,7 @@ class BookingCheckoutForm extends Component
         if ($value === null || $value === '') {
             $this->timeFrom = '';
             $this->timeTo = '';
+
             return;
         }
         $index = (int) $value;
@@ -152,8 +182,9 @@ class BookingCheckoutForm extends Component
 
         try {
             $seat = Seat::find($this->seat['id']);
-            if (!$seat) {
+            if (! $seat) {
                 $this->dateLoader = false;
+
                 return;
             }
             $serviceIds = collect($this->cartServices)->pluck('id')->toArray();
@@ -237,10 +268,10 @@ class BookingCheckoutForm extends Component
         try {
             $cart = (new BuildCartForWebCheckoutAction)->handle($providerModel, $data);
             $this->totals = $cart->formattedTotals();
-            $this->couponApplied = !empty(trim($this->couponCode)) && $cart->getConditionsByType('coupon')->count() > 0;
+            $this->couponApplied = ! empty(trim($this->couponCode)) && $cart->getConditionsByType('coupon')->count() > 0;
             $this->pointsApplied = $cart->getConditionsByType('points')->count() > 0;
             $this->walletApplied = $cart->getConditionsByType('wallet')->count() > 0;
-            if (!empty(trim($this->couponCode)) && !$this->couponApplied) {
+            if (! empty(trim($this->couponCode)) && ! $this->couponApplied) {
                 $this->couponError = $cart->getLastCouponFailureMessage()
                     ?? __('validation.api.coupon_code_not_found');
             }
@@ -322,10 +353,10 @@ class BookingCheckoutForm extends Component
             ]);
             $cart->saveItemsToOrder($reservation->id);
 
-            if (!empty($data['wallet'])) {
+            if (! empty($data['wallet'])) {
                 $reservation->pay(max((float) $data['wallet'], $total), 'wallet');
             }
-            if (!empty($data['points'])) {
+            if (! empty($data['points'])) {
                 $reservation->pay((float) $data['points'], 'points');
             }
 
@@ -392,6 +423,7 @@ class BookingCheckoutForm extends Component
             session()->forget(['cart_provider_id', 'reservation_data']);
             session()->flash('reservation_id', $reservation->id);
             $this->checkoutLoader = false;
+
             return redirect()->route('site.booking.completed');
         } catch (\Throwable $e) {
             $this->checkoutLoader = false;
@@ -436,6 +468,7 @@ class BookingCheckoutForm extends Component
             $dur = (int) ($service['duration'] ?? $service['associatedModel']['duration'] ?? 0);
             $products = $service['products'] ?? [];
             $prodDur = collect($products)->sum(fn ($p) => ((int) ($p['duration'] ?? 0)) * ($p['quantity'] ?? 1));
+
             return $total + $dur + $prodDur;
         }, 0);
     }

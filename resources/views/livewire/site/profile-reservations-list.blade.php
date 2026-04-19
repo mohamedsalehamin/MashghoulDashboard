@@ -35,9 +35,11 @@
             <div class="booking-col-center">
                 <div class="booking-price">
                     @php
-                        $priceVal = $r->price instanceof \Cknow\Money\Money ? $r->price->formatByDecimal() : $r->price;
+                        $priceDisplay = $r->price instanceof \Cknow\Money\Money
+                            ? $r->price->formatByDecimal()
+                            : $r->price;
                     @endphp
-                    {{ number_format((float) $priceVal, 0) }} <i class="icon-saudi_riyal"></i>
+                    {{ $priceDisplay }} <i class="icon-saudi_riyal"></i>
                 </div>
             </div>
             <div class="booking-col-left">
