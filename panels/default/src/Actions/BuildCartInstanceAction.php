@@ -4,21 +4,22 @@ namespace App\DefaultPanel\Actions;
 
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Service;
+use App\DefaultPanel\Enum\WalletWithdrawEnum;
+use App\DefaultPanel\Lib\Cart;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Exceptions\APIException;
 use App\Models\ProviderOption;
-use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Exceptions\InvalidConditionException;
 use Lorisleiva\Actions\Concerns\AsAction;
-use App\DefaultPanel\Lib\Cart;
-use App\DefaultPanel\Enum\WalletWithdrawEnum;
 
-class BuildCartInstanceAction {
+class BuildCartInstanceAction
+{
     use AsAction;
 
     protected $data = [];
 
-    public function __construct(public ProviderOption|null $providerOptions) {
+    public function __construct(public ?ProviderOption $providerOptions)
+    {
         $this->providerOptions = request()->route('provider')->user?->options;
     }
 
@@ -26,10 +27,10 @@ class BuildCartInstanceAction {
      * @throws InvalidConditionException
      * @throws APIException
      */
-    public function handle($request) {
+    public function handle($request)
+    {
 
         /**
-         *
          * @var Cart $cart
          * */
         $cart = app('cart');
@@ -43,18 +44,18 @@ class BuildCartInstanceAction {
         $this->applyReservationFeesBasedOnTerms($cart);
         $cart->applyCoupon($request->get('coupon_code'));
 
-
         return $cart;
 
-
     }
 
-    public function isReservationFlowIsFees(): bool {
-        return $this->providerOptions?->reservation_flow == "fees";
+    public function isReservationFlowIsFees(): bool
+    {
+        return $this->providerOptions?->reservation_flow == 'fees';
     }
 
-    public function applyServiceToCart($request, $cart): void {
-        $services = Service::findMany(request()->collect('services')->pluck("id"));
+    public function applyServiceToCart($request, $cart): void
+    {
+        $services = Service::findMany(request()->collect('services')->pluck('id'));
         $productPrice = 0;
         foreach ($services as $service) {
 
@@ -63,7 +64,7 @@ class BuildCartInstanceAction {
                 ->where('id', $service->id)
                 ->first();
 
-            $products = Product::where('service_id', $service->id)->whereIn("id", collect($_service['products'])->pluck('id')->toArray() ?? [])
+            $products = Product::where('service_id', $service->id)->whereIn('id', collect($_service['products'])->pluck('id')->toArray() ?? [])
                 ->get()
                 ->map(function ($product) use ($_service) {
                     return $product->setAttribute('quantity', collect($_service['products'])->where('id', $product->id)->first()['quantity'] ?? 1)
@@ -71,8 +72,8 @@ class BuildCartInstanceAction {
                 });
 
             $price = $service->sale_price->formatByDecimal() > 0 ? $service->sale_price->formatByDecimal() : $service->price->formatByDecimal();
-            
-            $productPrice += $products->sum(fn($product): float|int => ($product->sale_price->formatByDecimal() > 0 ? $product->sale_price->formatByDecimal() : $product->price->formatByDecimal()) * $product['quantity']);
+
+            $productPrice += $products->sum(fn ($product): float|int => ($product->sale_price->formatByDecimal() > 0 ? $product->sale_price->formatByDecimal() : $product->price->formatByDecimal()) * $product['quantity']);
 
             $cart->applyItem($service, $price, 1, ['products' => $products]);
         }
@@ -82,18 +83,19 @@ class BuildCartInstanceAction {
     /**
      * @throws APIException
      */
-    public function applyWalletToCart($cart, $request): void {
+    public function applyWalletToCart($cart, $request): void
+    {
         $pendingWithdrawalAmount = auth()->user()->withdrawalRequests()
-        ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
-        ->sum('amount');
+            ->whereIn('status', [WalletWithdrawEnum::PENDING, WalletWithdrawEnum::WAITING_TRANSFER])
+            ->sum('amount');
 
         $availableBalance = auth()->user()->balance - $pendingWithdrawalAmount;
         if ($request->filled('wallet') && $cart->getTotal() < $request->get('wallet')) {
-            throw new APIException(__("validation.api.overdue_wallet_balance"));
+            throw new APIException(__('validation.api.overdue_wallet_balance'));
         }
 
         if ($request->filled('wallet') && $availableBalance < $request->get('wallet')) {
-            throw new APIException(__("validation.api.insufficient_wallet_balance"));
+            throw new APIException(__('validation.api.insufficient_wallet_balance'));
         }
         if ($request->filled('wallet')) {
             $cart->applyWalletDiscount($request->get('wallet'));
@@ -113,28 +115,30 @@ class BuildCartInstanceAction {
     /**
      * @throws APIException
      */
-    public function applyPointsToCart($cart, $request): void {
+    public function applyPointsToCart($cart, $request): void
+    {
         if ($request->filled('points') && $cart->getTotal() < $request->get('points')) {
-            throw new APIException(__("validation.api.overdue_points_balance"));
+            throw new APIException(__('validation.api.overdue_points_balance'));
         }
 
-        if ($request->filled('points') && auth()->user()->getTotalPointsBalance() < $request->get('points')) {
-            throw new APIException(__("validation.api.insufficient_points_balance"));
+        if ($request->filled('points') && auth()->user()->getTotalPoints() < $request->get('points')) {
+            throw new APIException(__('validation.api.insufficient_points_balance'));
         }
         if ($request->filled('points')) {
             $cart->applyPointsDiscount($request->get('points'));
         }
     }
 
-    public function applyReservationFeesBasedOnTerms($cart): void {
-        $settings = new GeneralSettings();
-        if (!$settings->enabled_free_fees_in_first_reservation || auth()->user()->reservations()->count() != 0) {
+    public function applyReservationFeesBasedOnTerms($cart): void
+    {
+        $settings = new GeneralSettings;
+        if (! $settings->enabled_free_fees_in_first_reservation || auth()->user()->reservations()->count() != 0) {
             $cart->applyReservationsFees($settings?->reservations_fess ?? 0);
         }
     }
 
-    public function getTaxesPercentageBasedOnProviderCountry($provider): int {
+    public function getTaxesPercentageBasedOnProviderCountry($provider): int
+    {
         return $provider?->city?->state?->country?->taxes ?? 0;
     }
-
 }

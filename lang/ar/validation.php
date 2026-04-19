@@ -227,6 +227,7 @@ return [
         'type' => 'النوع',
         'message' => 'الرسالة',
         'contact_type_id' => 'نوع الرسالة',
+        'coupon_code' => 'رمز الخصم',
         'guest' => 'زائر',
         'user_id' => 'المستخدم',
         'branch_id' => 'الفرع',
@@ -270,7 +271,7 @@ return [
             "option_required" => ":title مطلوب",
 
         ],
-        "coupon_code_not_found" => "كود الخصم غير صحيح",
+        "coupon_code_not_found" => "لم يتم العثور على رمز الخصم هذا.",
         'coupon_not_valid_for_this_provider' => 'هذا الكود غير صالح لهذا المزود.',
         'coupon_requires_products_in_cart' => 'هذا الكود يخص المنتجات الإضافية فقط. أضف منتجات إلى حجزك ثم أعد المحاولة.',
         'coupon_requires_non_sale_products' => 'هذا الكود يخص المنتجات غير المخفضة فقط. لا توجد منتجات مؤهلة في سلتك.',

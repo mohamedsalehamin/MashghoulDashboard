@@ -31,6 +31,12 @@ class CartDetailsRequest extends FormRequest {
         ];
     }
 
+    public function messages(): array {
+        return [
+            'coupon_code.exists' => __('validation.api.coupon_code_not_found'),
+        ];
+    }
+
     public function cart() {
         return BuildCartInstanceAction::run($this);
     }

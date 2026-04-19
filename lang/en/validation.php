@@ -175,7 +175,7 @@ return [
         "coupon_code_is_expired"=>'Code is expired',
         "coupon_code_exceeds_the_number_of_usages_times"=>'Code exceeds the number of usages times',
         "coupon_code_already_used"=>'Code already used',
-        "coupon_code_not_found" => "Code not found",
+        "coupon_code_not_found" => "This coupon code could not be found.",
         'coupon_not_valid_for_this_provider' => 'This code is not valid for this provider.',
         'coupon_requires_products_in_cart' => 'This code applies to add-on products only. Add products to your booking, then try again.',
         'coupon_requires_non_sale_products' => 'This code applies to non-sale products only. Your cart has no eligible products.',
@@ -206,6 +206,7 @@ return [
 
     'attributes' => [
         'country_id' => 'Country',
+        'coupon_code' => 'coupon code',
     ],
     'translatable_required.missing' => 'The :attribute field is required in :locales.',
     'tabby' => [
