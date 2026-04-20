@@ -38,8 +38,10 @@ class CustomerResource extends JsonResource {
             'gender' => GenderEnum::from($this->gender)->getLabel(),
             'gender_enum' => GenderEnum::from($this->gender)->value,
             'wallet_balance'=>(float)$availableBalance ?? 0,
-            'points_balance' =>$this->getTotalPointsBalance(),
-            'points'=>$this->getTotalPoints(),
+            // Same as web checkout (getTotalPoints); not PointsExchange::getTotalPointsBalance.
+            'points_balance' => (int) $this->getTotalPoints(),
+            'points_exchange_balance' => (float) $this->getTotalPointsBalance(),
+            'points' => (int) $this->getTotalPoints(),
             'notification_status' => $this->settings['notification_status'] ?? 1,
             'unread_notifications_count' => $this->unreadNotifications()->count(),
             'preferred_language' => $this->settings['preferred_language'] ?? 'ar',
