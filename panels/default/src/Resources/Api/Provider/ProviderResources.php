@@ -24,7 +24,7 @@ class ProviderResources extends JsonResource {
             'id' => $this->id,
             'name' => $this->name,
             'bio' => $this->bio,
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getDisplayImageUrl(),
             'images' => $this->getMedia("images")->map(fn($item) => $item->getUrl()),
             'commercial_register' => $this->getFirstMediaUrl("commercial_register"),
             'category' => $this->category?->name,

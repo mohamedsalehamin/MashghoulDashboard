@@ -12,7 +12,7 @@ class ProviderResource extends JsonResource {
             'id' => $this->id,
             'name' => $this->name,
             'bio' => $this->bio,
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getDisplayImageUrl(),
             'images'=>$this->getMedia('images')->map(fn($image) => $image->getFullUrl())->toArray(),
 
             'rate' => $this->getAvgRate(),

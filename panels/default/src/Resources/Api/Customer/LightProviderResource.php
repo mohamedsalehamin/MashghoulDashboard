@@ -11,7 +11,7 @@ class LightProviderResource extends JsonResource {
 
         return [
             'id' => $this->id,
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getDisplayImageUrl(),
             'name' => $this->name,
             'city' => $this->city->name,
             'rate' => $this->getAvgRate(),

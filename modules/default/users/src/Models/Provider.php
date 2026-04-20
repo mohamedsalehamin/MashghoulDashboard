@@ -91,6 +91,28 @@ class Provider extends Model implements HasMedia, Sitemapable
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Primary provider image URL; falls back to the linked user's avatar when none is set on the provider.
+     */
+    public function getDisplayImageUrl(): string
+    {
+        foreach (['default', 'image'] as $collection) {
+            $url = $this->getFirstMediaUrl($collection);
+            if ($url !== '') {
+                return $url;
+            }
+        }
+
+        $user = $this->relationLoaded('user') ? $this->user : $this->user()->first();
+        if ($user === null) {
+            return '';
+        }
+
+        $avatar = $user->getFirstMediaUrl('avatar');
+
+        return $avatar !== '' ? $avatar : $user->getFirstMediaUrl();
+    }
+
     public function subscriptions() {
         return $this->hasMany(Subscription::class, 'user_id', 'user_id');
     }

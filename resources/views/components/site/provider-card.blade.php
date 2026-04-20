@@ -18,8 +18,8 @@
              data-initial-state="{{ $isFavorited ? '1' : '0' }}"
              aria-label="{{ __('site.heading.favorites') }}"><i class="fa-regular fa-heart"></i></div>
         <a href="{{ route('site.provider.show', $provider->id) }}">
-            @if($provider->getFirstMediaUrl())
-                <img src="{{ $provider->getFirstMediaUrl() }}" class="img-fluid" alt="{{ $provider->getTranslation('name', $locale) }}">
+            @if($provider->getDisplayImageUrl())
+                <img src="{{ $provider->getDisplayImageUrl() }}" class="img-fluid" alt="{{ $provider->getTranslation('name', $locale) }}">
             @else
                 <img src="{{ $assetBase }}/images/product-demo_optmized.webp" class="img-fluid" alt="{{ $provider->getTranslation('name', $locale) }}">
             @endif
