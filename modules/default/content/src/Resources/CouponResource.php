@@ -247,9 +247,9 @@ class CouponResource extends Resource implements HasShieldPermissions {
             RelationGroup::make(__("sections.usages"),[
                 UsersRelationManager::class,
             ]),
-            RelationGroup::make(__("sections.providers"),[
-                ServicesRelationManager::class,
-            ]),
+            // RelationGroup::make(__("sections.providers"),[
+            //     ServicesRelationManager::class,
+            // ]),
 
         ];
     }

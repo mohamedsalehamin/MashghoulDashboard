@@ -16,7 +16,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class ProviderController extends Controller
@@ -123,13 +122,7 @@ class ProviderController extends Controller
 
     protected function getActiveCoupons(Provider $provider): array
     {
-        $directCouponIds = DB::table('coupon_provider')
-            ->where('provider_id', $provider->id)
-            ->pluck('coupon_id');
-        $indirectCouponIds = DB::table('coupon_services')
-            ->where('provider_id', $provider->id)
-            ->pluck('coupon_id');
-        $couponIds = $directCouponIds->merge($indirectCouponIds)->unique();
+        $couponIds = Coupon::listingIdsForProvider($provider->id);
 
         if ($couponIds->isEmpty()) {
             return [];

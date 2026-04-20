@@ -11,6 +11,7 @@ use App\Models\User;
 use App\UsersModule\Models\Provider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 
 
 class Coupon extends Model {
@@ -67,6 +68,25 @@ class Coupon extends Model {
 
     public function services(): HasMany {
         return $this->hasMany(CouponService::class);
+    }
+
+    /**
+     * Coupon IDs to surface on a provider profile (site + customer API): linked to this provider,
+     * or global scope (all providers). Caller should still filter by status / active dates as needed.
+     */
+    public static function listingIdsForProvider(int $providerId): \Illuminate\Support\Collection
+    {
+        $directIds = DB::table('coupon_provider')
+            ->where('provider_id', $providerId)
+            ->pluck('coupon_id');
+        $viaServiceIds = DB::table('coupon_services')
+            ->where('provider_id', $providerId)
+            ->pluck('coupon_id');
+        $generalIds = static::query()
+            ->where('scope', self::SCOPE_GENERAL)
+            ->pluck('id');
+
+        return $directIds->merge($viaServiceIds)->merge($generalIds)->unique()->values();
     }
 
     /**

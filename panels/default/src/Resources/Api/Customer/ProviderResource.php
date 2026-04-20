@@ -146,18 +146,7 @@ class ProviderResource extends JsonResource {
      */
     private function getActiveCoupons(): array
     {
-        // Get coupon IDs from direct relationship (coupon_provider table)
-        $directCouponIds = \DB::table('coupon_provider')
-            ->where('provider_id', $this->id)
-            ->pluck('coupon_id');
-
-        // Get coupon IDs from indirect relationship (coupon_services table)
-        $indirectCouponIds = \DB::table('coupon_services')
-            ->where('provider_id', $this->id)
-            ->pluck('coupon_id');
-
-        // Combine and get unique coupon IDs
-        $couponIds = $directCouponIds->merge($indirectCouponIds)->unique();
+        $couponIds = \App\ContentModule\Models\Coupon::listingIdsForProvider($this->id);
 
         if ($couponIds->isEmpty()) {
             return [];
