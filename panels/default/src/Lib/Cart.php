@@ -87,7 +87,11 @@ class Cart extends CoreCart {
             return false;
         }
 
-        $providerId = session('cart_provider_id');
+        // Web checkout sets cart_provider_id in session; API cart uses route model binding without session.
+        $routeProvider = request()->route('provider');
+        $routeProviderId = is_object($routeProvider) ? ($routeProvider->id ?? null) : $routeProvider;
+        $providerId = session('cart_provider_id') ?? $routeProviderId;
+
         if ($coupon->scope === Coupon::SCOPE_PROVIDERS) {
             if (empty($providerId) || !$coupon->providers()->where('providers.id', $providerId)->exists()) {
                 $this->lastCouponFailureMessage = __('validation.api.coupon_not_valid_for_this_provider');
