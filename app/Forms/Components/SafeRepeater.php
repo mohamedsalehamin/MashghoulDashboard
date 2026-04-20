@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ProviderPanel\Forms\Components;
+namespace App\Forms\Components;
 
 use Filament\Forms\Components\Repeater;
 use Illuminate\Contracts\Support\Htmlable;

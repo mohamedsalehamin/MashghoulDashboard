@@ -7,7 +7,7 @@ use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Settings\GeneralSettings;
-use App\ProviderPanel\Forms\Components\SafeRepeater;
+use App\Forms\Components\SafeRepeater;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
