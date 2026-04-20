@@ -103,6 +103,22 @@ class Service extends Model implements HasMedia {
         return $this->hasManyThrough(Reservation::class, ItemsLine::class, 'service_id', 'id', 'id', 'reservation_id');
     }
 
+    /**
+     * Cover image URL for this service row only (media on {@see Service}, not User).
+     * Filament uses Spatie collection name `avatar` for the file upload field — unrelated to account avatars.
+     */
+    public function getServiceImageUrl(): string
+    {
+        foreach (['avatar', 'default', 'image'] as $collection) {
+            $url = $this->getFirstMediaUrl($collection);
+            if ($url !== '') {
+                return $url;
+            }
+        }
+
+        return '';
+    }
+
     public function paidReservations() {
         return $this->reservations()->paid();
     }

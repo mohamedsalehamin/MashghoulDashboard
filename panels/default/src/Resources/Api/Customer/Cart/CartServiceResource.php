@@ -31,7 +31,7 @@ class CartServiceResource extends JsonResource {
         }
         return [
             'id' => $this->associatedModel->id,
-            'image' => $this->associatedModel->getFirstMediaUrl(),
+            'image' => $this->associatedModel->getServiceImageUrl(),
             "name" => $title ?? '',
             "quantity" => $this->quantity,
             'products' => CartProductResource::collection($products),

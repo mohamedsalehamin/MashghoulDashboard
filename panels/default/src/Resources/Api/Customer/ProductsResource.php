@@ -23,7 +23,7 @@ class ProductsResource extends JsonResource {
             'sale_price_include_taxes' => $this->sale_price_include_taxes->format(),
             'price_include_taxes' => $this->price_include_taxes->format(),
             'discount_percentage' => $discountPercentage, 
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getProductImageUrl(),
 
 
         ];

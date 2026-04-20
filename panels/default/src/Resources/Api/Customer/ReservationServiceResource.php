@@ -18,7 +18,7 @@ class ReservationServiceResource extends JsonResource {
         }
         return [
             'id' => $this->associatedModel->id,
-            'image' => $this->associatedModel->getFirstMediaUrl(),
+            'image' => $this->associatedModel->getServiceImageUrl(),
             "name" => $this->associatedModel?->title,
             "quantity" => $this->quantity,
             'products' => ReservationProductResource::collection($products),

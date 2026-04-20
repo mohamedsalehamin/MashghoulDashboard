@@ -77,5 +77,19 @@ class Product extends Model implements HasMedia {
         return $this->belongsTo(Service::class);
     }
 
+    /**
+     * Image URL for this product row only (media on {@see Product}, not User).
+     * Same Spatie collection naming as services (`avatar` field in Filament).
+     */
+    public function getProductImageUrl(): string
+    {
+        foreach (['avatar', 'default', 'image'] as $collection) {
+            $url = $this->getFirstMediaUrl($collection);
+            if ($url !== '') {
+                return $url;
+            }
+        }
 
+        return '';
+    }
 }

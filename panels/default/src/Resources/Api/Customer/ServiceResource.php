@@ -25,7 +25,7 @@ class ServiceResource extends JsonResource {
             'sale_price_include_taxes' => $this->sale_price_include_taxes->format(),
             'discount_percentage' => $discountPercentage,
             'duration' => $this->duration,
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getServiceImageUrl(),
             'products' => ProductsResource::collection($this->products),
 
 

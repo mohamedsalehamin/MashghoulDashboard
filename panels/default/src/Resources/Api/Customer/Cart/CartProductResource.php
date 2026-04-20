@@ -26,7 +26,7 @@ class CartProductResource extends JsonResource {
         return [
             'id' => $this->id,
             'name' => $this->title[app()->getLocale()]??'',
-            'image' => $this->getFirstMediaUrl(),
+            'image' => $this->getProductImageUrl(),
             'price' => $this->price->format(),
             'sale_price' => !$this->sale_price->isZero() ? $this->sale_price->format() : false,
             'discount_percentage' => $discountPercentage, 
