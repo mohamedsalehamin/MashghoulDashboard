@@ -194,6 +194,8 @@ class ProviderResource extends Resource
                             })
                             ->autocomplete('address_name')
                             ->debug()
+                            ->debug()
+                            ->debug()
                             ->drawingField('boundaries')
                             ->defaultLocation([24.7136, 46.6753])
                             ->draggable()
@@ -212,7 +214,9 @@ class ProviderResource extends Resource
                                 return $data;
                             }
                             $record = $component->getCachedExistingRecord();
-                            $data['meta_data'] = array_replace_recursive(
+                            // Do not use array_replace_recursive: numeric portfolio_albums rows merge by index and
+                            // duplicate / resurrect removed albums. Replace whole top-level meta keys instead.
+                            $data['meta_data'] = array_replace(
                                 $record?->meta_data ?? [],
                                 $incomingMeta
                             );
