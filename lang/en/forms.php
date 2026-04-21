@@ -290,6 +290,7 @@ return [
         'source'=> 'source',
         'days_count'=>'days count',
         'reservation_id'=>'reservation id',
+        'transaction_id'=>'transaction id',
         'subscription_id'=>'subscription id',
         'view_file'=>'view file',
         'file'=>'file',

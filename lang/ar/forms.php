@@ -84,6 +84,7 @@ return [
         'source' => 'المصدر',
         'days_count' => 'عدد الأيام',
         'reservation_id' => 'رقم الحجز',
+        'transaction_id' => 'رقم المعاملة',
         'subscription_id' => 'رقم الاشتراك',
         'view_file' => 'عرض الملف',
         'file' => 'الملف',

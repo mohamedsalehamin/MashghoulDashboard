@@ -46,11 +46,15 @@ class CustomerPaymentResource extends Resource {
             ->modifyQueryUsing(fn($query) => $query->paid())
             ->columns([
 
+                TextColumn::make('id')
+                    ->label(__('forms.fields.transaction_id'))
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('transactionable_id')
                     ->label(__('forms.fields.reservation_id'))
                     ->url(fn($record) => route('filament.admin.resources.reservations.view', $record->transactionable_id), true)
-                    ->searchable(['id']),
+                    ->searchable(),
 
                 TextColumn::make('user.name')
                     ->label(__('forms.fields.customer_name'))
