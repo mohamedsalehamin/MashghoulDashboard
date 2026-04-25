@@ -16,7 +16,7 @@
                     @endif
                 </div>
                 <div>
-                    <label class="form-label mb-1">{{ __('site.fields.avatar') ?? 'الصورة الشخصية' }}</label>
+                    <label class="form-label mb-3">{{ __('site.fields.avatar') ?? 'الصورة الشخصية' }}</label>
                     <input type="file" class="form-control form-control-sm" accept="image/*" wire:model="avatar">
                     @error('avatar')
                         <span class="text-danger small">{{ $message }}</span>
@@ -26,18 +26,44 @@
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
+                <label class="form-label mb-3">{{ __('site.fields.name') }}</label>
                 <input type="text" class="form-control auth-input" id="name" placeholder="{{ __('site.fields.name') }}" wire:model="name">
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
+                <label class="form-label mb-3">{{ __('site.fields.phone') }}</label>
                 @include('livewire._phone-input')
                 @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
             </div>
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
+                <label class="form-label mb-3">{{ __('site.fields.email') }}</label>
                 <input type="email" class="form-control auth-input" id="email" placeholder="{{ __('site.fields.email') }}" wire:model="email">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="mb-3" style="{{ $user->dob ? 'opacity:0.6' : '' }}">
+                <label class="form-label mb-3">{{ __('site.fields.dob') }}</label>
+                @if($user->dob)
+                    <input
+                        type="date"
+                        class="form-control auth-input"
+                        value="{{ \Carbon\Carbon::parse($user->dob)->toDateString() }}"
+                        readonly
+                        disabled
+                    >
+                    <input type="hidden" wire:model="dob">
+                @else
+                    <input
+                        type="date"
+                        class="form-control auth-input"
+                        wire:model="dob"
+                        max="{{ now()->subDay()->toDateString() }}"
+                    >
+                @endif
+                @error('dob')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
             </div>
         </div>
         <div class="col-lg-6">
@@ -56,7 +82,7 @@
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label class="form-label mb-1">{{ __('site.fields.country') }}</label>
+                <label class="form-label mb-3">{{ __('site.fields.country') }}</label>
                 <select class="form-select auth-input" name="country_id" wire:model.live="country_id">
                     <option value="" selected disabled>{{ __('site.enum.select') }}</option>
                     @foreach($countries as $country)
@@ -67,7 +93,7 @@
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label class="form-label mb-1">{{ __('site.fields.state') }}</label>
+                <label class="form-label mb-3">{{ __('site.fields.state') }}</label>
                 <select class="form-select auth-input" name="region_id" wire:model.live="region_id">
                     <option value="" selected disabled>{{ __('site.enum.select') }}</option>
                     @foreach($regions as $region)
@@ -78,7 +104,7 @@
         </div>
         <div class="col-lg-6">
             <div class="mb-3">
-                <label class="form-label mb-1">{{ __('site.fields.city') }}</label>
+                <label class="form-label mb-3">{{ __('site.fields.city') }}</label>
                 <select class="form-select auth-input" name="city_id" wire:model="city_id">
                     <option value="" selected disabled>{{ __('site.enum.select') }}</option>
                     @foreach($cities as $city)

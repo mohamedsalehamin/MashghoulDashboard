@@ -5,6 +5,7 @@ namespace App\Livewire\Site;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -21,6 +22,8 @@ class EditProfileForm extends Component
     public string $country_code = '966';
 
     public $gender = '';
+
+    public ?string $dob = null;
 
     public $country_id = null;
 
@@ -46,6 +49,7 @@ class EditProfileForm extends Component
         $this->city_id = $user->city_id;
         $this->region_id = $user->city?->state_id;
         $this->country_id = $user->city?->state?->country_id;
+        $this->dob = $user->dob ? Carbon::parse($user->dob)->toDateString() : null;
     }
 
     protected function fullPhone(): string
@@ -55,25 +59,34 @@ class EditProfileForm extends Component
 
     public function save()
     {
+        $user = site()->user();
+
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'phone' => ['required'],
             'gender' => ['nullable', 'in:male,female'],
+            'dob' => $user->dob ? ['nullable'] : ['nullable', 'date', 'before:today'],
             'country_id' => ['nullable', 'exists:countries,id'],
             'region_id' => ['nullable', 'exists:states,id'],
             'city_id' => ['nullable', 'exists:cities,id'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $user = site()->user();
-        $user->update([
+        $payload = [
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->fullPhone(),
             'gender' => $this->gender ?: $user->gender,
             'city_id' => $this->city_id,
-        ]);
+        ];
+
+        // DOB is set-once (matches app behavior): allow setting only if currently empty.
+        if (!$user->dob && $this->dob) {
+            $payload['dob'] = $this->dob;
+        }
+
+        $user->update($payload);
 
         if ($this->avatar) {
             $user->clearMediaCollection('avatar');
