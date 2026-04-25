@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AlignPublicDiskUrlWithRequestHost;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\EnsureLocationSet;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -44,8 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         // Configure guest redirect (for unauthenticated users)
-        $middleware->redirectGuestsTo(fn (Request $request) => 
-            $request->expectsJson() ? null : route('auth.login')
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->expectsJson() ? null : route('auth.login')
         );
 
         // Configure authenticated user redirect
@@ -58,6 +58,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'current_password',
             'password',
             'password_confirmation',
+        ]);
+
+        $middleware->prependToGroup('web', [
+            AlignPublicDiskUrlWithRequestHost::class,
         ]);
 
         // API middleware - append custom middleware
@@ -104,22 +108,23 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->wantsJson()) {
-                return \Api::setStatus(401)->setMessage(__("Unauthenticated"))->build();
+                return \Api::setStatus(401)->setMessage(__('Unauthenticated'))->build();
             }
         });
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->wantsJson()) {
-                return \Api::isNotFound("Are you lost? ,There is no url matched")->build();
+                return \Api::isNotFound('Are you lost? ,There is no url matched')->build();
             }
         });
 
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->wantsJson()) {
                 $messages = $e->validator->errors()->getMessages();
+
                 return \Api::setStatusError()
                     ->setMessage($e->validator->getMessageBag()->first())
-                    ->setErrors(collect($messages)->mapWithKeys(fn($errors, $key) => [$key => $errors[0]])->toArray())
+                    ->setErrors(collect($messages)->mapWithKeys(fn ($errors, $key) => [$key => $errors[0]])->toArray())
                     ->build();
             }
         });
