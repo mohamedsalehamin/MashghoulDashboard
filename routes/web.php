@@ -10,6 +10,7 @@ use App\Http\Controllers\Site\ProviderController;
 use App\Http\Controllers\Site\BookingController;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
 use App\Http\Middleware\VerifyCsrfToken;
+use Livewire\Mechanisms\HandleRequests\HandleRequests;
 
 // Define specific routes BEFORE the catch-all route group
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {
@@ -50,13 +51,12 @@ Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Mo
 |--------------------------------------------------------------------------
 | Livewire update route (must stay outside the locale prefix group)
 |--------------------------------------------------------------------------
-| If this is registered as /{locale}/livewire/update, the embedded URI in
-| @livewireScripts must match exactly. Registering globally at /livewire/update
-| avoids mismatches and failed wire:click requests on localized pages.
+| We register this explicitly to avoid environment differences (route caching,
+| provider boot order, etc.) that can result in /livewire/update returning 404.
 */
-Livewire::setUpdateRoute(function ($handle) {
-    return \Illuminate\Support\Facades\Route::post('/livewire/update', $handle);
-});
+Route::post('/livewire/update', [HandleRequests::class, 'handleUpdate'])
+    ->middleware('web')
+    ->name('livewire.update');
 
 // Localized routes with catch-all page route at the end
 Route::group([
