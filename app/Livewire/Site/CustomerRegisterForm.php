@@ -40,6 +40,30 @@ class CustomerRegisterForm extends Component
     public function mount()
     {
         $this->gender = GenderEnum::MALE->value ?? 'male';
+
+        // Prefill from login redirect: /register?phone=5xxxxxxx&country_code=966&code=1234
+        $qPhone = request()->query('phone');
+        $qCountryCode = request()->query('country_code');
+        $qCode = request()->query('code');
+
+        if (is_string($qCountryCode) && $qCountryCode !== '') {
+            $this->country_code = preg_replace('/\D/', '', $qCountryCode) ?: $this->country_code;
+        }
+
+        if (is_string($qPhone) && $qPhone !== '') {
+            $this->phone = preg_replace('/\D/', '', $qPhone) ?: $this->phone;
+        }
+
+        if (is_string($qCode) && $qCode !== '') {
+            $this->codeString = preg_replace('/\D/', '', $qCode);
+            $this->otpSent = true;
+
+            // If the code is still valid, jump directly to the profile step.
+            request()->merge(['phone' => $this->fullPhone()]);
+            if ((new IsValidVerificationCodeRule())->passes('codeString', $this->codeString)) {
+                $this->otpVerified = true;
+            }
+        }
     }
 
     protected function fullPhone(): string

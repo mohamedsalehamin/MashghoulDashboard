@@ -93,7 +93,14 @@ class LoginForm extends Component
             $this->addError('code', __('validation.api.invalid_verification_code'));
             return;
         }
-        $customer = Customer::where('phone', $full)->firstOrFail();
+        $customer = Customer::where('phone', $full)->first();
+        if (! $customer) {
+            return $this->redirect(route('site.register', [
+                'phone' => preg_replace('/\D/', '', $this->phone ?? ''),
+                'country_code' => preg_replace('/\D/', '', $this->country_code ?? '966'),
+                'code' => $codeString,
+            ]), navigate: true);
+        }
         RemoveVerficationCodes::run($customer);
         auth()->guard('site')->login($customer, true);
         $intended = request('intended', session('url.intended', route('site.home')));
