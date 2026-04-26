@@ -304,19 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endif
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof Swiper !== 'undefined' && document.querySelector('.shop-by-category-swiper')) {
-        new Swiper('.shop-by-category-swiper', {
-            slidesPerView: 2,
-            spaceBetween: 16,
-            pagination: { el: '.shop-by-category-swiper .swiper-pagination' },
-            breakpoints: { 576: { slidesPerView: 3 }, 768: { slidesPerView: 4 }, 992: { slidesPerView: 5 } }
-        });
-    }
-    var productsConfig = { loop: true, spaceBetween: 24, pagination: { el: '.swiper-pagination', clickable: true }, breakpoints: { 350: { slidesPerView: 2, spaceBetween: 15 }, 500: { slidesPerView: 2, spaceBetween: 24 }, 768: { slidesPerView: 2 }, 992: { slidesPerView: 3 }, 1200: { slidesPerView: 4 } } };
-    if (document.querySelector('.nearest-providers-swiper')) new Swiper('.nearest-providers-swiper', productsConfig);
-    if (document.querySelector('.most-rated-providers-swiper')) new Swiper('.most-rated-providers-swiper', productsConfig);
-
     // Capture a random frame from each video testimonial for the thumbnail
     document.querySelectorAll('.testimonial-video-thumb[data-video-thumbnail]').forEach(function(img) {
         var videoUrl = img.getAttribute('data-video-thumbnail');
@@ -352,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
         video.src = videoUrl;
         video.load();
     });
-});
 </script>
 @endpush
 @endsection

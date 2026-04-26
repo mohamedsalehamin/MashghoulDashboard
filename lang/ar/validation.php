@@ -288,6 +288,7 @@ return [
         'invalid_phone_format' => 'صيغة رقم الهاتف غير صحيح',
         "invalid_credentials" => "بيانات الدخول غير صحيحة",
         'invalid_verification_code' => 'كود التفعيل غير صحيح او منتهي الصلاحية',
+        'user_not_found' => 'رقم الجوال غير مسجل.',
         "order_not_delivered_yet" => "الطلب لم يتم الانتهاء منه  بعد",
         'reservation_already_rated' => 'تم تقييم الاستشارة مسبقا',
         'reservation_already_reported' => 'تم الابلاغ عن الاستشارة مسبقا',

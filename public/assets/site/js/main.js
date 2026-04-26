@@ -55,46 +55,40 @@ jQuery(document).ready(function () {
     // swiper slider
 
 
-    const shopByCategorySwiper = new Swiper(".shop-by-category-swiper", {
-        loop: true,
-        draggable: true,
-        autoplay: true,
-        spaceBetween: 45,
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
+    function initShopByCategorySwipers() {
+        if (typeof Swiper === 'undefined') return;
+        document.querySelectorAll('.shop-by-category-swiper').forEach(function (el) {
+            if (el.swiper) return;
+            new Swiper(el, {
+                loop: true,
+                draggable: true,
+                autoplay: true,
+                spaceBetween: 45,
+                observer: true,
+                observeParents: true,
+                updateOnWindowResize: true,
+                navigation: {
+                    nextEl: el.querySelector(".swiper-button-next"),
+                    prevEl: el.querySelector(".swiper-button-prev"),
+                },
+                pagination: {
+                    el: el.querySelector(".swiper-pagination"),
+                    clickable: true,
+                },
+                breakpoints: {
+                    350: { slidesPerView: 2, spaceBetween: 15 },
+                    500: { slidesPerView: 2, spaceBetween: 20 },
+                    768: { slidesPerView: 3, spaceBetween: 24 },
+                    992: { slidesPerView: 4, spaceBetween: 24 },
+                    1200: { slidesPerView: 6, spaceBetween: 24 },
+                },
+            });
 
-        breakpoints: {
-            350: {
-                slidesPerView: 2,
-                spaceBetween: 15,
-
-            },
-            500: {
-                slidesPerView: 2,
-                spaceBetween: 20,
-
-            },
-            768: {
-                slidesPerView: 3,
-                spaceBetween: 24,
-            },
-            992: {
-                slidesPerView: 4,
-                spaceBetween: 24,
-            },
-            1200: {
-                slidesPerView: 6,
-                spaceBetween: 24,
-            },
-        },
-
-    });
+            // Prevent "stretched" slides when page was navigated without full reload.
+            requestAnimationFrame(function () { try { el.swiper && el.swiper.update(); } catch (e) {} });
+            setTimeout(function () { try { el.swiper && el.swiper.update(); } catch (e) {} }, 250);
+        });
+    }
     const salonHeroSlider = new Swiper(".salon-hero-slider .swiper", {
         loop: true,
         draggable: true,
@@ -116,47 +110,41 @@ jQuery(document).ready(function () {
 
 
 
-    const productsSwiper = new Swiper(".products-swiper", {
-        loop: true,
-        draggable: true,
-        autoplay: true,
-        spaceBetween: 24,
-        // navigation: {
-        //     nextEl: ".swiper-button-next",
-        //     prevEl: ".swiper-button-prev",
-        // },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-        },
-
-        breakpoints: {
-            350: {
-                slidesPerView: 2,
-                spaceBetween: 15,
-                navigation: false,
-
-            },
-            500: {
-                slidesPerView: 2,
+    function initProductsSwipers() {
+        if (typeof Swiper === 'undefined') return;
+        document.querySelectorAll('.products-swiper').forEach(function (el) {
+            if (el.swiper) return;
+            new Swiper(el, {
+                loop: true,
+                draggable: true,
+                autoplay: true,
                 spaceBetween: 24,
-                navigation: false,
+                observer: true,
+                observeParents: true,
+                updateOnWindowResize: true,
+                pagination: {
+                    el: el.querySelector(".swiper-pagination"),
+                    clickable: true,
+                },
+                breakpoints: {
+                    350: { slidesPerView: 2, spaceBetween: 15, navigation: false },
+                    500: { slidesPerView: 2, spaceBetween: 24, navigation: false },
+                    768: { slidesPerView: 2, spaceBetween: 24 },
+                    992: { slidesPerView: 3, spaceBetween: 24 },
+                    1200: { slidesPerView: 4, spaceBetween: 24 },
+                },
+            });
 
-            },
-            768: {
-                slidesPerView: 2,
-                spaceBetween: 24,
-            },
-            992: {
-                slidesPerView: 3,
-                spaceBetween: 24,
-            },
-            1200: {
-                slidesPerView: 4,
-                spaceBetween: 24,
-            },
-        },
+            requestAnimationFrame(function () { try { el.swiper && el.swiper.update(); } catch (e) {} });
+            setTimeout(function () { try { el.swiper && el.swiper.update(); } catch (e) {} }, 250);
+        });
+    }
 
+    initShopByCategorySwipers();
+    initProductsSwipers();
+    document.addEventListener('livewire:navigated', function () {
+        initShopByCategorySwipers();
+        initProductsSwipers();
     });
 
     const testimonialsSwiper = new Swiper(".testimonials-swiper", {

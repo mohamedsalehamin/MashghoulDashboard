@@ -10,6 +10,8 @@ use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -31,6 +33,28 @@ class AuthController extends Controller
 
     public function showLogin()
     {
+        // Temporary diagnostics for "login page redirects to home after logout".
+        // Remove once the root-cause is confirmed.
+        // Also: ensure no stale "location modal" / intended redirect can bounce the user away.
+        session()->forget([
+            'show_location_modal',
+            'intended_url',
+            'url.intended',
+        ]);
+
+        Log::info('site.login hit', [
+            'url' => request()->fullUrl(),
+            'path' => request()->path(),
+            'locale' => app()->getLocale(),
+            'auth_site' => Auth::guard('site')->check(),
+            'auth_web' => Auth::guard('web')->check(),
+            'session_id' => request()->session()->getId(),
+            'session_location_set' => session('location_set'),
+            'session_show_location_modal' => session('show_location_modal'),
+            'session_url_intended' => session('url.intended'),
+            'session_intended_url' => session('intended_url'),
+        ]);
+
         return view('site.new.login', $this->sharedData());
     }
 

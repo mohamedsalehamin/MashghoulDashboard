@@ -166,6 +166,7 @@ return [
         "invalid_phone_format" => "The phone number is invalid",
         "invalid_credentials"=>"Invalid credentials",
         'invalid_verification_code'=>"Invalid code or maybe expired",
+        'user_not_found' => 'This phone number is not registered.',
         "order_not_delivered_yet"=>"Order not delivered yet",
         "reservation_already_rated"=>"Order already rated",
         'reservation_already_reported'=>"Order already reported",

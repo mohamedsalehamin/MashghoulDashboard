@@ -124,7 +124,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 return \Api::setStatusError()
                     ->setMessage($e->validator->getMessageBag()->first())
-                    ->setErrors(collect($messages)->mapWithKeys(fn ($errors, $key) => [$key => $errors[0]])->toArray())
+                    ->setErrors(collect($messages)->mapWithKeys(fn($errors, $key) => [$key => $errors[0]])->toArray())
                     ->build();
             }
         });
