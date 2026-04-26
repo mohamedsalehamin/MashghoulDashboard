@@ -9,8 +9,6 @@ use App\Http\Controllers\Site\AuthController;
 use App\Http\Controllers\Site\ProviderController;
 use App\Http\Controllers\Site\BookingController;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
-use App\Http\Middleware\VerifyCsrfToken;
-use Livewire\Mechanisms\HandleRequests\HandleRequests;
 
 // Define specific routes BEFORE the catch-all route group
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {
@@ -51,12 +49,13 @@ Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Mo
 |--------------------------------------------------------------------------
 | Livewire update route (must stay outside the locale prefix group)
 |--------------------------------------------------------------------------
-| We register this explicitly to avoid environment differences (route caching,
-| provider boot order, etc.) that can result in /livewire/update returning 404.
+| If this is registered as /{locale}/livewire/update, the embedded URI in
+| @livewireScripts must match exactly. Registering globally at /livewire/update
+| avoids mismatches and failed wire:click requests on localized pages.
 */
-Route::post('/livewire/update', [HandleRequests::class, 'handleUpdate'])
-    ->middleware('web')
-    ->name('livewire.update');
+Livewire::setUpdateRoute(function ($handle) {
+    return \Illuminate\Support\Facades\Route::post('/livewire/update', $handle);
+});
 
 // Localized routes with catch-all page route at the end
 Route::group([
@@ -92,11 +91,7 @@ Route::group([
     Route::get('/booking/{provider}', [BookingController::class, 'create'])->name('site.booking.create')->middleware('auth:site');
     Route::get('/reservations/{reservation}', [BookingController::class, 'show'])->name('site.booking.show')->middleware('auth:site');
 
-    // Some environments/proxies can inadvertently hit the login URL with POST (e.g. method-preserving redirects).
-    // This endpoint is view-only (Livewire handles auth via /livewire/update), so allow POST safely to avoid 405s.
-    Route::match(['GET', 'POST'], '/login', [AuthController::class, 'showLogin'])
-        ->withoutMiddleware([VerifyCsrfToken::class])
-        ->name('site.login');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('site.login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('site.register');
     Route::get('/register-success', [AuthController::class, 'showRegisterSuccess'])->name('site.register.success');
     Route::middleware('auth:site')->group(function () {
