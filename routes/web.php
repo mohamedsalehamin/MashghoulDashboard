@@ -9,6 +9,7 @@ use App\Http\Controllers\Site\AuthController;
 use App\Http\Controllers\Site\ProviderController;
 use App\Http\Controllers\Site\BookingController;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf;
+use App\Http\Middleware\VerifyCsrfToken;
 
 // Define specific routes BEFORE the catch-all route group
 Route::get('reservations/{reservation}/invoice', function (\App\CatalogModule\Models\Reservation $reservation) {
@@ -91,7 +92,11 @@ Route::group([
     Route::get('/booking/{provider}', [BookingController::class, 'create'])->name('site.booking.create')->middleware('auth:site');
     Route::get('/reservations/{reservation}', [BookingController::class, 'show'])->name('site.booking.show')->middleware('auth:site');
 
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('site.login');
+    // Some environments/proxies can inadvertently hit the login URL with POST (e.g. method-preserving redirects).
+    // This endpoint is view-only (Livewire handles auth via /livewire/update), so allow POST safely to avoid 405s.
+    Route::match(['GET', 'POST'], '/login', [AuthController::class, 'showLogin'])
+        ->withoutMiddleware([VerifyCsrfToken::class])
+        ->name('site.login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('site.register');
     Route::get('/register-success', [AuthController::class, 'showRegisterSuccess'])->name('site.register.success');
     Route::middleware('auth:site')->group(function () {
