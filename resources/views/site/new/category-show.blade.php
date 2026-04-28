@@ -39,7 +39,13 @@
                     <x-site.provider-card :provider="$provider" :show-map-button="true" />
                 </div>
             @empty
-                <div class="col-12 text-center text-muted py-5">{{ __('site.no_data') }}</div>
+                <div class="col-12 text-center text-muted py-5">
+                    @if(request()->filled('q'))
+                        {{ __('site.no_matching_search_results') }}
+                    @else
+                        {{ __('site.no_providers_in_category') }}
+                    @endif
+                </div>
             @endforelse
         </div>
 

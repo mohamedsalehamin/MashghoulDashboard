@@ -2,6 +2,8 @@
 return [
     'app_name' => 'Tamona',
     'no_data' => 'No Data',
+    'no_matching_search_results' => 'No matching search results',
+    'no_providers_in_category' => 'There are no Providers in category',
     'coupon_min_order' => [
         'no_minimum' => 'No minimum',
         'type_cart_total' => 'Cart total',

@@ -2,6 +2,8 @@
 return [
     'app_name' => 'تمونوا',
     'no_data' => 'لا توجد  بيانات بعد',
+    'no_matching_search_results' => 'لا يوجد نتائج بحث مطابقة',
+    'no_providers_in_category' => 'لا يوجد مقدمي خدمات في هذا التصنيف',
     'coupon_min_order' => [
         'no_minimum' => 'لا يوجد حد أدنى',
         'type_cart_total' => 'إجمالي السلة',
