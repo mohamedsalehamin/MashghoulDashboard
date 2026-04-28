@@ -129,7 +129,7 @@
             <div class="col-lg-6">
                 <div class="loyalty-section">
                     <h3 class="data-card-title mb-4">{{ __('site.heading.loyalty_points') }}</h3>
-                    <p class="coupon-hint">{{ __('site.heading.your_points_balance') }} <span class="points fw-bold">{{ $userPointsBalance ?? 0 }}</span> {{ __('site.heading.you_can_pay_with_points') }}</p>
+                    <p class="coupon-hint">{{ __('site.heading.your_points_balance') }} <span class="points fw-bold">{{ $userPointsBalance ?? 0 }}</span> <i class="icon-saudi_riyal"></i> {{ __('site.heading.you_can_pay_with_points') }}</p>
                     <div class="input-action-wrapper d-flex gap-2">
                         <input type="number" class="form-control" placeholder="{{ __('site.placeholder.enter_points') }}" wire:model="points" {{ $pointsApplied ? 'readonly' : '' }}>
                         @if($pointsApplied)
