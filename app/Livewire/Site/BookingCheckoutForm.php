@@ -97,7 +97,7 @@ class BookingCheckoutForm extends Component
         $user = auth()->guard('site')->user();
         if ($user) {
             // Loyalty balance is sum of non-transferred `points` rows (same as rewards page), not PointsExchange credits.
-            $this->userPointsBalance = (int) ($user->getTotalPoints() ?? 0);
+            $this->userPointsBalance = (int) ($user->getTotalPointsBalance() ?? 0);
             $this->userWalletBalance = (float) ($user->balance ?? 0);
         }
 
