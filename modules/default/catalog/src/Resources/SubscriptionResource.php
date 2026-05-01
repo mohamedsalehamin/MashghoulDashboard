@@ -102,7 +102,7 @@ class SubscriptionResource extends Resource
                 Section::make(__('sections.basic_information'))
                     ->schema([
                         TextEntry::make('id')->label(__('forms.fields.id')),
-                        TextEntry::make('subscriber.name')->label(__('forms.fields.provider_name')),
+                        TextEntry::make('provider.name')->label(__('forms.fields.provider_name')),
                         TextEntry::make('plan.name')->label(__('menu.plan')),
                         TextEntry::make('planPrice.period_label')->label(__('forms.fields.period')),
                         TextEntry::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
@@ -147,9 +147,10 @@ class SubscriptionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['provider', 'plan', 'planPrice', 'transaction']))
             ->columns([
                 TextColumn::make('id')->label(__('forms.fields.id'))->searchable(),
-                TextColumn::make('subscriber.name')->label(__('forms.fields.provider_name'))->searchable(),
+                TextColumn::make('provider.name')->label(__('forms.fields.provider'))->searchable(),
                 TextColumn::make('plan.name')->searchable(),
                 TextColumn::make('planPrice.period_label')->label(__('forms.fields.period')),
                 TextColumn::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
@@ -205,7 +206,7 @@ class SubscriptionResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->plan?->name . ' - ' . $record->subscriber?->name;
+        return $record->plan?->name . ' - ' . $record->provider?->name;
     }
 
     public static function getNavigationGroup(): ?string

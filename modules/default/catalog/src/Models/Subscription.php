@@ -6,6 +6,7 @@ use App\DefaultPanel\Enum\ReservationStatus;
 use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
 use App\DefaultPanel\Traits\Transactionable;
 use App\Models\User;
+use App\UsersModule\Models\Provider;
 use App\Notifications\DoctorSubscribedToPlanSuccessFullyNotification;
 use App\Notifications\ReservationCanceledFromPatientNotification;
 use App\Notifications\ReservationScheduledNotification;
@@ -96,6 +97,10 @@ class Subscription extends Model {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function provider(): BelongsTo
+    {
+        return $this->belongsTo(Provider::class, 'user_id', 'user_id');
+    }
 
     public function plan()
     {
