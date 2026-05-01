@@ -17,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use MatanYadaev\EloquentSpatial\Objects\Point;
+use Cknow\Money\Money;
+use App\DefaultPanel\Enum\CouponTypes;
 
 class ProviderController extends Controller
 {
@@ -141,15 +143,27 @@ class ProviderController extends Controller
                 'discount_type' => $c->discount_type->value,
                 'discount_value' => $c->discount_value,
                 'formatted_value' => $c->formattedValue(),
-                'display_value' => $c->discount_type == \App\DefaultPanel\Enum\CouponTypes::PERCENTAGE
-                    ? $c->formattedValue()
-                    : \Cknow\Money\Money::parse($c->discount_value)->format(),
+                'display_value' => $this->couponListingDisplayValue($c),
                 'end_date' => $c->end_date?->format('d/m/Y'),
                 'applies_to' => $c->appliesToLabel(),
                 'min_order_amount' => $c->minOrderAmountFormatted(),
                 'min_order_type_label' => $c->minOrderTypeLabel(),
             ])
             ->toArray();
+    }
+
+    /**
+     * Coupon discount text for provider listing: ASCII digits only (no Arabic numerals / ر.س.) — riyal icon is in the view for fixed amounts.
+     */
+    protected function couponListingDisplayValue(Coupon $c): string
+    {
+        if ($c->discount_type === CouponTypes::PERCENTAGE) {
+            return number_format((float) $c->discount_value, 0) . '%';
+        }
+
+        $amount = (float) Money::parse($c->discount_value)->formatByDecimal();
+
+        return number_format($amount, $amount === floor($amount) ? 0 : 2);
     }
 
     protected function getPortfolioAlbums(Provider $provider): array

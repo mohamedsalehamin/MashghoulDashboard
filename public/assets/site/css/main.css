@@ -3293,6 +3293,10 @@ footer .social-icons a:hover i {
 }
 .data-card .data-item .value {
     color: #6c757d;
+    line-height: 24px;
+}
+.data-card .data-item .value .icon-saudi_riyal {
+    font-size: 22px;
 }
 .data-card .data-item .price {
     color: #001233;
