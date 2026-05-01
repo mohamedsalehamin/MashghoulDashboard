@@ -18,6 +18,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -136,6 +137,75 @@ class PlanResource extends Resource
                     ->onColor('success')
                     ->offColor('danger'),
             ])->columns(1);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make(__('sections.basic_information'))
+                    ->schema([
+                        TextEntry::make('name_ar')
+                            ->label(__('forms.fields.name_ar'))
+                            ->state(fn (Plan $record): string => $record->translationString('name', 'ar')),
+                        TextEntry::make('name_en')
+                            ->label(__('forms.fields.name_en'))
+                            ->state(fn (Plan $record): string => $record->translationString('name', 'en')),
+                        TextEntry::make('is_free')
+                            ->label(__('forms.fields.is_free_plan'))
+                            ->formatStateUsing(function (?bool $state): string {
+                                if ($state === true) {
+                                    return __('forms.fields.is_free_plan');
+                                }
+
+                                return app()->getLocale() === 'ar' ? 'باقة مدفوعة' : 'Paid plan';
+                            }),
+                        TextEntry::make('commission_percent')
+                            ->label(__('forms.fields.commission_percent'))
+                            ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? $state.'%' : '—'),
+                        TextEntry::make('status')
+                            ->label(__('forms.fields.status'))
+                            ->formatStateUsing(fn (?bool $state): string => $state ? __('panel.enums.active') : __('panel.enums.inactive')),
+                    ])
+                    ->columns(2),
+                Section::make(__('forms.fields.features'))
+                    ->schema([
+                        TextEntry::make('features')
+                            ->label('')
+                            ->formatStateUsing(function ($state): string {
+                                $features = is_array($state) ? $state : [];
+                                if ($features === []) {
+                                    return '';
+                                }
+                                $lines = [];
+                                foreach ($features as $feature) {
+                                    if (! is_array($feature)) {
+                                        continue;
+                                    }
+                                    $ar = trim((string) ($feature['ar'] ?? ''));
+                                    $en = trim((string) ($feature['en'] ?? ''));
+                                    if ($ar === '' && $en === '') {
+                                        continue;
+                                    }
+                                    $lines[] = ($ar !== '' ? $ar : '—').' / '.($en !== '' ? $en : '—');
+                                }
+
+                                return $lines !== [] ? implode("\n", $lines) : '';
+                            })
+                            ->markdown()
+                            ->placeholder('—'),
+                    ])
+                    ->visible(fn (Plan $record): bool => ! empty($record->features)),
+                Section::make(__('menu.plans').' - '.__('forms.fields.price'))
+                    ->schema([
+                        TextEntry::make('plan_price_summary')
+                            ->label('')
+                            ->state(fn (Plan $record): string => $record->planPrices
+                                ->sortBy('period')
+                                ->map(fn (PlanPrice $p) => $p->period_label.': '.$p->price->format())
+                                ->join(' | ')),
+                    ]),
+            ]);
     }
 
     public static function table(Table $table): Table

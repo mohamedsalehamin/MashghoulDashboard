@@ -67,7 +67,7 @@
                 @php
                     $plan = $row['plan'];
                     $planPrice = $row['planPrice'];
-                    $planName = is_string($plan->name) ? $plan->name : ($plan->name[app()->getLocale()] ?? $plan->name['ar'] ?? $plan->name['en'] ?? '');
+                    $planName = $plan->displayName();
                 @endphp
                 <div
                     class="col-lg-4 mb-4"

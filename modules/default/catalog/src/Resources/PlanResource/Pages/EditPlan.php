@@ -10,14 +10,14 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable
 
 class EditPlan extends EditRecord
 {
-    use Translatable;
+    //use Translatable;
 
     protected static string $resource = PlanResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(),
+            // LocaleSwitcher::make(),
         ];
     }
 

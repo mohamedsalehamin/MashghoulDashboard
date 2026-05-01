@@ -26,6 +26,33 @@ class Plan extends Model
         'commission_percent' => 'decimal:2',
     ];
 
+    /**
+     * Safely read one locale from a translatable attribute (avoids array values breaking Filament / Blade).
+     */
+    public function translationString(string $attribute, string $locale): string
+    {
+        $v = $this->getTranslation($attribute, $locale);
+        if (is_array($v)) {
+            $v = $v[$locale] ?? $v['ar'] ?? $v['en'] ?? null;
+            if ($v === null) {
+                foreach ($this->getTranslations($attribute) as $piece) {
+                    if (is_string($piece) && $piece !== '') {
+                        return $piece;
+                    }
+                }
+
+                return '';
+            }
+        }
+
+        return (string) ($v ?? '');
+    }
+
+    public function displayName(?string $locale = null): string
+    {
+        return $this->translationString('name', $locale ?? app()->getLocale());
+    }
+
     public function planPrices(): HasMany
     {
         return $this->hasMany(PlanPrice::class);

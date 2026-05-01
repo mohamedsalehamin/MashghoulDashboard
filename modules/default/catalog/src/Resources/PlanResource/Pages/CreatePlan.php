@@ -10,14 +10,14 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatab
 
 class CreatePlan extends CreateRecord
 {
-    use Translatable;
+    // use Translatable;
 
     protected static string $resource = PlanResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(),
+            // LocaleSwitcher::make(),
         ];
     }
 
