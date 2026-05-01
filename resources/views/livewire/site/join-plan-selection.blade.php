@@ -84,8 +84,8 @@
                                     <div class="package-price-amount">{{ __('site.join.free_plan') }}</div>
                                     <div class="package-period small text-muted mt-1">&nbsp;</div>
                                 @else
-                                    <div class="package-price-amount">{{ $planPrice->price->format() }}</div>
-                                    
+                                    <div class="package-price-amount">{{ $planPrice->price->formatByDecimal() }} <i class="icon-saudi_riyal"></i></div>
+
                                     <div class="package-period small text-muted mt-1">{{ $planPrice->period_label }}</div>
                                 @endif
                                
