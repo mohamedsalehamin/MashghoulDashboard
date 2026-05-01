@@ -152,7 +152,13 @@
         <div class="row align-items-md-center">
             @if($appDownload[$locale]['image'])
                 <div class="col-md-5">
-                    <img src="{{ $appDownload[$locale]['image'] }}" loading="lazy" class="img-fluid" alt>
+                    @php
+                        $appDownloadImage = (string) $appDownload[$locale]['image'];
+                        $appDownloadImageUrl = str_starts_with($appDownloadImage, 'http://') || str_starts_with($appDownloadImage, 'https://')
+                            ? $appDownloadImage
+                            : \Illuminate\Support\Facades\Storage::url($appDownloadImage);
+                    @endphp
+                    <img src="{{ $appDownloadImageUrl }}" loading="lazy" class="img-fluid" alt>
                 </div>
             @endif
             <div class="col-md-7">
