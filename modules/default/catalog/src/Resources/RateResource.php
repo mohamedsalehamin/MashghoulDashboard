@@ -246,9 +246,11 @@ class RateResource extends Resource
 
                 TextColumn::make('provider_name')
                     ->label(__('forms.fields.provider'))
-                    ->state(fn($record) => $record->provider?->name ?? $record->reservation?->reservable?->name ?? '-')
-                    ->searchable(query: function ($query, $search) {
-                        $query->whereHas('provider', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                    ->state(fn($record) => $record->providerProfile?->name ?? $record->reservation?->reservable?->name ?? '-')
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->whereHas('providerProfile', fn($q) => $q
+                            ->where('name->ar', 'like', "%{$search}%")
+                            ->orWhere('name->en', 'like', "%{$search}%"))
                               ->orWhereHas('reservation.reservable', fn($q) => $q->where('name', 'like', "%{$search}%"));
                     }),
 
@@ -341,7 +343,7 @@ class RateResource extends Resource
 
                 SelectFilter::make('provider_id')
                     ->label(__('forms.fields.provider'))
-                    ->relationship('provider', 'name')
+                    ->relationship('providerProfile', 'name')
                     ->searchable()
                     ->preload(),
 
@@ -410,9 +412,9 @@ class RateResource extends Resource
             ->components([
                 Section::make(__('panel.rating_details'))
                     ->schema([
-                        TextEntry::make('provider.name')
+                        TextEntry::make('providerProfile.name')
                             ->label(__('panel.provider'))
-                            ->state(fn($record) => $record->provider?->name ?? $record->reservation?->reservable?->name ?? '-'),
+                            ->state(fn($record) => $record->providerProfile?->name ?? $record->reservation?->reservable?->name ?? '-'),
 
                         TextEntry::make('user.name')
                             ->label(__('panel.customer'))
@@ -535,7 +537,7 @@ class RateResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['provider', 'user', 'reservation.reservable', 'reservation.customer', 'replies'])
+            ->with(['providerProfile', 'user', 'reservation.reservable', 'reservation.customer', 'replies'])
             // Show only 'service' type to avoid duplicate rows (place rating shown in same row)
             // Also show ratings without type. Always hide replies from the table.
             ->where(function ($query) {
