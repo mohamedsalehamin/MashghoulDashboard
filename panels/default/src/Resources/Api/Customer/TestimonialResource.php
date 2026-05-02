@@ -28,23 +28,12 @@ class TestimonialResource extends JsonResource
             $avatarUrl = asset('storage/'.ltrim((string) $t['avatar'], '/'));
         }
 
-        $dateRaw = $t['date'] ?? null;
-        $dateIso = null;
-        if ($dateRaw !== null && $dateRaw !== '') {
-            try {
-                $dateIso = Carbon::parse($dateRaw)->toIso8601String();
-            } catch (\Throwable) {
-                $dateIso = is_string($dateRaw) ? $dateRaw : null;
-            }
-        }
-
+       
         return [
-            'name_ar' => $t['name_ar'] ?? null,
-            'name_en' => $t['name_en'] ?? null,
-            'text_ar' => $t['text_ar'] ?? null,
-            'text_en' => $t['text_en'] ?? null,
+            'name' => $t['name_' . app()->getLocale()] ?? null,
+            'text' => $t['text_' . app()->getLocale()] ?? null,
             'rating' => (int) ($t['rating'] ?? 5),
-            'date' => $dateIso,
+            'date' => Carbon::parse($t['date'])->translatedFormat('M j, Y') ?? null,
             'type' => $type,
             'avatar_url' => $avatarUrl,
             'media_url' => $mediaUrl,
