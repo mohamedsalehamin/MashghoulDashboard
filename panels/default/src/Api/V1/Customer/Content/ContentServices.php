@@ -14,7 +14,9 @@ use App\DefaultPanel\Resources\Api\Customer\ContactTypeResource;
 use App\DefaultPanel\Resources\Api\Customer\FaqResource;
 use App\DefaultPanel\Resources\Api\Customer\PageResource;
 use App\DefaultPanel\Resources\Api\Customer\PointResource;
+use App\DefaultPanel\Resources\Api\Customer\TestimonialResource;
 use App\DefaultPanel\Settings\GeneralSettings;
+use App\DefaultPanel\Settings\LandingSettings;
 use App\Models\PointsExchange;
 use Tasawk\Api\Facade\Api;
 
@@ -41,6 +43,14 @@ class ContentServices {
 
     public function faqs() {
         return Api::isOk(__("Frequently asked questions"), FaqResource::collection(Faq::enabled()->latest()->get()));
+    }
+
+    public function testimonials() {
+        $landingSettings = new LandingSettings;
+        $raw = data_get($landingSettings->content, 'testimonials', []);
+        $items = collect($raw)->filter(fn ($row) => is_array($row));
+
+        return Api::isOk(__('sections.testimonials'), TestimonialResource::collection($items));
     }
 
     public function points() {

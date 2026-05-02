@@ -53,6 +53,7 @@ Route::prefix('v1')->group(function () {
     Route::post('join', [ContentServices::class, 'join']);
     Route::get('pages/{slug}', [ContentServices::class, 'page']);
     Route::get('faqs', [ContentServices::class, 'faqs']);
+    Route::get('testimonials', [ContentServices::class, 'testimonials']);
 
     Route::get('titles', [ContentServices::class, 'titles']);
     Route::get('locations/countries', [LocationServices::class, 'countries']);
