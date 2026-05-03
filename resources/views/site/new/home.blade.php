@@ -65,7 +65,7 @@
 <section class="home-banners pt-64">
     <div class="container">
         <div class="row">
-            @foreach($categoryBanners->take(2) as $b)
+            @foreach($categoryBanners as $b)
                 <div class="col-md-6 mb-4">
                     <a href="{{ $b->object_type === 'link' ? ($b->object_id ?? '#') : ($b->object_type === 'category' ? route('site.category.show', $b->object_id) : ($b->object_type === 'provider' ? (Route::has('site.provider.show') ? route('site.provider.show', $b->object_id) : '#') : '#')) }}" class="banner-wrapper">
                         <img src="{{ $b->getFirstMediaUrl($bannerImgCollection) }}" loading="lazy" class="img-fluid" alt="{{ $b->getTranslation('name', $locale) }}">
