@@ -95,7 +95,7 @@ class ReservationCommissionResource extends Resource {
                     ->badge()
                     ->searchable(false),
                 TextColumn::make('created_at')
-                    ->date()
+                    ->formatStateUsing(fn ($state) => filled($state) ? \Illuminate\Support\Carbon::parse($state)->format('d/m/Y') : '')
                     ->searchable(),
             ])
             ->filters([
