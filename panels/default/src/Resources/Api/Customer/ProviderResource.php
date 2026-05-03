@@ -130,7 +130,7 @@ class ProviderResource extends JsonResource
      */
     private function getActiveCoupons(): array
     {
-        $couponIds = \App\ContentModule\Models\Coupon::listingIdsForProvider($this->id);
+        $couponIds = \App\ContentModule\Models\Coupon::listingIdsForProvider($this->id, includeGeneralScope: false);
 
         if ($couponIds->isEmpty()) {
             return [];

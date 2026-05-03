@@ -2,22 +2,22 @@
 
 namespace App\ContentModule\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\DefaultPanel\Enum\CouponTypes;
 use App\DefaultPanel\Traits\Publishable;
-use App\Models\CouponProduct;
 use App\Models\CouponService;
 use App\Models\User;
 use App\UsersModule\Models\Provider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
-
-class Coupon extends Model {
+class Coupon extends Model
+{
     use Publishable;
 
-    protected $guarded = ["id"];
+    protected $guarded = ['id'];
+
     protected $casts = [
         'discount_type' => CouponTypes::class,
         'meta_data' => 'array',
@@ -26,55 +26,73 @@ class Coupon extends Model {
     ];
 
     public const SCOPE_GENERAL = 'general';
+
     public const SCOPE_PROVIDERS = 'providers';
 
     public const REQUESTED_BY_ADMIN = 'admin';
+
     public const REQUESTED_BY_PROVIDER = 'provider';
 
     public const APPLY_TARGET_ALL_ITEMS = 'all_items';
+
     public const APPLY_TARGET_ALL_ITEMS_WITHOUT_DISCOUNT = 'all_items_without_discount';
+
     public const APPLY_TARGET_SERVICES_ONLY = 'services_only';
+
     public const APPLY_TARGET_SERVICES_WITHOUT_DISCOUNT = 'services_without_discount';
+
     public const APPLY_TARGET_PRODUCTS_ONLY = 'products_only';
+
     public const APPLY_TARGET_PRODUCTS_WITHOUT_DISCOUNT = 'products_without_discount';
 
-    public function formattedValue() {
-        return $this->discount_type == CouponTypes::PERCENTAGE ? $this->discount_value . '%' : $this->discount_value;
+    public function formattedValue()
+    {
+        return $this->discount_type == CouponTypes::PERCENTAGE ? $this->discount_value.'%' : $this->discount_value;
     }
 
-    public function isAvailableToUse(): bool {
+    public function isAvailableToUse(): bool
+    {
         return $this->status && now()->between($this->start_date, $this->end_date);
     }
 
-    public function isUsedBy($user): bool {
+    public function isUsedBy($user): bool
+    {
         return $this->users()->where('user_id', $user->id)->exists();
     }
 
-    public function isUserExceedUsageTimes($user): bool {
+    public function isUserExceedUsageTimes($user): bool
+    {
         return $this->users()->where('user_id', $user->id)->count() >= $this->usage_per_user;
     }
 
-    public function users(): BelongsToMany {
+    public function users(): BelongsToMany
+    {
         return $this->belongsToMany(User::class, 'coupon_user', 'coupon_id', 'user_id');
     }
 
-    public function providers(): BelongsToMany {
+    public function providers(): BelongsToMany
+    {
         return $this->belongsToMany(Provider::class, 'coupon_provider', 'coupon_id', 'provider_id');
     }
 
-    public function applyForUser($user): void {
+    public function applyForUser($user): void
+    {
         $this->users()->attach($user->id);
     }
 
-    public function services(): HasMany {
+    public function services(): HasMany
+    {
         return $this->hasMany(CouponService::class);
     }
 
     /**
-     * Coupon IDs to surface on a provider profile (site + customer API): linked to this provider,
-     * or global scope (all providers). Caller should still filter by status / active dates as needed.
+     * Coupon IDs tied to a provider (pivot + coupon_services).
+     *
+     * @param  bool  $includeGeneralScope  When true, also includes coupons with {@see self::SCOPE_GENERAL}
+     *                                     (usable everywhere). Provider profile UIs should pass false so only
+     *                                     coupons assigned to this provider are listed.
      */
-    public static function listingIdsForProvider(int $providerId): \Illuminate\Support\Collection
+    public static function listingIdsForProvider(int $providerId, bool $includeGeneralScope = true): \Illuminate\Support\Collection
     {
         $directIds = DB::table('coupon_provider')
             ->where('provider_id', $providerId)
@@ -82,11 +100,16 @@ class Coupon extends Model {
         $viaServiceIds = DB::table('coupon_services')
             ->where('provider_id', $providerId)
             ->pluck('coupon_id');
-        $generalIds = static::query()
-            ->where('scope', self::SCOPE_GENERAL)
-            ->pluck('id');
 
-        return $directIds->merge($viaServiceIds)->merge($generalIds)->unique()->values();
+        $merged = $directIds->merge($viaServiceIds);
+
+        if ($includeGeneralScope) {
+            $merged = $merged->merge(
+                static::query()->where('scope', self::SCOPE_GENERAL)->pluck('id')
+            );
+        }
+
+        return $merged->unique()->values();
     }
 
     /**
@@ -154,5 +177,4 @@ class Coupon extends Model {
             default => __('validation.api.coupon_requires_services_or_products'),
         };
     }
-
 }

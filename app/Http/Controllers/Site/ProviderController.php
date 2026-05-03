@@ -127,7 +127,7 @@ class ProviderController extends Controller
 
     protected function getActiveCoupons(Provider $provider): array
     {
-        $couponIds = Coupon::listingIdsForProvider($provider->id);
+        $couponIds = Coupon::listingIdsForProvider($provider->id, includeGeneralScope: false);
 
         if ($couponIds->isEmpty()) {
             return [];
