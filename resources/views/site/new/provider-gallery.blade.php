@@ -65,9 +65,6 @@
                         @if(!empty($item['title']))
                         <div class="card-title">{{ $item['title'] }}</div>
                         @endif
-                        @if(!empty($item['description']))
-                        <div class="small text-muted mt-1">{{ $item['description'] }}</div>
-                        @endif
                     </div>
                 </div>
                 @endforeach
