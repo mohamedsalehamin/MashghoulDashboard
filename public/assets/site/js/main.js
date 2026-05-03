@@ -577,8 +577,8 @@ function openMediaModal(type, src, title, description) {
             `</div>`;
     } else if (type === 'audio') {
         mediaHtml =
-            `<div class="gallery-modal-media px-3 py-4">` +
-            `<audio src="${safeSrc}" class="w-100" controls autoplay preload="metadata"></audio>` +
+            `<div class="gallery-modal-media px-3 py-4 w-100">` +
+            `<audio src="${safeSrc}" class="w-100 gallery-modal-audio" controls preload="none" playsinline></audio>` +
             `</div>`;
     }
 
@@ -599,6 +599,25 @@ function openMediaModal(type, src, title, description) {
 
     const modalElement = document.getElementById('mediaModal');
     const mediaModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    if (type === 'audio') {
+        document.querySelectorAll('audio').forEach(function (el) {
+            if (!modalBody.contains(el)) {
+                el.pause();
+            }
+        });
+        modalElement.addEventListener(
+            'shown.bs.modal',
+            function tryPlayGalleryAudio() {
+                const audioEl = modalBody.querySelector('audio.gallery-modal-audio');
+                if (audioEl) {
+                    audioEl.play().catch(function () {});
+                }
+            },
+            { once: true },
+        );
+    }
+
     mediaModal.show();
 }
 
