@@ -248,35 +248,72 @@ class ProviderResource extends Resource
                                             ->label(__('forms.fields.album_title')),
                                     ]),
                                 ])->columnSpanFull(),
-                                SpatieMediaLibraryFileUpload::make('media')
-                                    ->collection('portfolio')
-                                    ->multiple()
+                                SafeRepeater::make('items')
+                                    ->label(__('forms.fields.portfolio_items'))
+                                    ->addActionLabel(__('forms.fields.add_portfolio_item'))
                                     ->reorderable()
-                                    ->customProperties(function ($file, \Filament\Schemas\Components\Utilities\Get $get) {
-                                        $albumId = $get('album_id');
+                                    ->defaultItems(0)
+                                    ->schema([
+                                        Hidden::make('item_id')
+                                            ->default(fn () => \Illuminate\Support\Str::random(12))
+                                            ->dehydrated(),
+                                        Hidden::make('album_id')
+                                            ->default(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                                                return $get('../../album_id');
+                                            })
+                                            ->dehydrated(),
+                                        Tabs::make('portfolio_item_text')->tabs([
+                                            Tab::make(__('panel.languages.arabic'))->schema([
+                                                TextInput::make('title.ar')
+                                                    ->label(__('forms.fields.portfolio_item_title')),
+                                                Textarea::make('description.ar')
+                                                    ->label(__('forms.fields.portfolio_item_description'))
+                                                    ->rows(2),
+                                            ]),
+                                            Tab::make(__('panel.languages.english'))->schema([
+                                                TextInput::make('title.en')
+                                                    ->label(__('forms.fields.portfolio_item_title')),
+                                                Textarea::make('description.en')
+                                                    ->label(__('forms.fields.portfolio_item_description'))
+                                                    ->rows(2),
+                                            ]),
+                                        ])->columnSpanFull(),
+                                        SpatieMediaLibraryFileUpload::make('media')
+                                            ->collection('portfolio')
+                                            ->label(__('forms.fields.media'))
+                                            ->customProperties(function ($file, \Filament\Schemas\Components\Utilities\Get $get) {
+                                                $albumId = $get('album_id');
+                                                $itemId = $get('item_id');
 
-                                        return ['album_id' => $albumId ?? \Illuminate\Support\Str::random(12)];
-                                    })
-                                    ->filterMediaUsing(function ($media, \Filament\Schemas\Components\Utilities\Get $get) {
-                                        $albumId = $get('album_id');
-                                        if (! $albumId) {
-                                            return $media->filter(fn ($m) => false);
-                                        }
+                                                return [
+                                                    'album_id' => $albumId ?? \Illuminate\Support\Str::random(12),
+                                                    'item_id' => $itemId ?? \Illuminate\Support\Str::random(12),
+                                                ];
+                                            })
+                                            ->filterMediaUsing(function ($media, \Filament\Schemas\Components\Utilities\Get $get) {
+                                                $albumId = $get('album_id');
+                                                $itemId = $get('item_id');
+                                                if (! $albumId || ! $itemId) {
+                                                    return $media->filter(fn ($m) => false);
+                                                }
 
-                                        return $media->filter(fn ($m) => ($m->getCustomProperty('album_id') ?? '') === $albumId);
-                                    })
-                                    ->acceptedFileTypes([
-                                        'image/jpeg',
-                                        'image/png',
-                                        'image/webp',
-                                        'image/gif',
-                                        'video/mp4',
-                                        'video/mpeg',
-                                        'audio/mpeg',
-                                        'audio/mp3',
-                                        'audio/wav',
+                                                return $media->filter(fn ($m) => (string) ($m->getCustomProperty('album_id') ?? '') === (string) $albumId
+                                                    && (string) ($m->getCustomProperty('item_id') ?? '') === (string) $itemId);
+                                            })
+                                            ->acceptedFileTypes([
+                                                'image/jpeg',
+                                                'image/png',
+                                                'image/webp',
+                                                'image/gif',
+                                                'video/mp4',
+                                                'video/mpeg',
+                                                'audio/mpeg',
+                                                'audio/mp3',
+                                                'audio/wav',
+                                            ])
+                                            ->nullable(),
                                     ])
-                                    ->nullable(),
+                                    ->columns(1),
                             ])
                             ->columns(1),
                     ])->relationship('provider'),

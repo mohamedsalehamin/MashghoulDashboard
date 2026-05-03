@@ -533,27 +533,87 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==========================================
 // Open Media Modal
 // ==========================================
-function openMediaModal(type, src) {
-    const modalBody = document.getElementById('mediaModalBody');
-
-    // Detect Content Type
-    if (type === 'image') {
-        modalBody.innerHTML = `<img src="${src}" class="img-fluid rounded shadow-lg" style="max-height: 80vh; object-fit: contain;">`;
-    } else if (type === 'video') {
-        modalBody.innerHTML = `<video src="${src}" class="w-100 rounded shadow-lg" style="max-height: 80vh;" controls autoplay></video>`;
+function escapeHtml(text) {
+    if (text === null || text === undefined) {
+        return '';
     }
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeAttr(url) {
+    if (!url) {
+        return '';
+    }
+    return String(url).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+/** @param {'image'|'video'|'audio'} type */
+function openMediaModal(type, src, title, description) {
+    const modalBody = document.getElementById('mediaModalBody');
+    if (!modalBody) {
+        return;
+    }
+
+    title = title !== undefined && title !== null ? String(title) : '';
+    description = description !== undefined && description !== null ? String(description) : '';
+
+    const safeSrc = escapeAttr(src);
+    let mediaHtml = '';
+
+    if (type === 'image') {
+        mediaHtml =
+            `<div class="gallery-modal-media">` +
+            `<img src="${safeSrc}" class="img-fluid rounded shadow-lg" alt="${escapeAttr(title)}" style="max-height:70vh;width:auto;max-width:100%;object-fit:contain;">` +
+            `</div>`;
+    } else if (type === 'video') {
+        mediaHtml =
+            `<div class="gallery-modal-media">` +
+            `<video src="${safeSrc}" class="w-100 rounded shadow-lg" style="max-height:70vh;" controls autoplay playsinline></video>` +
+            `</div>`;
+    } else if (type === 'audio') {
+        mediaHtml =
+            `<div class="gallery-modal-media px-3 py-4">` +
+            `<audio src="${safeSrc}" class="w-100" controls autoplay preload="metadata"></audio>` +
+            `</div>`;
+    }
+
+    let captionHtml = '';
+    if (title || description) {
+        captionHtml = '<div class="gallery-modal-caption mt-3 text-center">';
+        if (title) {
+            captionHtml += `<h4 class="h5 mb-2 text-dark">${escapeHtml(title)}</h4>`;
+        }
+        if (description) {
+            captionHtml += `<p class="mb-0 small text-muted lh-lg">${escapeHtml(description)}</p>`;
+        }
+        captionHtml += '</div>';
+    }
+
+    modalBody.innerHTML =
+        `<div class="d-flex flex-column align-items-center justify-content-center">${mediaHtml}${captionHtml}</div>`;
 
     const modalElement = document.getElementById('mediaModal');
     const mediaModal = bootstrap.Modal.getOrCreateInstance(modalElement);
     mediaModal.show();
 }
 
-// Clean the modal and stop the video when it is closed (with confirmation that it exists first)
+// Clean the modal and stop media when it is closed
 const mediaModalElement = document.getElementById('mediaModal');
 if (mediaModalElement) {
     mediaModalElement.addEventListener('hidden.bs.modal', function () {
         const modalBody = document.getElementById('mediaModalBody');
         if (modalBody) {
+            modalBody.querySelectorAll('video, audio').forEach(function (el) {
+                el.pause();
+                try {
+                    el.currentTime = 0;
+                } catch (e) {}
+            });
             modalBody.innerHTML = '';
         }
     });

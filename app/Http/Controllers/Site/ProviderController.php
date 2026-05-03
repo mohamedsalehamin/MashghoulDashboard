@@ -6,26 +6,27 @@ use App\CatalogModule\Models\Reservation\Rate;
 use App\ContentModule\Models\Coupon;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Actions\AddProviderCartAction;
-use App\Http\Requests\Site\AddToCartRequest;
-use Carbon\Carbon;
+use App\DefaultPanel\Enum\CouponTypes;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Site\AddToCartRequest;
+use App\Support\PortfolioAlbumPresentation;
 use App\UsersModule\Models\Provider;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use MatanYadaev\EloquentSpatial\Objects\Point;
+use Carbon\Carbon;
 use Cknow\Money\Money;
-use App\DefaultPanel\Enum\CouponTypes;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class ProviderController extends Controller
 {
     protected function sharedData(): array
     {
-        $settings = new GeneralSettings();
-        $landingSettings = new LandingSettings();
+        $settings = new GeneralSettings;
+        $landingSettings = new LandingSettings;
         $appPages = $landingSettings->content['app_pages'] ?? [];
         $pages = collect($appPages)->mapWithKeys(function ($pageId, $pageName) {
             return [$pageName => Page::find($pageId)];
@@ -73,10 +74,12 @@ class ProviderController extends Controller
         $metaKeywords = is_array($metaKeywords) ? implode(', ', $metaKeywords) : (string) $metaKeywords;
 
         $seats = $provider->seats->map(function ($seat) {
-            $services = $seat->services->map(function ($svc) use ($seat) {
+            $services = $seat->services->map(function ($svc) {
                 $svc->pivot_service_group_id = $svc->pivot?->service_group_id;
+
                 return $svc;
             });
+
             return [
                 'id' => $seat->id,
                 'title' => $seat->getTranslation('title', app()->getLocale()),
@@ -92,9 +95,9 @@ class ProviderController extends Controller
             ->where('status', 1)
             ->map(fn ($slot) => [
                 'day_name' => $slot['day_name'] ?? null,
-                'day' => isset($slot['day_name']) ? __('forms.fields.weekdays.' . $slot['day_name']) : '',
-                'from' => !empty($slot['from']) ? Carbon::parse($slot['from'])->locale(app()->getLocale())->translatedFormat('h:i A') : '',
-                'to' => !empty($slot['to']) ? Carbon::parse($slot['to'])->locale(app()->getLocale())->translatedFormat('h:i A') : '',
+                'day' => isset($slot['day_name']) ? __('forms.fields.weekdays.'.$slot['day_name']) : '',
+                'from' => ! empty($slot['from']) ? Carbon::parse($slot['from'])->locale(app()->getLocale())->translatedFormat('h:i A') : '',
+                'to' => ! empty($slot['to']) ? Carbon::parse($slot['to'])->locale(app()->getLocale())->translatedFormat('h:i A') : '',
             ])
             ->filter(fn ($s) => $s['day_name'])
             ->values();
@@ -158,7 +161,7 @@ class ProviderController extends Controller
     protected function couponListingDisplayValue(Coupon $c): string
     {
         if ($c->discount_type === CouponTypes::PERCENTAGE) {
-            return number_format((float) $c->discount_value, 0) . '%';
+            return number_format((float) $c->discount_value, 0).'%';
         }
 
         $amount = (float) Money::parse($c->discount_value)->formatByDecimal();
@@ -168,39 +171,7 @@ class ProviderController extends Controller
 
     protected function getPortfolioAlbums(Provider $provider): array
     {
-        $locale = app()->getLocale();
-        $albums = collect($provider->meta_data['portfolio_albums'] ?? []);
-        $allMedia = $provider->getMedia('portfolio');
-
-        if ($albums->isEmpty() && $allMedia->isNotEmpty()) {
-            return [[
-                'title' => __('site.heading.gallery'),
-                'items' => $allMedia->map(fn ($m) => [
-                    'id' => $m->id,
-                    'url' => $m->getUrl(),
-                    'type' => str_starts_with($m->mime_type ?? '', 'video/') ? 'video' : (str_starts_with($m->mime_type ?? '', 'audio/') ? 'audio' : 'image'),
-                    'title' => $m->getCustomProperty('title') ?? '',
-                ])->values()->all(),
-            ]];
-        }
-
-        return $albums->map(function ($album) use ($allMedia, $locale) {
-            $albumId = $album['album_id'] ?? null;
-            $title = is_array($album['title'] ?? null)
-                ? ($album['title'][$locale] ?? $album['title']['ar'] ?? $album['title']['en'] ?? '')
-                : ($album['title'] ?? '');
-            $items = $allMedia
-                ->filter(fn ($m) => ($m->getCustomProperty('album_id') ?? '') === $albumId)
-                ->map(fn ($m) => [
-                    'id' => $m->id,
-                    'url' => $m->getUrl(),
-                    'type' => str_starts_with($m->mime_type ?? '', 'video/') ? 'video' : (str_starts_with($m->mime_type ?? '', 'audio/') ? 'audio' : 'image'),
-                    'title' => $m->getCustomProperty('title') ?? '',
-                ])
-                ->values()
-                ->all();
-            return ['title' => $title, 'items' => $items];
-        })->filter(fn ($a) => ! empty($a['items']))->values()->all();
+        return PortfolioAlbumPresentation::forProvider($provider);
     }
 
     protected function getGroupedRates(Provider $provider): array
@@ -215,7 +186,7 @@ class ProviderController extends Controller
             ->latest()
             ->get();
 
-        $grouped = $allRatings->groupBy(fn ($r) => $r->pair_id ?? $r->reservation_id ?? 'single_' . $r->id);
+        $grouped = $allRatings->groupBy(fn ($r) => $r->pair_id ?? $r->reservation_id ?? 'single_'.$r->id);
 
         return $grouped->take(10)->map(function ($group) {
             $serviceRating = $group->firstWhere('type', 'service');

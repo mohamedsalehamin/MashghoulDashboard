@@ -8,6 +8,7 @@ use App\ContentModule\Models\Country;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Forms\Components\SafeRepeater;
+use App\Support\PortfolioAlbumsFormState;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -225,35 +226,72 @@ class EditProfilePage extends Page
                                                 ->label(__('forms.fields.album_title')),
                                         ]),
                                     ])->columnSpanFull(),
-                                    SpatieMediaLibraryFileUpload::make('media')
-                                        ->collection('portfolio')
-                                        ->multiple()
+                                    SafeRepeater::make('items')
+                                        ->label(__('forms.fields.portfolio_items'))
+                                        ->addActionLabel(__('forms.fields.add_portfolio_item'))
                                         ->reorderable()
-                                        ->customProperties(function ($file, \Filament\Schemas\Components\Utilities\Get $get) {
-                                            $albumId = $get('album_id');
+                                        ->defaultItems(0)
+                                        ->schema([
+                                            Hidden::make('item_id')
+                                                ->default(fn () => \Illuminate\Support\Str::random(12))
+                                                ->dehydrated(),
+                                            Hidden::make('album_id')
+                                                ->default(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                                                    return $get('../../album_id');
+                                                })
+                                                ->dehydrated(),
+                                            Tabs::make('portfolio_item_text')->tabs([
+                                                Tab::make(__('panel.languages.arabic'))->schema([
+                                                    TextInput::make('title.ar')
+                                                        ->label(__('forms.fields.portfolio_item_title')),
+                                                    Textarea::make('description.ar')
+                                                        ->label(__('forms.fields.portfolio_item_description'))
+                                                        ->rows(2),
+                                                ]),
+                                                Tab::make(__('panel.languages.english'))->schema([
+                                                    TextInput::make('title.en')
+                                                        ->label(__('forms.fields.portfolio_item_title')),
+                                                    Textarea::make('description.en')
+                                                        ->label(__('forms.fields.portfolio_item_description'))
+                                                        ->rows(2),
+                                                ]),
+                                            ])->columnSpanFull(),
+                                            SpatieMediaLibraryFileUpload::make('media')
+                                                ->collection('portfolio')
+                                                ->label(__('forms.fields.media'))
+                                                ->customProperties(function ($file, \Filament\Schemas\Components\Utilities\Get $get) {
+                                                    $albumId = $get('album_id');
+                                                    $itemId = $get('item_id');
 
-                                            return ['album_id' => $albumId ?? \Illuminate\Support\Str::random(12)];
-                                        })
-                                        ->filterMediaUsing(function ($media, \Filament\Schemas\Components\Utilities\Get $get) {
-                                            $albumId = $get('album_id');
-                                            if (! $albumId) {
-                                                return $media->filter(fn ($m) => false);
-                                            }
+                                                    return [
+                                                        'album_id' => $albumId ?? \Illuminate\Support\Str::random(12),
+                                                        'item_id' => $itemId ?? \Illuminate\Support\Str::random(12),
+                                                    ];
+                                                })
+                                                ->filterMediaUsing(function ($media, \Filament\Schemas\Components\Utilities\Get $get) {
+                                                    $albumId = $get('album_id');
+                                                    $itemId = $get('item_id');
+                                                    if (! $albumId || ! $itemId) {
+                                                        return $media->filter(fn ($m) => false);
+                                                    }
 
-                                            return $media->filter(fn ($m) => ($m->getCustomProperty('album_id') ?? '') === $albumId);
-                                        })
-                                        ->acceptedFileTypes([
-                                            'image/jpeg',
-                                            'image/png',
-                                            'image/webp',
-                                            'image/gif',
-                                            'video/mp4',
-                                            'video/mpeg',
-                                            'audio/mpeg',
-                                            'audio/mp3',
-                                            'audio/wav',
+                                                    return $media->filter(fn ($m) => (string) ($m->getCustomProperty('album_id') ?? '') === (string) $albumId
+                                                        && (string) ($m->getCustomProperty('item_id') ?? '') === (string) $itemId);
+                                                })
+                                                ->acceptedFileTypes([
+                                                    'image/jpeg',
+                                                    'image/png',
+                                                    'image/webp',
+                                                    'image/gif',
+                                                    'video/mp4',
+                                                    'video/mpeg',
+                                                    'audio/mpeg',
+                                                    'audio/mp3',
+                                                    'audio/wav',
+                                                ])
+                                                ->nullable(),
                                         ])
-                                        ->nullable(),
+                                        ->columns(1),
                                 ])
                                 ->columns(1),
                         ])->relationship('provider'),
@@ -350,11 +388,8 @@ class EditProfilePage extends Page
         if (! is_array($albums)) {
             return;
         }
-        $normalized = collect($albums)
-            ->filter(fn ($item) => is_array($item))
-            ->unique('album_id')
-            ->values()
-            ->all();
+        $provider = provider()->user?->provider;
+        $normalized = PortfolioAlbumsFormState::normalizeAlbums($provider, $albums);
         data_set($this->record, 'provider.meta_data.portfolio_albums', $normalized);
     }
 
@@ -382,11 +417,12 @@ class EditProfilePage extends Page
             'meta_data',
         ])->toArray();
 
-        $portfolioAlbums = collect(data_get($providerPayload, 'meta_data.portfolio_albums', []))
-            ->filter(fn ($item) => is_array($item))
-            ->unique('album_id')
-            ->values()
-            ->all();
+        $portfolioAlbums = PortfolioAlbumsFormState::normalizeIncomingMeta(
+            collect(data_get($providerPayload, 'meta_data.portfolio_albums', []))
+                ->filter(fn ($item) => is_array($item))
+                ->values()
+                ->all()
+        );
         data_set($providerPayload, 'meta_data.portfolio_albums', $portfolioAlbums);
         data_set($this->record, 'provider.meta_data.portfolio_albums', $portfolioAlbums);
 
@@ -398,13 +434,22 @@ class EditProfilePage extends Page
         // Removing a portfolio repeater row only updates form state; media rows remain until removed.
         $providerModel = $this->form->model->provider()->first();
         if ($providerModel) {
-            $allowedAlbumIds = collect(data_get($this->record, 'provider.meta_data.portfolio_albums', []))
-                ->pluck('album_id')
-                ->filter(fn ($id) => $id !== null && $id !== '')
-                ->unique();
+            $pairs = PortfolioAlbumsFormState::allowedAlbumItemPairs(
+                data_get($this->record, 'provider.meta_data.portfolio_albums', [])
+            );
+            $allowedAlbumIds = $pairs->pluck('album_id')->unique();
             foreach ($providerModel->getMedia('portfolio') as $mediaItem) {
                 $albumId = $mediaItem->getCustomProperty('album_id');
+                $itemId = (string) ($mediaItem->getCustomProperty('item_id') ?? '');
                 if ($albumId !== null && $albumId !== '' && ! $allowedAlbumIds->contains($albumId)) {
+                    $mediaItem->delete();
+
+                    continue;
+                }
+                if ($itemId === '') {
+                    continue;
+                }
+                if (! $pairs->contains(fn (array $p) => $p['album_id'] === (string) $albumId && $p['item_id'] === $itemId)) {
                     $mediaItem->delete();
                 }
             }

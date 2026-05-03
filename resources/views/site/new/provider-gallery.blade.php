@@ -28,30 +28,45 @@
                     <div class="single-gallery-card p-0 border-0 h-100 bg-transparent shadow-none">
                         @if(($item['type'] ?? '') === 'video')
                         <div class="testimonial-media-wrapper m-0 rounded-4 overflow-hidden shadow-sm h-100"
-                            onclick="openMediaModal('video', '{{ $item['url'] }}')">
+                            style="cursor: pointer;"
+                            role="button"
+                            tabindex="0"
+                            onclick="openMediaModal('video', @js($item['url']), @js($item['title'] ?? ''), @js($item['description'] ?? ''))"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                             <img src="{{ $item['url'] }}" class="testimonial-media-img" alt="{{ $item['title'] ?? '' }}" onerror="this.src='{{ $assetBase }}/images/about.webp'">
                             <div class="play-overlay-btn">
                                 <i class="fa-solid fa-play"></i>
                             </div>
                         </div>
                         @elseif(($item['type'] ?? '') === 'audio')
-                        <div class="testimonial-media-wrapper testimonial-media-wrapper--dark m-0 rounded-4 overflow-hidden shadow-sm h-100">
+                        <div class="testimonial-media-wrapper testimonial-media-wrapper--dark m-0 rounded-4 overflow-hidden shadow-sm h-100"
+                            style="cursor: pointer;"
+                            role="button"
+                            tabindex="0"
+                            onclick="openMediaModal('audio', @js($item['url']), @js($item['title'] ?? ''), @js($item['description'] ?? ''))"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                             <div class="audio-player-wrapper">
-                                <button class="btn btn-blue play-audio-btn d-flex align-items-center justify-content-center" onclick="toggleAudio(this)">
-                                    <i class="fa-solid fa-play"></i>
-                                </button>
-                                <img src="{{ $assetBase }}/images/audio-waves.png" class="waveform-img" alt="Waveform">
-                                <audio src="{{ $item['url'] }}" onended="resetAudio(this)"></audio>
+                                <span class="btn btn-blue play-audio-btn d-flex align-items-center justify-content-center" style="pointer-events: none;" aria-hidden="true">
+                                    <i class="fa-solid fa-headphones"></i>
+                                </span>
+                                <img src="{{ $assetBase }}/images/audio-waves.png" class="waveform-img" alt="">
                             </div>
                         </div>
                         @else
                         <div class="testimonial-media-wrapper m-0 rounded-4 overflow-hidden shadow-sm h-100"
-                            onclick="openMediaModal('image', '{{ $item['url'] }}')">
+                            style="cursor: pointer;"
+                            role="button"
+                            tabindex="0"
+                            onclick="openMediaModal('image', @js($item['url']), @js($item['title'] ?? ''), @js($item['description'] ?? ''))"
+                            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                             <img src="{{ $item['url'] }}" class="testimonial-media-img" alt="{{ $item['title'] ?? '' }}">
                         </div>
                         @endif
                         @if(!empty($item['title']))
                         <div class="card-title">{{ $item['title'] }}</div>
+                        @endif
+                        @if(!empty($item['description']))
+                        <div class="small text-muted mt-1">{{ $item['description'] }}</div>
                         @endif
                     </div>
                 </div>
@@ -68,12 +83,12 @@
 </div>
 <!-- Start Media Modal -->
 <div class="modal fade" id="mediaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-header border-0 justify-content-end p-0 mb-2">
-                <button type="button" class="btn-close btn-close-white modal-invert-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content bg-white border-0 rounded-4 shadow">
+            <div class="modal-header border-0 justify-content-end py-2 px-3">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center p-0" id="mediaModalBody"></div>
+            <div class="modal-body text-center px-3 pb-4 pt-0" id="mediaModalBody"></div>
         </div>
     </div>
 </div>
