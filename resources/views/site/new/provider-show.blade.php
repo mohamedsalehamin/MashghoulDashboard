@@ -6,7 +6,7 @@
     $assetBase = asset('assets/site');
     $providerName = $provider->getTranslation('name', $locale);
     $providerBio = $provider->getTranslation('bio', $locale);
-    $avgRate = (float) ($provider->rate_avg_rate ?? $provider->rate()->avg('rate') ?? 0);
+    $avgRate = $provider->getCustomerAverageRating();
     $media = $provider->getMedia('images');
     $firstSeat = $seats->first();
     $reservationFees = 0;

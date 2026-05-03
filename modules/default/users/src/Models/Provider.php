@@ -2,12 +2,10 @@
 
 namespace App\UsersModule\Models;
 
-
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Reservation\Rate;
-use App\CatalogModule\Models\Subscription;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\Subscription;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\DefaultPanel\Settings\GeneralSettings;
@@ -15,6 +13,7 @@ use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -28,19 +27,20 @@ use Theamostafa\Wallet\Traits\HasWallet;
 
 class Provider extends Model implements HasMedia, Sitemapable
 {
-    use InteractsWithMedia, HasWallet, HasTranslations;
     use Favoriteable;
     use HasSpatial;
+    use HasTranslations, HasWallet, InteractsWithMedia;
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
     protected array $translatable = ['name', 'bio', 'meta_description', 'meta_keywords'];
 
     protected $casts = [
         'location' => Point::class,
         'meta_data' => 'array',
-//        'name'=>'array',
-//        'bio'=>'array',
+        //        'name'=>'array',
+        //        'bio'=>'array',
     ];
 
     public function registerMediaCollections(): void
@@ -52,7 +52,7 @@ class Provider extends Model implements HasMedia, Sitemapable
                 // Videos
                 'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm',
                 // Audio
-                'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac'
+                'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/aac',
             ]);
     }
 
@@ -60,26 +60,30 @@ class Provider extends Model implements HasMedia, Sitemapable
      * Override bootHasWallet to prevent wallet creation during pluck operations
      * when the model doesn't have an ID yet.
      */
-    protected static function bootHasWallet() {
+    protected static function bootHasWallet()
+    {
         static::retrieved(function ($model) {
             // Only create wallet if model has an ID and wallet doesn't exist
-            if ($model->id && !$model->wallet()->exists()) {
+            if ($model->id && ! $model->wallet()->exists()) {
                 $model->wallet()->create(['balance' => 0, 'name' => 'Default Wallet']);
             }
         });
     }
 
-    public function scopeEnabled($builder) {
+    public function scopeEnabled($builder)
+    {
         return $builder
             ->whereHas('user', fn ($q) => $q->where('active', 1))
             ->whereHas('activeSubscription');
     }
 
-    public function city() {
+    public function city()
+    {
         return $this->belongsTo(City::class);
     }
 
-    protected function location(): Attribute {
+    protected function location(): Attribute
+    {
         return Attribute::make(
             set: function ($coordinate) {
                 return (new Point($coordinate['lat'], $coordinate['lng']))->toSqlExpression($this->getConnection());
@@ -87,7 +91,8 @@ class Provider extends Model implements HasMedia, Sitemapable
         );
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
@@ -113,11 +118,13 @@ class Provider extends Model implements HasMedia, Sitemapable
         return $avatar !== '' ? $avatar : $user->getFirstMediaUrl();
     }
 
-    public function subscriptions() {
+    public function subscriptions()
+    {
         return $this->hasMany(Subscription::class, 'user_id', 'user_id');
     }
 
-    public function activeSubscription() {
+    public function activeSubscription()
+    {
         return $this->hasOne(Subscription::class, 'user_id', 'user_id')
             ->where('status', \App\DefaultPanel\Enum\SubscriptionsStatusEnum::PROCESSING)
             ->where('start_date', '<=', now())
@@ -125,19 +132,23 @@ class Provider extends Model implements HasMedia, Sitemapable
             ->latest();
     }
 
-    public function hasActiveSubscription(): bool {
+    public function hasActiveSubscription(): bool
+    {
         return $this->activeSubscription()->exists();
     }
 
-    public function reservations(): MorphMany {
+    public function reservations(): MorphMany
+    {
         return $this->morphMany(Reservation::class, 'reservable');
     }
 
-    public function seats() {
+    public function seats()
+    {
         return $this->hasMany(Seat::class);
     }
 
-    public function rate() {
+    public function rate()
+    {
         return $this->hasManyThrough(Rate::class, Reservation::class, 'reservable_id', 'reservation_id');
     }
 
@@ -146,33 +157,35 @@ class Provider extends Model implements HasMedia, Sitemapable
      * This includes ratings through reservations and direct manual ratings
      * Grouped by pair_id or reservation_id (one rating per group, preferring service type)
      */
-    public function allRates() {
+    public function allRates()
+    {
         // Get all matching ratings with minimal columns for grouping
-        $allRatings = Rate::where(function($query) {
+        $allRatings = Rate::where(function ($query) {
             // Reservation-based ratings
-            $query->whereHas('reservation', function($q) {
+            $query->whereHas('reservation', function ($q) {
                 $q->where('reservable_type', static::class)
-                  ->where('reservable_id', $this->id);
+                    ->where('reservable_id', $this->id);
             })
             // OR manual ratings with this provider
-            ->orWhere(function($q) {
-                $q->where('provider_id', $this->user_id)
-                  ->where('source', 'manual');
-            });
+                ->orWhere(function ($q) {
+                    $q->where('provider_id', $this->user_id)
+                        ->where('source', 'manual');
+                });
         })
-        ->whereNull('parent_id') // Only top-level ratings, not replies
-        ->where('is_approved', true)
-        ->select('id', 'type', 'pair_id', 'reservation_id', 'created_at')
-        ->get();
+            ->whereNull('parent_id') // Only top-level ratings, not replies
+            ->where('is_approved', true)
+            ->select('id', 'type', 'pair_id', 'reservation_id', 'created_at')
+            ->get();
 
         // Group by pair_id or reservation_id
-        $grouped = $allRatings->groupBy(function($rate) {
-            return $rate->pair_id ?? $rate->reservation_id ?? 'single_' . $rate->id;
+        $grouped = $allRatings->groupBy(function ($rate) {
+            return $rate->pair_id ?? $rate->reservation_id ?? 'single_'.$rate->id;
         });
 
         // For each group, prefer service rating, otherwise take place rating
-        $selectedIds = $grouped->map(function($group) {
+        $selectedIds = $grouped->map(function ($group) {
             $serviceRating = $group->firstWhere('type', 'service');
+
             return ($serviceRating ?: $group->first())->id;
         })->values()->toArray();
 
@@ -183,18 +196,44 @@ class Provider extends Model implements HasMedia, Sitemapable
         return Rate::whereIn('id', $selectedIds)->orderBy('created_at', 'desc');
     }
 
-    public function category(): BelongsTo {
+    public function category(): BelongsTo
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function avgRate(): float|int {
-        return (float)$this->rate()->avg('rate') ?? 0;
+    public function avgRate(): float|int
+    {
+        return (float) $this->rate()->avg('rate') ?? 0;
+    }
+
+    /**
+     * Average of approved top-level ratings (reservations + manual), same rule as API customer ProviderResource::rate.
+     */
+    public function getCustomerAverageRating(): float
+    {
+        $avg = Rate::query()
+            ->where(function ($query) {
+                $query->whereHas('reservation', function ($q) {
+                    $q->where('reservable_type', static::class)
+                        ->where('reservable_id', $this->id);
+                })
+                    ->orWhere(function ($q) {
+                        $q->where('provider_id', $this->user_id)
+                            ->where('source', Rate::SOURCE_MANUAL);
+                    });
+            })
+            ->whereNull('parent_id')
+            ->where('is_approved', true)
+            ->whereNotNull('rate')
+            ->avg('rate');
+
+        return (float) ($avg ?? 0);
     }
 
     public function getReservationFeesIncludeTaxesAttribute(): float|int|string
     {
         $taxes = $this->city->state->country->taxes;
-        $reservationFees = (new GeneralSettings())->reservations_fess;
+        $reservationFees = (new GeneralSettings)->reservations_fess;
         $taxes = $reservationFees / 100 * $taxes;
 
         return $taxes + $reservationFees;

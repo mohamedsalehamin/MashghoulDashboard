@@ -27,10 +27,13 @@
     </div>
     <div class="product-info">
         <div class="product-title"><a href="{{ route('site.provider.show', $provider->id) }}">{{ $provider->getTranslation('name', $locale) }}</a></div>
-        @if($provider->rate_avg_rate)
+        @php
+            $avgRating = $provider->getCustomerAverageRating();
+        @endphp
+        @if($avgRating > 0)
             <div class="rating">
                 @for($i = 1; $i <= 5; $i++)
-                    <i class="fa-solid fa-star {{ $i <= round($provider->rate_avg_rate) ? '' : 'text-muted' }}"></i>
+                    <i class="fa-solid fa-star {{ $i <= round($avgRating) ? '' : 'text-muted' }}"></i>
                 @endfor
             </div>
         @else

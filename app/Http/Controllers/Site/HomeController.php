@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\CatalogModule\Models\Reservation\Rate;
 use App\ContentModule\Models\Banner;
-use App\ContentModule\Models\Slider;
 use App\ContentModule\Models\Category;
+use App\ContentModule\Models\Faq;
 use App\ContentModule\Models\Page;
-use App\Http\Controllers\Controller;
+use App\ContentModule\Models\Slider;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
-use App\ContentModule\Models\Faq;
+use App\Http\Controllers\Controller;
 use App\UsersModule\Models\Provider;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
@@ -17,8 +18,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $settings = new GeneralSettings();
-        $landingSettings = new LandingSettings();
+        $settings = new GeneralSettings;
+        $landingSettings = new LandingSettings;
         $appPages = $landingSettings->content['app_pages'] ?? [];
         $pages = collect($appPages)->mapWithKeys(function ($pageId, $pageName) {
             return [$pageName => Page::find($pageId)];
@@ -41,12 +42,22 @@ class HomeController extends Controller
         $userLng = (float) session('user_longitude', request()->get('longitude', 0));
         $point = new Point($userLat, $userLng);
 
+        $providersTable = (new Provider)->getTable();
+        $reservableType = Provider::class;
+
+        $customerAvgSql = '(select avg(`rr`.`rate`) from `reservation_rates` as `rr`
+            left join `reservations` as `res` on `rr`.`reservation_id` = `res`.`id`
+            where `rr`.`parent_id` is null and `rr`.`is_approved` = 1 and `rr`.`rate` is not null
+            and (
+                (`res`.`reservable_type` = ? and `res`.`reservable_id` = `'.$providersTable.'`.`id`)
+                or (`rr`.`provider_id` = `'.$providersTable.'`.`user_id` and `rr`.`source` = ?)
+            ))';
+
         $nearestProviders = $locationSet
             ? Provider::enabled()
                 ->withoutTrashed()
                 ->whereHas('user')
                 ->withDistanceSphere('location', $point)
-                ->withAvg('rate', 'rate')
                 ->orderBy('distance', 'asc')
                 ->limit(10)
                 ->get()
@@ -56,8 +67,7 @@ class HomeController extends Controller
             ->withoutTrashed()
             ->whereHas('user')
             ->withDistanceSphere('location', $point)
-            ->withAvg('rate', 'rate')
-            ->orderBy('rate_avg_rate', 'desc')
+            ->orderByRaw($customerAvgSql.' desc', [$reservableType, Rate::SOURCE_MANUAL])
             ->limit(10)
             ->get();
 
