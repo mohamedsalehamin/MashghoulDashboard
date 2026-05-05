@@ -5,6 +5,7 @@ namespace App\UsersModule\Resources;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
+use App\ContentModule\Models\ProviderActivity;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\ModelStatus;
@@ -157,6 +158,16 @@ class ProviderResource extends Resource
 
                                 return Category::pluck('name', 'id');
                             }),
+                        Select::make('provider_activity_id')
+                            ->label(__('forms.fields.provider_activity_id'))
+                            ->options(fn () => ProviderActivity::query()
+                                ->enabled()
+                                ->orderBy('sort')
+                                ->orderBy('id')
+                                ->get()
+                                ->mapWithKeys(fn (ProviderActivity $activity) => [
+                                    $activity->id => $activity->getTranslation('name', app()->getLocale()),
+                                ])),
                         Select::make('country_id')
                             ->live()
                             ->required()
@@ -392,6 +403,8 @@ class ProviderResource extends Resource
 
                 TextColumn::make('name')->label(__('forms.fields.provider_account_name'))->searchable(),
                 TextColumn::make('provider.name')->label(__('forms.fields.provider_name')),
+                TextColumn::make('provider.providerActivity.name')
+                    ->label(__('forms.fields.provider_activity_id')),
                 TextColumn::make('phone')
                     ->searchable(),
                 TextColumn::make('provider.city.state.country.name')

@@ -383,6 +383,7 @@ return [
         'receipt' => 'receipt',
         'edit' => 'edit',
         'category_id' => 'category',
+        'provider_activity_id' => 'Provider activity',
         'payment_data_paid_at' => 'payment data paid at',
         'address' => 'address',
         'institution_activity' => 'institution activity',

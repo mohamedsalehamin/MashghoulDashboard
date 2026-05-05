@@ -197,6 +197,7 @@ return [
 
         'edit' => 'تعديل',
         'category_id' => 'القسم',
+        'provider_activity_id' => 'نشاط مقدم الخدمة',
         'shipping_id' => 'رقم الشحنة',
         'shipping_public_id' => 'رقم الشحنة العام',
         'payment_data_paid_at' => 'تاريخ الدفع',

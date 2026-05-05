@@ -8,6 +8,7 @@ use App\CatalogModule\Models\Seat;
 use App\CatalogModule\Models\Subscription;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
+use App\ContentModule\Models\ProviderActivity;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
@@ -199,6 +200,11 @@ class Provider extends Model implements HasMedia, Sitemapable
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function providerActivity(): BelongsTo
+    {
+        return $this->belongsTo(ProviderActivity::class);
     }
 
     public function avgRate(): float|int

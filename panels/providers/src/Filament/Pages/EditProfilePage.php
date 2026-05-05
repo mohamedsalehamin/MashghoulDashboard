@@ -5,6 +5,7 @@ namespace App\ProviderPanel\Filament\Pages;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\Country;
+use App\ContentModule\Models\ProviderActivity;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Forms\Components\SafeRepeater;
@@ -137,6 +138,16 @@ class EditProfilePage extends Page
 
                                     return Category::pluck('name', 'id');
                                 }),
+                            Select::make('provider_activity_id')
+                                ->label(__('forms.fields.provider_activity_id'))
+                                ->options(fn () => ProviderActivity::query()
+                                    ->enabled()
+                                    ->orderBy('sort')
+                                    ->orderBy('id')
+                                    ->get()
+                                    ->mapWithKeys(fn (ProviderActivity $activity) => [
+                                        $activity->id => $activity->getTranslation('name', app()->getLocale()),
+                                    ])),
                             Select::make('country_id')
                                 ->live()
                                 ->required()

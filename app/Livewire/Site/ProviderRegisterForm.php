@@ -5,6 +5,7 @@ namespace App\Livewire\Site;
 use App\CatalogModule\Models\Plan;
 use App\CatalogModule\Models\PlanPrice;
 use App\ContentModule\Models\Category;
+use App\ContentModule\Models\ProviderActivity;
 use App\DefaultPanel\Enum\GenderEnum;
 use App\DefaultPanel\Enum\UserStatus;
 use App\DefaultPanel\Rules\ProviderRegistrationPhoneRule;
@@ -12,6 +13,7 @@ use App\UsersModule\Models\Provider as ProviderProfile;
 use App\UsersModule\Models\Users\Provider as ProviderUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class ProviderRegisterForm extends Component
@@ -42,6 +44,8 @@ class ProviderRegisterForm extends Component
 
     public $category_id = null;
 
+    public $provider_activity_id = null;
+
     public bool $terms = false;
 
     public function mount(): void
@@ -56,7 +60,7 @@ class ProviderRegisterForm extends Component
 
     protected function fullPhone(): string
     {
-        return '+' . $this->country_code . preg_replace('/\D/', '', $this->phone ?? '');
+        return '+'.$this->country_code.preg_replace('/\D/', '', $this->phone ?? '');
     }
 
     protected function rules(): array
@@ -69,7 +73,7 @@ class ProviderRegisterForm extends Component
                 'required',
                 'string',
                 function (string $attribute, mixed $value, \Closure $fail) {
-                    (new ProviderRegistrationPhoneRule())->validate($attribute, $this->fullPhone(), $fail);
+                    (new ProviderRegistrationPhoneRule)->validate($attribute, $this->fullPhone(), $fail);
                 },
             ],
             'gender' => ['required', 'in:male,female'],
@@ -79,6 +83,10 @@ class ProviderRegisterForm extends Component
             'state_id' => ['required', 'exists:states,id'],
             'city_id' => ['required', 'exists:cities,id'],
             'category_id' => ['required', 'exists:categories,id'],
+            'provider_activity_id' => [
+                'required',
+                Rule::exists('provider_activities', 'id')->where(fn ($q) => $q->where('status', 1)),
+            ],
             'terms' => ['accepted'],
         ];
     }
@@ -109,7 +117,7 @@ class ProviderRegisterForm extends Component
         $user = DB::transaction(function () use ($phoneFormatted) {
             /** @var ProviderUser $user */
             $user = ProviderUser::create([
-                'name' => trim($this->first_name . ' ' . $this->last_name),
+                'name' => trim($this->first_name.' '.$this->last_name),
                 'email' => $this->email,
                 'phone' => $phoneFormatted,
                 'password' => $this->password,
@@ -136,6 +144,7 @@ class ProviderRegisterForm extends Component
                 'name' => $name,
                 'bio' => $bio,
                 'category_id' => $this->category_id,
+                'provider_activity_id' => $this->provider_activity_id,
                 'city_id' => $this->city_id,
             ]);
 
@@ -219,6 +228,15 @@ class ProviderRegisterForm extends Component
             ->get();
     }
 
+    public function getProviderActivitiesProperty()
+    {
+        return ProviderActivity::query()
+            ->enabled()
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get();
+    }
+
     public function render()
     {
         $locale = app()->getLocale();
@@ -228,6 +246,7 @@ class ProviderRegisterForm extends Component
             'states' => $this->states,
             'cities' => $this->cities,
             'categories' => $this->categories,
+            'providerActivities' => $this->providerActivities,
             'locale' => $locale,
         ]);
     }

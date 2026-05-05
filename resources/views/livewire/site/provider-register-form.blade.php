@@ -98,6 +98,17 @@
             @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
         </div>
 
+        <div class="form-group mb-3">
+            <label class="form-label mb-1">{{ __('site.fields.provider_activity') }}</label>
+            <select wire:model="provider_activity_id" class="form-select auth-input @error('provider_activity_id') is-invalid @enderror">
+                <option value="">{{ __('site.enum.select') }}</option>
+                @foreach($providerActivities as $activity)
+                    <option value="{{ $activity->id }}">{{ $activity->getTranslation('name', $locale) }}</option>
+                @endforeach
+            </select>
+            @error('provider_activity_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        </div>
+
         <div class="form-group mb-4">
             <label class="d-flex align-items-start gap-2">
                 <input type="checkbox" wire:model="terms" class="mt-1">
