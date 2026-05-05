@@ -24,15 +24,15 @@ class AddReservationCommissionAction
     {
         $provider = $reservation->reservable;
 
-        if (!$provider instanceof Provider) {
+        if (! $provider instanceof Provider) {
             return $this->fallbackPercentage();
         }
 
         $subscription = $provider->activeSubscription()->with('plan')->first();
-        $plan = $subscription?->plan;
+        $commissionPercent = $subscription?->resolvedPlanCommissionPercent();
 
-        if ($plan && $plan->commission_percent !== null && $plan->commission_percent !== '') {
-            return (float) (100 - $plan->commission_percent);
+        if ($commissionPercent !== null) {
+            return (float) (100 - $commissionPercent);
         }
 
         return $this->fallbackPercentage();

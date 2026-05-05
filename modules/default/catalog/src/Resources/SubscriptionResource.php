@@ -4,27 +4,25 @@ namespace App\CatalogModule\Resources;
 
 use App\CatalogModule\Models\Plan;
 use App\CatalogModule\Models\Subscription;
-use App\DefaultPanel\Enum\ReservationPaymentStatus;
-use App\UsersModule\Models\Provider;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\CreateSubscription;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\EditSubscription;
-use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptions;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptionActivities;
+use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptions;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ViewSubscription;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
+use App\UsersModule\Models\Provider;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +33,8 @@ class SubscriptionResource extends Resource
 
     protected static ?string $model = Subscription::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
@@ -72,7 +71,7 @@ class SubscriptionResource extends Resource
                     ->live()
                     ->visibleOn('create')
                     ->afterStateUpdated(function ($state, $set) {
-                        if (!$state) {
+                        if (! $state) {
                             return;
                         }
                         $planPrice = \App\CatalogModule\Models\PlanPrice::find($state);
@@ -103,8 +102,12 @@ class SubscriptionResource extends Resource
                     ->schema([
                         TextEntry::make('id')->label(__('forms.fields.id')),
                         TextEntry::make('provider.name')->label(__('forms.fields.provider_name')),
-                        TextEntry::make('plan.name')->label(__('menu.plan')),
-                        TextEntry::make('planPrice.period_label')->label(__('forms.fields.period')),
+                        TextEntry::make('plan_display')
+                            ->label(__('menu.plan'))
+                            ->state(fn (Subscription $record): string => $record->resolvedPlanName()),
+                        TextEntry::make('period_display')
+                            ->label(__('forms.fields.period'))
+                            ->state(fn (Subscription $record): string => $record->resolvedPeriodLabel()),
                         TextEntry::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
                         TextEntry::make('status')->color(fn ($record) => $record->status->getColor())->badge(),
                         TextEntry::make('transaction.status')
@@ -132,9 +135,10 @@ class SubscriptionResource extends Resource
                                         ? ($feature[$locale] ?? $feature['ar'] ?? $feature['en'] ?? '')
                                         : $feature;
                                     if (is_string($text) && $text !== '') {
-                                        $lines[] = '• ' . $text;
+                                        $lines[] = '• '.$text;
                                     }
                                 }
+
                                 return implode("\n", $lines);
                             })
                             ->markdown()
@@ -151,8 +155,12 @@ class SubscriptionResource extends Resource
             ->columns([
                 TextColumn::make('id')->label(__('forms.fields.id'))->searchable(),
                 TextColumn::make('provider.name')->label(__('forms.fields.provider'))->searchable(),
-                TextColumn::make('plan.name')->searchable(),
-                TextColumn::make('planPrice.period_label')->label(__('forms.fields.period')),
+                TextColumn::make('plan_display')
+                    ->label(__('menu.plan'))
+                    ->state(fn (Subscription $record): string => $record->resolvedPlanName()),
+                TextColumn::make('period_display')
+                    ->label(__('forms.fields.period'))
+                    ->state(fn (Subscription $record): string => $record->resolvedPeriodLabel()),
                 TextColumn::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
                 TextColumn::make('status')
                     ->color(fn ($record) => $record->status->getColor())
@@ -206,7 +214,7 @@ class SubscriptionResource extends Resource
 
     public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return $record->plan?->name . ' - ' . $record->provider?->name;
+        return $record->resolvedPlanName().' - '.($record->provider?->name ?? '');
     }
 
     public static function getNavigationGroup(): ?string

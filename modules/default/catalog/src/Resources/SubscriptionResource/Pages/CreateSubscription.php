@@ -4,6 +4,7 @@ namespace App\CatalogModule\Resources\SubscriptionResource\Pages;
 
 use App\CatalogModule\Models\Plan;
 use App\CatalogModule\Models\PlanPrice;
+use App\CatalogModule\Models\Subscription;
 use App\CatalogModule\Resources\SubscriptionResource;
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
@@ -25,6 +26,7 @@ class CreateSubscription extends CreateRecord
         $data['status'] = SubscriptionsStatusEnum::PROCESSING->value;
         $data['features'] = $plan?->features ?? [];
         $data['price'] = $planPrice ? $planPrice->price->getAmount() : 0;
+        $data['plan_snapshot'] = $plan ? Subscription::buildPlanSnapshot($plan, $planPrice) : null;
 
         return $data;
     }

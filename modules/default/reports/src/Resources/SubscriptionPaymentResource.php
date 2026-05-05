@@ -2,27 +2,27 @@
 
 namespace App\ReportsModule\Resources;
 
+use App\CatalogModule\Models\Subscription;
+use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
+use App\ReportsModule\Filters\SubscriptionPaymentsLocationFilter;
 use App\ReportsModule\Models\SubscriptionPayment;
 use App\ReportsModule\Resources\SubscriptionPaymentResource\Pages\ListSubscriptionPayments;
-use App\ReportsModule\Filters\SubscriptionPaymentsLocationFilter;
 use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
-use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Excel;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Maatwebsite\Excel\Excel;
-use Filament\Actions\BulkActionGroup;
-use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 
 class SubscriptionPaymentResource extends Resource
 {
@@ -30,7 +30,7 @@ class SubscriptionPaymentResource extends Resource
 
     protected static ?string $model = SubscriptionPayment::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-credit-card';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
     protected static ?string $slug = 'subscription-payments';
 
@@ -53,12 +53,17 @@ class SubscriptionPaymentResource extends Resource
                     ->label(__('forms.fields.provider_name'))
                     ->searchable(),
 
-                TextColumn::make('transactionable.plan.name')
+                TextColumn::make('subscription_plan_display')
                     ->label(__('menu.plan'))
-                    ->searchable(),
+                    ->state(fn ($record) => $record->transactionable instanceof Subscription
+                        ? $record->transactionable->resolvedPlanName()
+                        : '-'),
 
-                TextColumn::make('transactionable.planPrice.period_label')
-                    ->label(__('forms.fields.period')),
+                TextColumn::make('subscription_period_display')
+                    ->label(__('forms.fields.period'))
+                    ->state(fn ($record) => $record->transactionable instanceof Subscription
+                        ? $record->transactionable->resolvedPeriodLabel()
+                        : '-'),
 
                 TextColumn::make('user.phone')
                     ->label(__('forms.fields.phone'))
@@ -69,13 +74,15 @@ class SubscriptionPaymentResource extends Resource
                     ->badge()
                     ->formatStateUsing(function ($record) {
                         $gateway = $record->meta_data['gateway'] ?? $record->meta_data['method'] ?? 'system';
-                        return __('panel.gateways.' . $gateway);
+
+                        return __('panel.gateways.'.$gateway);
                     }),
 
                 TextColumn::make('meta_data.paid_at')
                     ->label(__('forms.fields.payment_data_paid_at'))
                     ->state(function ($record) {
                         $date = $record->meta_data['paid_at'] ?? $record->created_at?->toIso8601String() ?? $record->created_at;
+
                         return Carbon::parse($date)->timezone('africa/cairo')->translatedFormat('Y-m-d h:i a');
                     }),
 
@@ -115,7 +122,7 @@ class SubscriptionPaymentResource extends Resource
                     ExportBulkAction::make()->exports([
                         ExcelExport::make('CSV')
                             ->fromTable()
-                            ->withFilename(fn () => static::getPluralLabel() . '-' . now()->format('Y-m-d'))
+                            ->withFilename(fn () => static::getPluralLabel().'-'.now()->format('Y-m-d'))
                             ->withWriterType(Excel::XLSX),
                     ]),
                 ]),

@@ -4,16 +4,16 @@ namespace App\CatalogModule\Models;
 
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
-use Illuminate\Support\Facades\Route;
 use App\DefaultPanel\Traits\Publishable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Route;
 use Spatie\Translatable\HasTranslations;
 
 class Plan extends Model
 {
-    use HasFactory, Publishable, HasTranslations;
+    use HasFactory, HasTranslations, Publishable;
 
     public array $translatable = ['name'];
 
@@ -99,6 +99,7 @@ class Plan extends Model
             'start_date' => now(),
             'end_date' => now()->addDays($planPrice->days_count),
             'features' => $this->features ?? [],
+            'plan_snapshot' => Subscription::buildPlanSnapshot($this, $planPrice),
         ]);
     }
 

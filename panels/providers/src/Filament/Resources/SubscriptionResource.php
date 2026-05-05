@@ -12,7 +12,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -22,7 +21,8 @@ class SubscriptionResource extends Resource
 
     protected static ?string $model = Subscription::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
@@ -47,8 +47,12 @@ class SubscriptionResource extends Resource
                 Section::make(__('sections.basic_information'))
                     ->schema([
                         TextEntry::make('id')->label(__('forms.fields.id')),
-                        TextEntry::make('plan.name')->label(__('menu.plan')),
-                        TextEntry::make('planPrice.period_label')->label(__('forms.fields.period')),
+                        TextEntry::make('plan_display')
+                            ->label(__('menu.plan'))
+                            ->state(fn (Subscription $record): string => $record->resolvedPlanName()),
+                        TextEntry::make('period_display')
+                            ->label(__('forms.fields.period'))
+                            ->state(fn (Subscription $record): string => $record->resolvedPeriodLabel()),
                         TextEntry::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
                         TextEntry::make('status')->color(fn ($record) => $record->status->getColor())->badge(),
                         TextEntry::make('transaction.status')
@@ -76,15 +80,16 @@ class SubscriptionResource extends Resource
                                         ? ($feature[$locale] ?? $feature['ar'] ?? $feature['en'] ?? '')
                                         : $feature;
                                     if (is_string($text) && $text !== '') {
-                                        $lines[] = '• ' . $text;
+                                        $lines[] = '• '.$text;
                                     }
                                 }
+
                                 return implode("\n", $lines);
                             })
                             ->markdown()
-                            ->visible(fn ($record) => !empty($record->features)),
+                            ->visible(fn ($record) => ! empty($record->features)),
                     ])
-                    ->visible(fn ($record) => !empty($record->features)),
+                    ->visible(fn ($record) => ! empty($record->features)),
             ]);
     }
 
@@ -94,8 +99,12 @@ class SubscriptionResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query->belongsToAuthUser())
             ->columns([
                 TextColumn::make('id')->label(__('forms.fields.id'))->searchable(),
-                TextColumn::make('plan.name')->searchable(),
-                TextColumn::make('planPrice.period_label')->label(__('forms.fields.period')),
+                TextColumn::make('plan_display')
+                    ->label(__('menu.plan'))
+                    ->state(fn (Subscription $record): string => $record->resolvedPlanName()),
+                TextColumn::make('period_display')
+                    ->label(__('forms.fields.period'))
+                    ->state(fn (Subscription $record): string => $record->resolvedPeriodLabel()),
                 TextColumn::make('price')->formatStateUsing(fn ($record) => $record->price->format()),
                 TextColumn::make('status')
                     ->color(fn ($record) => $record->status->getColor())

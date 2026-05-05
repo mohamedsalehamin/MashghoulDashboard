@@ -28,14 +28,17 @@ class ActiveSubscriptionOverview extends BaseWidget
             ];
         }
 
-        $planName = $this->asText($subscription->plan?->getTranslation('name', app()->getLocale()) ?? '-');
+        $locale = app()->getLocale();
+        $planNameResolved = $subscription->resolvedPlanName($locale);
+        $planName = $this->asText($planNameResolved !== '' ? $planNameResolved : '-');
         $priceLabel = $this->asText($subscription->planPrice?->price?->format() ?? $subscription->price?->format() ?? '-');
-        $periodLabel = $this->asText($subscription->planPrice?->period_label ?? '-');
+        $periodResolved = $subscription->resolvedPeriodLabel();
+        $periodLabel = $this->asText($periodResolved !== '-' ? $periodResolved : '-');
         $endDate = Carbon::parse($subscription->end_date);
 
         return [
             Stat::make($this->asText(__('menu.subscription')), $planName)
-                ->description($priceLabel . ' - ' . $periodLabel),
+                ->description($priceLabel.' - '.$periodLabel),
 
             Stat::make($this->asText(__('forms.fields.end_date')), $this->asText($endDate->translatedFormat('Y-m-d h:i A'))),
 
@@ -82,4 +85,3 @@ class ActiveSubscriptionOverview extends BaseWidget
         return '-';
     }
 }
-

@@ -51,18 +51,34 @@ class ProviderSubscriptionResource extends JsonResource
         $planPrice = $subscription->planPrice;
         $locale = app()->getLocale();
 
-        $planName = $plan
-            ? ($plan->getTranslation('name', $locale) ?? $plan->getTranslation('name', 'ar') ?? $plan->getTranslation('name', 'en'))
-            : null;
+        $planNameDisplay = $subscription->resolvedPlanName($locale);
+        $planName = $planNameDisplay !== '' ? $planNameDisplay : null;
 
         $priceFormatted = $planPrice?->price?->format()
             ?? $subscription->price?->format()
             ?? null;
 
-        $periodLabel = $planPrice?->period_label ?? null;
+        $resolvedPeriod = $subscription->resolvedPeriodLabel();
+        $periodLabel = $planPrice?->period_label ?? (($resolvedPeriod !== '-') ? $resolvedPeriod : null);
 
         $endDate = Carbon::parse($subscription->end_date);
         $startDate = Carbon::parse($subscription->start_date);
+
+        $planPayload = ($plan || $planName !== null || $subscription->plan_snapshot)
+            ? [
+                'id' => $plan?->id ?? $subscription->plan_id,
+                'name' => $planName,
+            ]
+            : null;
+
+        $periodFromSnapshot = data_get($subscription->plan_snapshot, 'plan_price.period');
+        $planPricePayload = ($planPrice || $periodFromSnapshot)
+            ? [
+                'id' => $planPrice?->id,
+                'period' => $planPrice?->period ?? $periodFromSnapshot,
+                'period_label' => $periodLabel,
+            ]
+            : null;
 
         return [
             'has_active_subscription' => true,
@@ -71,15 +87,8 @@ class ProviderSubscriptionResource extends JsonResource
                 'status' => $subscription->status instanceof \BackedEnum
                     ? $subscription->status->value
                     : (string) $subscription->status,
-                'plan' => $plan ? [
-                    'id' => $plan->id,
-                    'name' => $planName,
-                ] : null,
-                'plan_price' => $planPrice ? [
-                    'id' => $planPrice->id,
-                    'period' => $planPrice->period,
-                    'period_label' => $periodLabel,
-                ] : null,
+                'plan' => $planPayload,
+                'plan_price' => $planPricePayload,
                 'price_formatted' => $priceFormatted,
                 'price_and_period' => $priceFormatted && $periodLabel
                     ? $priceFormatted.' - '.$periodLabel
