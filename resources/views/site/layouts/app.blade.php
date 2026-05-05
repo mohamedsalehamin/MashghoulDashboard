@@ -33,7 +33,7 @@ $assetBase = asset('assets/site');
     <link rel="stylesheet" href="{{ $assetBase }}/css/animate.css">
     <link rel="stylesheet" href="{{ $assetBase }}/css/swiper-bundle.min.css">
     <link rel="stylesheet" href="{{ $assetBase }}/css/main.css">
-    <title>{{ $title ?? __('site.heading.home') }} - {{ config('app.name', 'Mashghol') }}</title>
+    <title>{{ $title ?? __('site.heading.home') }} - {{ config('app.name', 'Mashghoul') }}</title>
 
     @stack('meta')
     @stack("css")

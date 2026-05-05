@@ -64,7 +64,7 @@
     </div>
     <div class="copyrights">
         <div class="container">
-            <div class="text-center">{{ __('site.heading.copyright') }} <span>Mashghol</span> {{ date('Y') }}</div>
+            <div class="text-center">{{ __('site.heading.copyright') }} <span>Mashghoul</span> {{ date('Y') }}</div>
         </div>
     </div>
 </footer>
