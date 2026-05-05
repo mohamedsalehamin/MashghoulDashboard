@@ -288,7 +288,7 @@ return [
         'join_us_as_a_doctor' => 'Join us as a doctor',
         'join_us_as_a_provider' => 'Join us as a provider',
         'provider_join_register_title' => 'Create provider account',
-        'provider_join_register_subtitle' => 'Register your salon to subscribe to a plan and manage bookings.',
+        'provider_join_register_subtitle' => 'Register your account to subscribe to a plan and manage bookings.',
         'provider_portal_login' => 'Log in to provider portal',
         'copyright' => '© 2024 Mashghool App. All rights reserved',
         'register_as_provider' => 'Register as service provider',

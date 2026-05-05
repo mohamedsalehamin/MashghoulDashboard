@@ -223,7 +223,7 @@ return [
         'register_as_provider' => 'التسجيل كمقدم خدمة',
         'join_us_as_a_provider' => 'انضم كمقدم خدمة',
         'provider_join_register_title' => 'إنشاء حساب مقدم خدمة',
-        'provider_join_register_subtitle' => 'سجّل صالونك للاشتراك في باقة وإدارة الحجوزات.',
+        'provider_join_register_subtitle' => 'سجّل حسابك للاشتراك في باقة وإدارة الحجوزات.',
         'provider_portal_login' => 'تسجيل الدخول إلى بوابة مقدمي الخدمة',
         'mashghoul_features' => 'مميزات مشغول',
         'added_to_favorite_list' => 'تم الاضافة للمفضله بنجاح',
