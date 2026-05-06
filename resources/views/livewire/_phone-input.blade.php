@@ -68,21 +68,33 @@
                     separateDialCode: true,
                     initialCountry: 'sa',
                     onlyCountries: ['sa'],
-                    nationalMode: true
+                    nationalMode: true,
+                    // Prevent display normalization that can drop a leading trunk "0" (e.g. 05xxxxxxxx -> 5xxxxxxxx).
+                    formatOnDisplay: false
                 });
                 telInput._iti = iti;
                 telInput.dataset.itiReady = '1';
 
+                // Important: do NOT sync on init.
+                // intl-tel-input may normalize/format the value on load (e.g. trimming a leading trunk "0"),
+                // and pushing that into Livewire immediately would mutate the stored phone even if the user
+                // only edits other profile fields.
+                var touched = false;
+
                 function sync() {
+                    if (!touched) return;
                     window.syncItiPhoneToLivewire();
                 }
 
-                telInput.addEventListener('input', sync);
-                telInput.addEventListener('change', sync);
-                telInput.addEventListener('blur', sync);
-                telInput.addEventListener('countrychange', sync);
+                function markTouchedAndSync() {
+                    touched = true;
+                    sync();
+                }
 
-                sync();
+                telInput.addEventListener('input', markTouchedAndSync);
+                telInput.addEventListener('change', markTouchedAndSync);
+                telInput.addEventListener('blur', markTouchedAndSync);
+                telInput.addEventListener('countrychange', sync);
             };
 
             function schedulePhoneInit() {

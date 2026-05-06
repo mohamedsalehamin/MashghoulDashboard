@@ -39,12 +39,30 @@ class EditProfileForm extends Component
         $this->name = $user->name ?? '';
         $this->email = $user->email ?? '';
         $fullPhone = $user->phone ?? '';
-        if (preg_match('/^\+(\d{1,4})(\d+)$/', $fullPhone, $m)) {
+        // Parse E.164 safely.
+        // Important: avoid greedy capture that can swallow the first national digit
+        // (e.g. +9665xxxxxxxx could be parsed as country=9665, phone=xxxxxxxx).
+        if (preg_match('/^\+966(\d+)$/', $fullPhone, $m)) {
+            $this->country_code = '966';
+            $this->phone = $m[1];
+        } elseif (preg_match('/^\+(\d{1,3})(\d+)$/', $fullPhone, $m)) {
             $this->country_code = $m[1];
             $this->phone = $m[2];
         } else {
             $this->phone = preg_replace('/\D/', '', $fullPhone);
         }
+
+        // UX: Saudi mobile numbers are commonly written with a leading trunk "0" (05xxxxxxxx).
+        // We store E.164 (+9665xxxxxxxx) but show the familiar local form in the edit field.
+        // if ($this->country_code === '966') {
+        //     $digits = preg_replace('/\D/', '', $this->phone ?? '');
+        //     if ($digits !== '' && $digits[0] !== '0') {
+        //         $this->phone = '0' . $digits;
+        //     } else {
+        //         $this->phone = $digits;
+        //     }
+        // }
+
         $this->gender = $user->gender ?? '';
         $this->city_id = $user->city_id;
         $this->region_id = $user->city?->state_id;
@@ -54,7 +72,14 @@ class EditProfileForm extends Component
 
     protected function fullPhone(): string
     {
-        return '+' . $this->country_code . preg_replace('/\D/', '', $this->phone ?? '');
+        $digits = preg_replace('/\D/', '', $this->phone ?? '');
+        // dd($digits);
+        // If user enters local form starting with 0, drop a single trunk prefix.
+        // Example: 05xxxxxxxx -> +9665xxxxxxxx
+        if ($digits !== '' && $digits[0] === '0') {
+            $digits = substr($digits, 1);
+        }
+        return '+' . $this->country_code . $digits;
     }
 
     public function save()
