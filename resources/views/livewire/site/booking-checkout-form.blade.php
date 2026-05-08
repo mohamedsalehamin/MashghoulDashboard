@@ -209,13 +209,13 @@
                         @if(!empty($totals['points_discount'] ?? null) && $totals['points_discount'] != '0.00')
                         <div class="data-item border-0 p-0">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.points_balance') }}</span>
-                            <span class="value">-{{ $totals['points_discount'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
+                            <span class="value">-{{ number_format(abs((float) ($totals['points_discount'] ?? 0)), 2, '.', '') }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
                         @if(!empty($totals['wallet_discount'] ?? null) && $totals['wallet_discount'] != '0.00')
                         <div class="data-item border-0 p-0">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.wallet_discount') }}</span>
-                            <span class="value">-{{ $totals['wallet_discount'] ?? '' }} <i class="icon-saudi_riyal"></i></span>
+                            <span class="value">-{{ number_format(abs((float) ($totals['wallet_discount'] ?? 0)), 2, '.', '') }} <i class="icon-saudi_riyal"></i></span>
                         </div>
                         @endif
                         @if(!empty($totals['taxes'] ?? null) && $totals['taxes'] != '0.00')

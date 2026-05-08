@@ -22,7 +22,7 @@
         <form method="get" action="{{ route('site.category.show', $category->getSlugUrl()) }}" class="filter-by d-flex flex-wrap justify-content-end align-items-center gap-2 mb-4">
             <div class="input-group w-auto">
                 <input type="text" name="q" class="form-control" placeholder="{{ __('site.heading.search') }}" value="{{ request('q') }}" aria-label="{{ __('site.heading.search') }}">
-                <button type="submit" class="btn btn-green" aria-label="{{ __('site.fields.search') }}"><i class="fa-light fa-magnifying-glass"></i></button>
+                <button type="submit" class="btn btn-green d-flex align-items-center justify-content-center" aria-label="{{ __('site.fields.search') }}"><i class="fa-light fa-magnifying-glass"></i></button>
             </div>
             <select name="sort" class="form-select custom-select w-auto" onchange="this.form.submit()" aria-label="{{ __('site.heading.category_sort_label') }}">
                 <option value="">{{ __('site.heading.category_sort_label') }}</option>

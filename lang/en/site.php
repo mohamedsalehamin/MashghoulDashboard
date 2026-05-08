@@ -463,7 +463,7 @@ return [
         'report' => 'Report',
         'problem_data' => 'Problem Data',
         'rate_text' => 'Please rate the order',
-        'search' => 'Search',
+        'search' => 'Search by provider name',
         'average_rating' => 'Average Rating',
         'back' => 'Back',
         'blogs' => 'Blog',
