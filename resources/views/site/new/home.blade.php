@@ -100,7 +100,7 @@
 </section>
 @endif
 <!-- Start Products Section: Nearest to you -->
-@if(session()->get('location_set') === true)
+@if($locationSet ?? false)
     <section class="products-section pt-64">
         <div class="container">
             <div class="section-title text-center">{{ __('site.heading.nearest_to_you') }}</div>

@@ -507,6 +507,8 @@ return [
         'category_sort_oldest' => 'الأقدم',
         'category_sort_rating_high' => 'التقييم الأعلى',
         'category_sort_rating_low' => 'التقييم الأقل',
+        'category_sort_nearest' => 'الأقرب أولاً',
+        'category_sort_farthest' => 'الأبعد أولاً',
         'browse_categories' => 'تصفح التصنيفات',
         'back_to_login' => 'العودة لتسجيل الدخول',
         'account_info' => 'معلومات الحساب',

@@ -8,11 +8,47 @@ use App\ContentModule\Models\Page;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
+use App\Support\ProviderListingRadius;
 use App\UsersModule\Models\Provider;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class CategoryController extends Controller
 {
+    /**
+     * Visitor chose a location on the site (set-location flow); matches HomeController / EnsureLocationSet.
+     */
+    protected function userLocationIsSet(): bool
+    {
+        return session()->has('location_set')
+            && session('location_set') === true
+            && session()->has('user_latitude')
+            && session()->has('user_longitude');
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\UsersModule\Models\Provider>  $query
+     */
+    protected function applyProviderSort($query): void
+    {
+        $sort = request()->get('sort');
+        $explicitSorts = ['rating_desc', 'rating_asc', 'date_desc', 'date_asc', 'nearest', 'farthest'];
+
+        $query
+            ->when($sort === 'rating_desc', fn ($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'desc'))
+            ->when($sort === 'rating_asc', fn ($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'asc'))
+            ->when($sort === 'date_desc', fn ($q) => $q->orderBy('created_at', 'desc'))
+            ->when($sort === 'date_asc', fn ($q) => $q->orderBy('created_at', 'asc'))
+            ->when($sort === 'nearest', fn ($q) => $q->orderBy('distance', 'asc'))
+            ->when($sort === 'farthest', fn ($q) => $q->orderBy('distance', 'desc'))
+            ->when(! in_array($sort, $explicitSorts, true), function ($q) {
+                if ($this->userLocationIsSet()) {
+                    $q->orderBy('distance', 'asc');
+                } else {
+                    $q->orderBy('created_at', 'desc');
+                }
+            });
+    }
+
     public function index()
     {
         $settings = new GeneralSettings();
@@ -42,12 +78,9 @@ class CategoryController extends Controller
                 }))
                 ->when(request()->filled('city_id'), fn($q) => $q->where('city_id', request('city_id')))
                 ->when(request()->filled('category'), fn($q) => $q->where('category_id', request('category')))
-                ->when(request()->get('sort') == 'rating_desc', fn($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'desc'))
-                ->when(request()->get('sort') == 'rating_asc', fn($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'asc'))
-                ->when(request()->get('sort') == 'date_desc', fn($q) => $q->orderBy('created_at', 'desc'))
-                ->when(request()->get('sort') == 'date_asc', fn($q) => $q->orderBy('created_at', 'asc'))
-                ->when(! in_array(request()->get('sort'), ['rating_desc', 'rating_asc', 'date_desc', 'date_asc'], true), fn($q) => $q->orderBy('created_at', 'desc'))
+                ->when($this->userLocationIsSet(), fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
                 ->withDistanceSphere('location', $point)
+                ->tap(fn ($q) => $this->applyProviderSort($q))
                 ->get();
         }
 
@@ -59,6 +92,7 @@ class CategoryController extends Controller
             'providers' => $providers,
             'cities' => $cities,
             'category' => null,
+            'sortDefaultsToNearest' => $this->userLocationIsSet(),
         ]);
     }
 
@@ -95,12 +129,9 @@ class CategoryController extends Controller
                     ->orWhere('name->en', 'like', '%' . request('q') . '%');
             }))
             ->when(request()->filled('city_id'), fn ($q) => $q->where('city_id', request('city_id')))
-            ->when(request()->get('sort') == 'rating_desc', fn ($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'desc'))
-            ->when(request()->get('sort') == 'rating_asc', fn ($q) => $q->withAvg('rate', 'rate')->orderBy('rate_avg_rate', 'asc'))
-            ->when(request()->get('sort') == 'date_desc', fn ($q) => $q->orderBy('created_at', 'desc'))
-            ->when(request()->get('sort') == 'date_asc', fn ($q) => $q->orderBy('created_at', 'asc'))
-            ->when(! in_array(request()->get('sort'), ['rating_desc', 'rating_asc', 'date_desc', 'date_asc'], true), fn ($q) => $q->orderBy('created_at', 'desc'))
+            ->when($this->userLocationIsSet(), fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
             ->withDistanceSphere('location', $point)
+            ->tap(fn ($q) => $this->applyProviderSort($q))
             ->paginate(4)
             ->withQueryString();
 
@@ -112,6 +143,7 @@ class CategoryController extends Controller
             'providers' => $providers,
             'cities' => $cities,
             'category' => $category,
+            'sortDefaultsToNearest' => $this->userLocationIsSet(),
         ]);
     }
 }

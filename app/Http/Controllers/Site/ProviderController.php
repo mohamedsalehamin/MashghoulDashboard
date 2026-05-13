@@ -12,6 +12,7 @@ use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Site\AddToCartRequest;
 use App\Support\PortfolioAlbumPresentation;
+use App\Support\ProviderListingRadius;
 use App\UsersModule\Models\Provider;
 use Carbon\Carbon;
 use Cknow\Money\Money;
@@ -23,6 +24,14 @@ use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class ProviderController extends Controller
 {
+    protected function userLocationIsSet(): bool
+    {
+        return session()->has('location_set')
+            && session('location_set') === true
+            && session()->has('user_latitude')
+            && session()->has('user_longitude');
+    }
+
     protected function sharedData(): array
     {
         $settings = new GeneralSettings;
@@ -267,6 +276,7 @@ class ProviderController extends Controller
         $providers = Provider::enabled()
             ->withoutTrashed()
             ->whereHas('user')
+            ->when($this->userLocationIsSet(), fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
             ->withDistanceSphere('location', $point)
             ->withAvg('rate', 'rate')
             ->orderBy('rate_avg_rate', 'desc')
@@ -292,6 +302,7 @@ class ProviderController extends Controller
         $providers = Provider::enabled()
             ->withoutTrashed()
             ->whereHas('user')
+            ->when($this->userLocationIsSet(), fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
             ->withDistanceSphere('location', $point)
             ->withAvg('rate', 'rate')
             ->orderBy('distance', 'asc')

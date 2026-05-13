@@ -38,6 +38,8 @@
                 </div>
                 <select name="sort" class="form-select custom-select w-auto" onchange="this.form.submit()" aria-label="{{ __('site.heading.category_sort_label') }}">
                     <option value="">{{ __('site.heading.category_sort_label') }}</option>
+                    <option value="nearest" {{ request('sort') === 'nearest' || (! filled(request('sort')) && ($sortDefaultsToNearest ?? false)) ? 'selected' : '' }}>{{ __('site.heading.category_sort_nearest') }}</option>
+                    <option value="farthest" {{ request('sort') == 'farthest' ? 'selected' : '' }}>{{ __('site.heading.category_sort_farthest') }}</option>
                     <option value="date_desc" {{ request('sort') == 'date_desc' ? 'selected' : '' }}>{{ __('site.heading.category_sort_newest') }}</option>
                     <option value="date_asc" {{ request('sort') == 'date_asc' ? 'selected' : '' }}>{{ __('site.heading.category_sort_oldest') }}</option>
                     <option value="rating_desc" {{ request('sort') == 'rating_desc' ? 'selected' : '' }}>{{ __('site.heading.category_sort_rating_high') }}</option>

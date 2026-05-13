@@ -11,11 +11,21 @@ use App\ContentModule\Models\Slider;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
+use App\Support\ProviderListingRadius;
 use App\UsersModule\Models\Provider;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 
 class HomeController extends Controller
 {
+    /** Same rule as CategoryController: set-location session. */
+    protected function userLocationIsSet(): bool
+    {
+        return session()->has('location_set')
+            && session('location_set') === true
+            && session()->has('user_latitude')
+            && session()->has('user_longitude');
+    }
+
     public function index()
     {
         $settings = new GeneralSettings;
@@ -33,10 +43,7 @@ class HomeController extends Controller
         $faqs = Faq::enabled()->get();
         $testimonials = data_get($landingSettings->content, 'testimonials', []);
 
-        $locationSet = session()->has('location_set')
-            && session('location_set') === true
-            && session()->has('user_latitude')
-            && session()->has('user_longitude');
+        $locationSet = $this->userLocationIsSet();
 
         $userLat = (float) session('user_latitude', request()->get('latitude', 0));
         $userLng = (float) session('user_longitude', request()->get('longitude', 0));
@@ -57,6 +64,7 @@ class HomeController extends Controller
             ? Provider::enabled()
                 ->withoutTrashed()
                 ->whereHas('user')
+                ->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters())
                 ->withDistanceSphere('location', $point)
                 ->orderBy('distance', 'asc')
                 ->limit(10)
@@ -66,8 +74,10 @@ class HomeController extends Controller
         $mostRatedProviders = Provider::enabled()
             ->withoutTrashed()
             ->whereHas('user')
+            ->when($locationSet, fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
             ->withDistanceSphere('location', $point)
             ->orderByRaw($customerAvgSql.' desc', [$reservableType, Rate::SOURCE_MANUAL])
+            ->when($locationSet, fn ($q) => $q->orderBy('distance', 'asc'))
             ->limit(10)
             ->get();
 
@@ -82,6 +92,7 @@ class HomeController extends Controller
             'appDownload' => $appDownload,
             'faqs' => $faqs,
             'testimonials' => $testimonials,
+            'locationSet' => $locationSet,
             'nearestProviders' => $nearestProviders,
             'mostRatedProviders' => $mostRatedProviders,
         ]);

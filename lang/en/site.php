@@ -486,6 +486,8 @@ return [
         'category_sort_oldest' => 'Oldest',
         'category_sort_rating_high' => 'Highest rating',
         'category_sort_rating_low' => 'Lowest rating',
+        'category_sort_nearest' => 'Closest first',
+        'category_sort_farthest' => 'Farthest first',
         'browse_categories' => 'Browse Categories',
         'back_to_login' => 'Back to Login',
         'account_info' => 'Account Info',
