@@ -33,7 +33,7 @@
                             tabindex="0"
                             onclick="openMediaModal('video', @js($item['url']), @js($item['title'] ?? ''), @js($item['description'] ?? ''))"
                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
-                            <img src="{{ $item['url'] }}" class="testimonial-media-img" alt="{{ $item['title'] ?? '' }}" onerror="this.src='{{ $assetBase }}/images/about.webp'">
+                            <img src="{{ $assetBase }}/images/about.webp" class="testimonial-media-img testimonial-video-thumb" alt="{{ $item['title'] ?? '' }}" data-video-thumbnail="{{ e($item['url']) }}">
                             <div class="play-overlay-btn">
                                 <i class="fa-solid fa-play"></i>
                             </div>
@@ -91,3 +91,7 @@
 </div>
 <!-- End Media Modal -->
 @endsection
+
+@push('scripts')
+@include('site.new.partials.video-thumbnail-capture-script')
+@endpush
