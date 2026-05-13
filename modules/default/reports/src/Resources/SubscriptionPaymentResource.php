@@ -43,6 +43,7 @@ class SubscriptionPaymentResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->paid())
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('transactionable_id')
                     ->label(__('forms.fields.subscription_id'))

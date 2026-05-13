@@ -396,6 +396,7 @@ class ProviderResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query)
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('provider.id')
                     ->default('')

@@ -44,6 +44,7 @@ class CustomerPaymentResource extends Resource {
     public static function table(Table $table): Table {
         return $table
             ->modifyQueryUsing(fn($query) => $query->paid())
+            ->defaultSort('created_at', 'desc')
             ->columns([
 
                 TextColumn::make('id')

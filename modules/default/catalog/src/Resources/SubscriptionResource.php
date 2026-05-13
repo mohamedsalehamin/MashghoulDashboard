@@ -152,6 +152,7 @@ class SubscriptionResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['provider', 'plan', 'planPrice', 'transaction']))
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')->label(__('forms.fields.id'))->searchable(),
                 TextColumn::make('provider.name')->label(__('forms.fields.provider'))->searchable(),

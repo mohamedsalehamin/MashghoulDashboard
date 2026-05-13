@@ -52,6 +52,7 @@ class ReservationCommissionResource extends Resource {
                     // ->whereHas("conditions",fn($builder) => $builder->where('type', 'reservation_fees')->where("value", ">", 0))
                 )
                 ->where('amount', ">", 0))
+            ->defaultSort('created_at', 'desc')
             ->columns([
 
 
