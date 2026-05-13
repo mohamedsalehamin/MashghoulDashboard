@@ -87,7 +87,7 @@ class RateResource extends Resource
 
                 TextColumn::make('customer_name')
                     ->label(__('forms.fields.customer_name'))
-                    ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-')
+                    ->state(fn($record) => $record->reviewerDisplayName())
                     ->searchable(),
 
                 // Service Rating Column

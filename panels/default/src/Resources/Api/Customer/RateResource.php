@@ -8,7 +8,7 @@ class RateResource extends JsonResource {
 
     public function toArray($request) {
         return [
-            "name" => $this->user?->name ?? $this->reservation?->customer?->name ?? __('panel.anonymous'),
+            "name" => $this->reviewerDisplayName(),
             "rate" => (int) $this->rate,
             "comment" => $this->comment,
             "type" => $this->type,

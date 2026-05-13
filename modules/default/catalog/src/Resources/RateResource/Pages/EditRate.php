@@ -4,6 +4,7 @@ namespace App\CatalogModule\Resources\RateResource\Pages;
 
 use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Resources\RateResource;
+use App\Support\ManualRatingNames;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -26,8 +27,32 @@ class EditRate extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data = parent::mutateFormDataBeforeFill($data);
+
+        if (($data['source'] ?? null) === 'manual' && ! empty($data['manual_customer_name'])) {
+            $idx = ManualRatingNames::indexForStored($data['manual_customer_name']);
+            if ($idx !== null) {
+                $data['manual_customer_name_index'] = (string) $idx;
+            }
+        }
+
+        return $data;
+    }
+
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        if ($this->record->source === 'manual') {
+            $manual = ManualRatingNames::resolve($data['manual_customer_name_index'] ?? null);
+            if ($manual) {
+                $data['manual_customer_name'] = $manual;
+            }
+            $data['user_id'] = null;
+        }
+
+        unset($data['manual_customer_name_index']);
+
         // If approval status changed to approved
         if (($data['is_approved'] ?? false) && !$this->record->is_approved) {
             $data['approved_at'] = now();
@@ -78,6 +103,7 @@ class EditRate extends EditRecord
         $commonUpdate = [
             'provider_id' => $data['provider_id'] ?? $record->provider_id,
             'user_id' => $data['user_id'] ?? $record->user_id,
+            'manual_customer_name' => $data['manual_customer_name'] ?? $record->manual_customer_name,
             'is_approved' => $data['is_approved'] ?? $record->is_approved,
             'approved_at' => $data['approved_at'] ?? $record->approved_at,
             'approved_by' => $data['approved_by'] ?? $record->approved_by,

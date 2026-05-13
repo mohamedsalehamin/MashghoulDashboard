@@ -108,7 +108,7 @@ class ProviderResource extends JsonResource
                 ->toArray();
 
             return [
-                'name' => $baseRating->user?->name ?? $baseRating->reservation?->customer?->name ?? __('panel.anonymous'),
+                'name' => $baseRating->reviewerDisplayName(),
                 'created_at' => $baseRating->created_at?->diffForHumans(),
                 'service' => $serviceRating ? [
                     'rate' => (int) $serviceRating->rate,

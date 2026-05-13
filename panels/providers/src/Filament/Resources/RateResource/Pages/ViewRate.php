@@ -105,7 +105,7 @@ class ViewRate extends ViewRecord
                     ->schema([
                         TextEntry::make('customer_name')
                             ->label(__('panel.customer'))
-                            ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-'),
+                            ->state(fn($record) => $record->reviewerDisplayName()),
 
                         TextEntry::make('reservation.id')
                             ->label(__('panel.reservation'))

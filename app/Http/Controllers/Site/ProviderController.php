@@ -215,7 +215,7 @@ class ProviderController extends Controller
             ])->values()->toArray();
 
             return [
-                'name' => $base->user?->name ?? $base->reservation?->customer?->name ?? __('panel.anonymous'),
+                'name' => $base->reviewerDisplayName(),
                 'created_at' => $base->created_at?->diffForHumans(),
                 'service' => $serviceRating ? ['rate' => (int) $serviceRating->rate, 'comment' => $serviceRating->comment] : null,
                 'place' => $placeRating ? ['rate' => (int) $placeRating->rate, 'comment' => $placeRating->comment] : null,

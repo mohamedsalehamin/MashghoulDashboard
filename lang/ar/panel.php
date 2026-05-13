@@ -470,6 +470,8 @@ return [
     'add_manual_rating' => 'إضافة تقييم يدوي',
     'reservation_ratings' => 'تقييمات الحجوزات',
     'manual_ratings' => 'التقييمات اليدوية',
+    'manual_rating_display_name' => 'اسم المعروض للمراجع',
+    'manual_rating_name_required' => 'يرجى اختيار اسم المعروض للمراجع.',
     'pending_approval' => 'في انتظار الموافقة',
     'top_level_only' => 'التقييمات الرئيسية فقط',
     'service_rating' => 'تقييم الخدمة',

@@ -4,6 +4,7 @@ namespace App\CatalogModule\Models\Reservation;
 
 use App\CatalogModule\Models\Reservation;
 use App\Models\User;
+use App\Support\ManualRatingNames;
 use App\UsersModule\Models\Provider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,7 @@ class Rate extends Model
         'reservation_id',
         'provider_id',
         'user_id',
+        'manual_customer_name',
         'parent_id',
         'pair_id',
         'source',
@@ -32,6 +34,7 @@ class Rate extends Model
         'rate' => 'integer',
         'is_approved' => 'boolean',
         'approved_at' => 'datetime',
+        'manual_customer_name' => 'array',
     ];
 
     /**
@@ -106,6 +109,21 @@ class Rate extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Display name for the reviewer (manual preset, user, reservation customer, or anonymous).
+     */
+    public function reviewerDisplayName(): string
+    {
+        $manual = ManualRatingNames::labelForLocale($this->manual_customer_name);
+        if ($manual !== null && $manual !== '') {
+            return $manual;
+        }
+
+        return $this->user?->name
+            ?? $this->reservation?->customer?->name
+            ?? __('panel.anonymous');
     }
 
     /**

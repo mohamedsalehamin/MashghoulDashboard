@@ -8,7 +8,7 @@ use App\CatalogModule\Resources\RateResource\Pages\EditRate;
 use App\CatalogModule\Resources\RateResource\Pages\ListRates;
 use App\CatalogModule\Resources\RateResource\Pages\ViewRate;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use App\Models\User;
+use App\Support\ManualRatingNames;
 use App\UsersModule\Models\Provider;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
@@ -85,7 +85,15 @@ class RateResource extends Resource
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
-                            ->disabled(fn($record) => $record && $record->source !== 'manual'),
+                            ->disabled()
+                            ->visible(fn($record) => $record !== null && $record->source !== 'manual'),
+
+                        Select::make('manual_customer_name_index')
+                            ->label(__('panel.manual_rating_display_name'))
+                            ->options(fn() => ManualRatingNames::selectOptions())
+                            ->searchable()
+                            ->required(fn($record) => $record !== null && $record->source === 'manual')
+                            ->visible(fn($record) => $record !== null && $record->source === 'manual'),
 
                         Hidden::make('source')
                             ->default('manual'),
@@ -172,11 +180,11 @@ class RateResource extends Resource
                             ->required()
                             ->preload(),
 
-                        Select::make('user_id')
-                            ->label(__('forms.fields.customer_name'))
-                            ->relationship('user', 'name')
+                        Select::make('manual_customer_name_index')
+                            ->label(__('panel.manual_rating_display_name'))
+                            ->options(fn() => ManualRatingNames::selectOptions())
                             ->searchable()
-                            ->preload(),
+                            ->required(),
 
                         TextInput::make('service_rate')
                             ->label(__('panel.service_rate'))
@@ -256,10 +264,12 @@ class RateResource extends Resource
 
                 TextColumn::make('customer_name')
                     ->label(__('forms.fields.customer_name'))
-                    ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-')
+                    ->state(fn($record) => $record->reviewerDisplayName())
                     ->searchable(query: function ($query, $search) {
                         $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$search}%"))
-                              ->orWhereHas('reservation.customer', fn($q) => $q->where('name', 'like', "%{$search}%"));
+                              ->orWhereHas('reservation.customer', fn($q) => $q->where('name', 'like', "%{$search}%"))
+                              ->orWhere('manual_customer_name->ar', 'like', "%{$search}%")
+                              ->orWhere('manual_customer_name->en', 'like', "%{$search}%");
                     }),
 
                 // Service Rating Column
@@ -418,7 +428,7 @@ class RateResource extends Resource
 
                         TextEntry::make('user.name')
                             ->label(__('panel.customer'))
-                            ->state(fn($record) => $record->user?->name ?? $record->reservation?->customer?->name ?? '-'),
+                            ->state(fn($record) => $record->reviewerDisplayName()),
 
                         TextEntry::make('source')
                             ->label(__('panel.source'))

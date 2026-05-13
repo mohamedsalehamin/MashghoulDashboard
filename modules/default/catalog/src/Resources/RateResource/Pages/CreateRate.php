@@ -4,6 +4,7 @@ namespace App\CatalogModule\Resources\RateResource\Pages;
 
 use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Resources\RateResource;
+use App\Support\ManualRatingNames;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Enums\Width;
@@ -20,13 +21,26 @@ class CreateRate extends CreateRecord
 
     protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
+        $manual = ManualRatingNames::resolve($data['manual_customer_name_index'] ?? null);
+        if (!$manual) {
+            Notification::make()
+                ->title(__('panel.manual_rating_name_required'))
+                ->danger()
+                ->send();
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'manual_customer_name_index' => __('panel.manual_rating_name_required'),
+            ]);
+        }
+
         // Generate a unique pair_id to group service and place ratings together
         $pairId = Str::uuid()->toString();
 
         // Extract common data
         $commonData = [
             'provider_id' => $data['provider_id'],
-            'user_id' => $data['user_id'] ?? auth()->id(),
+            'user_id' => null,
+            'manual_customer_name' => $manual,
             'pair_id' => $pairId, // Links service and place ratings together
             'source' => 'manual',
             'is_approved' => $data['is_approved'] ?? true,

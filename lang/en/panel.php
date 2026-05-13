@@ -440,6 +440,8 @@ return [
     'add_manual_rating' => 'Add Manual Rating',
     'reservation_ratings' => 'Reservation Ratings',
     'manual_ratings' => 'Manual Ratings',
+    'manual_rating_display_name' => 'Reviewer display name',
+    'manual_rating_name_required' => 'Select a reviewer display name.',
     'pending_approval' => 'Pending Approval',
     'top_level_only' => 'Top Level Only',
     'service_rating' => 'Service Rating',
