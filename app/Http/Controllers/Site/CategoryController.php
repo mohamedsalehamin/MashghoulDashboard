@@ -132,7 +132,7 @@ class CategoryController extends Controller
             ->when($this->userLocationIsSet(), fn ($q) => $q->whereDistanceSphere('location', $point, '<=', ProviderListingRadius::maxDistanceMeters()))
             ->withDistanceSphere('location', $point)
             ->tap(fn ($q) => $this->applyProviderSort($q))
-            ->paginate(4)
+            ->paginate()
             ->withQueryString();
 
         return view('site.new.category-show', [
