@@ -9,6 +9,7 @@ use App\CatalogModule\Resources\SubscriptionResource\Pages\EditSubscription;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptionActivities;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptions;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ViewSubscription;
+use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
 use Filament\Actions\Action;
@@ -80,17 +81,25 @@ class SubscriptionResource extends Resource
                             $set('end_date', now()->addDays($planPrice->days_count)->format('Y-m-d'));
                         }
                     }),
+                Select::make('status')
+                    ->label(__('forms.fields.status'))
+                    ->options(collect(SubscriptionsStatusEnum::cases())
+                        ->mapWithKeys(fn (SubscriptionsStatusEnum $case) => [$case->value => $case->getLabel()])
+                        ->all())
+                    ->required()
+                    ->native(false)
+                    ->visibleOn('edit'),
                 DatePicker::make('start_date')
                     ->required()
                     ->native(false)
                     ->displayFormat('d M Y')
-                    ->visibleOn('create'),
+                    ->visibleOn(['create', 'edit']),
                 DatePicker::make('end_date')
                     ->required()
                     ->native(false)
                     ->displayFormat('d M Y')
                     ->after('start_date')
-                    ->visibleOn('create'),
+                    ->visibleOn(['create', 'edit']),
             ])->columns(1);
     }
 
