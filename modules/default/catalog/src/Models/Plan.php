@@ -4,7 +4,9 @@ namespace App\CatalogModule\Models;
 
 use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
+use App\DefaultPanel\Enum\UserStatus;
 use App\DefaultPanel\Traits\Publishable;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -118,6 +120,8 @@ class Plan extends Model
                 'status' => ReservationPaymentStatus::PAID->value,
                 'meta_data' => ['method' => 'system', 'gateway' => 'system', 'paid_at' => now()->toIso8601String()],
             ]);
+
+            User::where('id', $subscription->user_id)->update(['active' => UserStatus::ACTIVE]);
 
             return $this->freeSubscriptionSuccessUrl();
         }

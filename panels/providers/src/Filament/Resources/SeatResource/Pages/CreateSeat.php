@@ -22,8 +22,14 @@ class CreateSeat extends CreateRecord {
         parent::mount();
         $defaults = GeneralSettings::defaultSeatDaysListFromProvider(provider());
         if ($defaults !== []) {
+            // Form statePath is `data`: passing only meta_data would replace the whole array and
+            // drop defaults (e.g. provider_id from Hidden).
+            $existing = $this->data ?? [];
             $this->form->fill([
+                ...$existing,
+                'provider_id' => $existing['provider_id'] ?? provider()?->id,
                 'meta_data' => [
+                    ...($existing['meta_data'] ?? []),
                     'days_list' => $defaults,
                 ],
             ]);
@@ -37,6 +43,8 @@ class CreateSeat extends CreateRecord {
     }
 
     public function mutateFormDataBeforeCreate(array $data): array {
+        $data['provider_id'] = $data['provider_id'] ?? provider()?->id;
+
         // Capture from form state or $data; normalize structure
         $items = array_values($this->form->getState()['serviceGroups'] ?? $data['serviceGroups'] ?? []);
         $this->serviceGroupsSnapshot = array_map(function ($item) {

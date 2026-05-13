@@ -74,22 +74,7 @@ class ProfileSetupNotice extends Widget
 
     protected static function providerHasWorkHours(Provider $provider): bool
     {
-        $days = collect($provider->meta_data['days_list'] ?? []);
-
-        return $days->filter(function (array $day) {
-            $status = $day['status'] ?? false;
-
-            if (is_string($status)) {
-                $status = $status === '1' || strtolower($status) === 'true';
-            }
-
-            $on = $status === true || $status === 1;
-
-            $from = $day['from'] ?? null;
-            $to = $day['to'] ?? null;
-
-            return $on && $from !== null && $from !== '' && $to !== null && $to !== '';
-        })->isNotEmpty();
+        return $provider->hasConfiguredWorkHours();
     }
 
     /**

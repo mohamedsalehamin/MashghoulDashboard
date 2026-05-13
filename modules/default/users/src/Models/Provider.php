@@ -5,16 +5,20 @@ namespace App\UsersModule\Models;
 use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Reservation\Rate;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\Service;
 use App\CatalogModule\Models\Subscription;
 use App\ContentModule\Models\Category;
 use App\ContentModule\Models\City;
 use App\ContentModule\Models\ProviderActivity;
+use App\DefaultPanel\Enum\UserStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -71,11 +75,116 @@ class Provider extends Model implements HasMedia, Sitemapable
         });
     }
 
-    public function scopeEnabled($builder)
+    /** Upper bound for `meta_data.days_list` array slots checked in SQL (matches typical week + buffer). */
+    private const DAYS_LIST_SLOT_SQL_CHECK_LIMIT = 24;
+
+    public function scopeEnabled(Builder $builder): Builder
     {
         return $builder
-            ->whereHas('user', fn ($q) => $q->where('active', 1))
-            ->whereHas('activeSubscription');
+            ->whereHas('user', fn ($q) => $q->where('active', UserStatus::ACTIVE->value))
+            ->whereHas('activeSubscription')
+            ->whereHas('media', fn ($q) => $q->whereIn('collection_name', ['default', 'image', 'images']))
+            ->whereHas('seats')
+            ->whereHas('services')
+            ->whereNotNull('location')
+            ->tap(fn (Builder $b) => static::applyConfiguredWorkHoursQueryConstraint($b));
+    }
+
+    /**
+     * At least one working day is enabled with non-empty from/to (same rules as provider panel setup notice).
+     */
+    public function hasConfiguredWorkHours(): bool
+    {
+        $days = collect($this->meta_data['days_list'] ?? []);
+
+        return $days->filter(function ($day) {
+            if (! is_array($day)) {
+                return false;
+            }
+
+            $status = $day['status'] ?? false;
+
+            if (is_string($status)) {
+                $status = $status === '1' || strtolower($status) === 'true';
+            }
+
+            $on = $status === true || $status === 1;
+
+            $from = $day['from'] ?? null;
+            $to = $day['to'] ?? null;
+
+            return $on && $from !== null && $from !== '' && $to !== null && $to !== '';
+        })->isNotEmpty();
+    }
+
+    /**
+     * Restrict the query to providers with at least one enabled days_list slot that has from/to set.
+     * Built in PHP (no JSON_TABLE): OR of per-index JSON_EXTRACT conditions, aligned with {@see hasConfiguredWorkHours()}.
+     */
+    protected static function applyConfiguredWorkHoursQueryConstraint(Builder $builder): void
+    {
+        $driver = $builder->getConnection()->getDriverName();
+        $meta = static::qualifiedMetaDataColumn($builder);
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $parts = [];
+            for ($i = 0; $i < self::DAYS_LIST_SLOT_SQL_CHECK_LIMIT; $i++) {
+                $parts[] = '('.static::mysqlMariaDaysListSlotConfiguredSql($meta, $i).')';
+            }
+            $builder->whereRaw('('.implode(' OR ', $parts).')');
+
+            return;
+        }
+
+        if ($driver === 'sqlite') {
+            $parts = [];
+            for ($i = 0; $i < self::DAYS_LIST_SLOT_SQL_CHECK_LIMIT; $i++) {
+                $parts[] = '('.static::sqliteDaysListSlotConfiguredSql($meta, $i).')';
+            }
+            $builder->whereRaw('('.implode(' OR ', $parts).')');
+        }
+    }
+
+    protected static function qualifiedMetaDataColumn(Builder $builder): string
+    {
+        $grammar = $builder->getConnection()->getQueryGrammar();
+
+        return $grammar->wrapTable($builder->getModel()->getTable())
+            .'.'
+            .$grammar->wrap('meta_data');
+    }
+
+    /**
+     * One days_list[i] row matches enabled + from + to (MySQL / MariaDB JSON functions).
+     */
+    protected static function mysqlMariaDaysListSlotConfiguredSql(string $meta, int $index): string
+    {
+        $pStatus = sprintf('$.days_list[%d].status', $index);
+        $pFrom = sprintf('$.days_list[%d]."from"', $index);
+        $pTo = sprintf('$.days_list[%d]."to"', $index);
+
+        return '(('
+            .'LOWER(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pStatus.'\')), \'\'))) IN (\'true\', \'1\') '
+            .'OR JSON_EXTRACT('.$meta.', \''.$pStatus.'\') = CAST(\'true\' AS JSON) '
+            .'OR JSON_EXTRACT('.$meta.', \''.$pStatus.'\') = CAST(1 AS JSON)'
+            .') AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pFrom.'\')), \'\'))) > 0 '
+            .'AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pTo.'\')), \'\'))) > 0)';
+    }
+
+    /**
+     * Same slot rule for SQLite (tests / sqlite driver).
+     */
+    protected static function sqliteDaysListSlotConfiguredSql(string $meta, int $index): string
+    {
+        $pStatus = '$.days_list['.$index.'].status';
+        $pFrom = '$.days_list['.$index.'].from';
+        $pTo = '$.days_list['.$index.'].to';
+
+        return '(('
+            .'LOWER(TRIM(COALESCE(CAST(json_extract('.$meta.', \''.$pStatus.'\') AS TEXT), \'\'))) IN (\'true\', \'1\') '
+            .'OR CAST(json_extract('.$meta.', \''.$pStatus.'\') AS INTEGER) = 1'
+            .') AND length(trim(coalesce(CAST(json_extract('.$meta.', \''.$pFrom.'\') AS TEXT), \'\'))) > 0 '
+            .'AND length(trim(coalesce(CAST(json_extract('.$meta.', \''.$pTo.'\') AS TEXT), \'\'))) > 0)';
     }
 
     public function city()
@@ -146,6 +255,11 @@ class Provider extends Model implements HasMedia, Sitemapable
     public function seats()
     {
         return $this->hasMany(Seat::class);
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
     }
 
     public function rate()

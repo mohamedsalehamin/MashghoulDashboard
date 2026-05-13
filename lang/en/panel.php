@@ -1,8 +1,8 @@
 <?php
 return [
     'profile_setup' => [
-        'title' => 'Complete your business setup',
-        'description' => 'Finish these steps so customers can find you and book appointments.',
+        'title' => 'Start your journey with Mashghoul',
+        'description' => 'Complete your business profile to enable your customers to find you and book appointments professionally.',
         'add_first_chair' => 'Add your first chair (seat)',
         'add_first_service' => 'Add your first service',
         'complete_salon_and_hours' => 'Complete business profile: category, city, map location, images, and working hours',
