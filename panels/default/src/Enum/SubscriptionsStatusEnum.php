@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasLabel;
 
 enum SubscriptionsStatusEnum: string implements HasLabel {
     case PENDING = 'pending';
-    case RUNNING = 'running';
+    // case RUNNING = 'running';
     case PROCESSING = 'processing';
     case EXIPRED = 'exipred';
 
@@ -16,7 +16,8 @@ enum SubscriptionsStatusEnum: string implements HasLabel {
 
     public function getColor(): string {
         return match ($this->value) {
-            'running','processing', => 'success',
+            // 'running',
+            'processing' => 'success',
             'pending' => 'primary',
             'exipred'=> 'danger',
         };

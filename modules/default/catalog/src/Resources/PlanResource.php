@@ -27,7 +27,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 
@@ -243,7 +245,16 @@ class PlanResource extends Resource
                             ->action(fn (Model $record) => $record->toggleStatus())
                     ),
             ])
-            ->filters([])
+            ->filters([
+                SelectFilter::make('catalog_status')
+                    ->label(__('panel.stats.plans_catalog_status'))
+                    ->attribute('status')
+                    ->options([
+                        '1' => __('panel.enums.active'),
+                        '0' => __('panel.enums.inactive'),
+                    ])
+                    ->native(false),
+            ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -288,4 +299,11 @@ class PlanResource extends Resource
         return __('menu.payments');
     }
 
+    /**
+     * @param  array<string, array{value?: mixed, values?: mixed}>  $filterGroups
+     */
+    public static function getIndexUrlWithTableFilters(array $filterGroups = []): string
+    {
+        return static::getUrl('index', $filterGroups === [] ? [] : ['filters' => $filterGroups]);
+    }
 }

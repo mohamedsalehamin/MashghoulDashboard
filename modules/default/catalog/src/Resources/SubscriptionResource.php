@@ -9,6 +9,7 @@ use App\CatalogModule\Resources\SubscriptionResource\Pages\EditSubscription;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptionActivities;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ListSubscriptions;
 use App\CatalogModule\Resources\SubscriptionResource\Pages\ViewSubscription;
+use App\DefaultPanel\Enum\ReservationPaymentStatus;
 use App\DefaultPanel\Enum\SubscriptionsStatusEnum;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
 use App\UsersModule\Models\Provider;
@@ -25,7 +26,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class SubscriptionResource extends Resource
@@ -183,7 +186,50 @@ class SubscriptionResource extends Resource
                 TextColumn::make('start_date')->date('d M Y'),
                 TextColumn::make('end_date')->date('d M Y'),
             ])
-            ->filters([])
+            ->filters([
+                SelectFilter::make('segment')
+                    ->label(__('panel.stats.subscriptions_dashboard_scope'))
+                    ->options([
+                        'active_now' => __('panel.stats.subscriptions_active_now'),
+                        'expiring_soon' => __('panel.stats.subscriptions_expiring_soon'),
+                    ])
+                    ->native(false)
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['value'] ?? null) {
+                            'active_now' => $query->active(),
+                            'expiring_soon' => $query
+                                ->where('status', SubscriptionsStatusEnum::PROCESSING)
+                                ->whereDate('end_date', '>=', now())
+                                ->whereDate('end_date', '<=', now()->addDays(3)),
+                            default => $query,
+                        };
+                    }),
+                SelectFilter::make('status')
+                    ->label(__('forms.fields.status'))
+                    ->options(SubscriptionsStatusEnum::class)
+                    ->native(false),
+                SelectFilter::make('payment_status')
+                    ->label(__('forms.fields.payment_status'))
+                    ->options(ReservationPaymentStatus::class)
+                    ->native(false)
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        filled($data['value'] ?? null),
+                        fn (Builder $q): Builder => $q->whereHas(
+                            'transactions',
+                            fn (Builder $tq): Builder => $tq->where('status', $data['value'])
+                        )
+                    )),
+                SelectFilter::make('plan_id')
+                    ->label(__('menu.plan'))
+                    ->options(fn (): array => Plan::query()
+                        ->orderBy('id')
+                        ->get()
+                        ->mapWithKeys(fn (Plan $plan): array => [$plan->id => $plan->displayName()])
+                        ->all())
+                    ->searchable()
+                    ->preload()
+                    ->native(false),
+            ])
             ->recordActions([
                 Action::make('activities')
                     ->label(__('forms.actions.activities'))
@@ -235,5 +281,13 @@ class SubscriptionResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('menu.subscriptions_log');
+    }
+
+    /**
+     * @param  array<string, array{value?: mixed, values?: mixed}>  $filterGroups
+     */
+    public static function getIndexUrlWithTableFilters(array $filterGroups = []): string
+    {
+        return static::getUrl('index', $filterGroups === [] ? [] : ['filters' => $filterGroups]);
     }
 }

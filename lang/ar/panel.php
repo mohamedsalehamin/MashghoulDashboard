@@ -317,6 +317,8 @@ return [
         'subscriptions_by_status_processing' => 'الاشتراكات (قيد المعالجة)',
         'subscriptions_by_status_processing_description' => 'عادةً الاشتراكات المدفوعة النشطة',
         'subscriptions_by_status_expired' => 'الاشتراكات (منتهية)',
+        'subscriptions_dashboard_scope' => 'نطاق لوحة التحكم',
+        'plans_catalog_status' => 'حالة الباقة',
         'rates_count' => 'عدد التقييمات',
         'avg_rate' => 'متوسط التقييم',
         'seats_count' => 'عدد كراسي الخدمة',

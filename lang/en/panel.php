@@ -281,6 +281,8 @@ return [
         'subscriptions_by_status_processing' => 'Subscriptions (processing)',
         'subscriptions_by_status_processing_description' => 'Typically active paid subscriptions',
         'subscriptions_by_status_expired' => 'Subscriptions (expired)',
+        'subscriptions_dashboard_scope' => 'Dashboard scope',
+        'plans_catalog_status' => 'Plan status',
         'reservations_total' => "Reservations total",
         'providers_count' => "Providers count",
         'rates_count' => 'Rates count',
