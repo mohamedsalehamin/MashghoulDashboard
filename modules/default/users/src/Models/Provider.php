@@ -156,6 +156,7 @@ class Provider extends Model implements HasMedia, Sitemapable
 
     /**
      * One days_list[i] row matches enabled + from + to (MySQL / MariaDB JSON functions).
+     * Avoid CAST(x AS JSON): MariaDB rejects or mishandles it on common production versions.
      */
     protected static function mysqlMariaDaysListSlotConfiguredSql(string $meta, int $index): string
     {
@@ -163,12 +164,14 @@ class Provider extends Model implements HasMedia, Sitemapable
         $pFrom = sprintf('$.days_list[%d]."from"', $index);
         $pTo = sprintf('$.days_list[%d]."to"', $index);
 
+        $st = 'JSON_EXTRACT('.$meta.', \''.$pStatus.'\')';
+
         return '(('
-            .'LOWER(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pStatus.'\')), \'\'))) IN (\'true\', \'1\') '
-            .'OR JSON_EXTRACT('.$meta.', \''.$pStatus.'\') = CAST(\'true\' AS JSON) '
-            .'OR JSON_EXTRACT('.$meta.', \''.$pStatus.'\') = CAST(1 AS JSON)'
-            .') AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pFrom.'\')), \'\'))) > 0 '
-            .'AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pTo.'\')), \'\'))) > 0)';
+            .'LOWER(TRIM(COALESCE(JSON_UNQUOTE('.$st.'), CAST('.$st.' AS CHAR), \'\'))) IN (\'true\', \'1\') '
+            .'OR '.$st.' = TRUE '
+            .'OR '.$st.' = 1'
+            .') AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pFrom.'\')), CAST(JSON_EXTRACT('.$meta.', \''.$pFrom.'\') AS CHAR), \'\'))) > 0 '
+            .'AND CHAR_LENGTH(TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT('.$meta.', \''.$pTo.'\')), CAST(JSON_EXTRACT('.$meta.', \''.$pTo.'\') AS CHAR), \'\'))) > 0)';
     }
 
     /**
