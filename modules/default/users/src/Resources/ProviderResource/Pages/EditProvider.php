@@ -3,9 +3,13 @@
 namespace App\UsersModule\Resources\ProviderResource\Pages;
 
 use App\Support\PortfolioAlbumsFormState;
+use App\UsersModule\Models\Provider as SalonProvider;
 use App\UsersModule\Resources\ProviderResource;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Support\Enums\Width;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class EditProvider extends EditRecord
 {
@@ -22,22 +26,45 @@ class EditProvider extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $albums = data_get($data, 'provider.meta_data.portfolio_albums');
-        if (! is_array($albums)) {
-            return $data;
+        if (is_array($albums)) {
+            $provider = $this->record?->provider;
+            data_set($data, 'provider.meta_data.portfolio_albums', PortfolioAlbumsFormState::normalizeAlbums($provider, $albums));
         }
-        $provider = $this->record?->provider;
-        data_set($data, 'provider.meta_data.portfolio_albums', PortfolioAlbumsFormState::normalizeAlbums($provider, $albums));
+
+        if (empty(data_get($data, 'provider.slug')) && ($provider = $this->record?->provider)) {
+            data_set($data, 'provider.slug', SalonProvider::generateUniqueSlug($provider, $provider->id));
+        }
 
         return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $albums = data_get($data, 'provider.meta_data.portfolio_albums');
-        if (! is_array($albums)) {
-            return $data;
+        $salon = $this->record?->provider;
+        if ($salon) {
+            $slug = Str::slug(trim((string) data_get($data, 'provider.slug', '')), '-', 'en');
+            if ($slug === '') {
+                $slug = SalonProvider::generateUniqueSlug($salon, $salon->id);
+            }
+            Validator::make(
+                ['slug' => $slug],
+                [
+                    'slug' => [
+                        'required',
+                        'max:255',
+                        Rule::unique('providers', 'slug')->ignore($salon->id),
+                    ],
+                ],
+                [],
+                ['slug' => __('forms.fields.slug')]
+            )->validate();
+            data_set($data, 'provider.slug', $slug);
         }
-        data_set($data, 'provider.meta_data.portfolio_albums', PortfolioAlbumsFormState::normalizeIncomingMeta($albums));
+
+        $albums = data_get($data, 'provider.meta_data.portfolio_albums');
+        if (is_array($albums)) {
+            data_set($data, 'provider.meta_data.portfolio_albums', PortfolioAlbumsFormState::normalizeIncomingMeta($albums));
+        }
 
         return $data;
     }

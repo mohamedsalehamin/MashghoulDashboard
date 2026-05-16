@@ -83,7 +83,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ route('site.provider.gallery', $provider->id) }}" class="btn btn-blue mt-4 px-5">{{ __('site.heading.gallery') }}</a>
+                    <a href="{{ route('site.provider.gallery', $provider) }}" class="btn btn-blue mt-4 px-5">{{ __('site.heading.gallery') }}</a>
                 </div>
 
             </div>
@@ -317,15 +317,15 @@
                 <div class="booking-bar d-none" id="provider-booking-bar"
                      data-provider-id="{{ $provider->id }}"
                      data-reservation-fees="{{ $reservationFees }}"
-                     data-add-to-cart-url="{{ route('site.provider.cart.add', $provider->id) }}"
-                     data-login-url="{{ route('site.login') }}?intended={{ urlencode(route('site.provider.show', $provider->id)) }}"
+                     data-add-to-cart-url="{{ route('site.provider.cart.add', $provider) }}"
+                     data-login-url="{{ route('site.login') }}?intended={{ urlencode(route('site.provider.show', $provider)) }}"
                      data-is-guest="{{ auth()->guard('site')->guest() ? '1' : '0' }}">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="booking-price-info">
                             <div class="booking-total" data-booking-total>0 <i class="icon-saudi_riyal"></i></div>
                             <div class="booking-fee" data-booking-fee>{{ __('site.reservation_fees') ?? 'رسوم الحجز' }} {{ \Cknow\Money\Money::parse($reservationFees)->formatByDecimal() }} <i class="icon-saudi_riyal"></i></div>
                         </div>
-                        <form method="POST" action="{{ route('site.provider.cart.add', $provider->id) }}" id="provider-add-to-cart-form" class="d-inline">
+                        <form method="POST" action="{{ route('site.provider.cart.add', $provider) }}" id="provider-add-to-cart-form" class="d-inline">
                             @csrf
                             <input type="hidden" name="seat_id" id="provider-cart-seat-id" value="">
                             <div id="provider-cart-services-inputs"></div>

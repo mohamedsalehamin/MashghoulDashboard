@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('site.home') }}">{{ __('site.heading.home') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('site.categories') }}">{{ __('site.heading.categories') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider->id) }}">{{ $providerName }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider) }}">{{ $providerName }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ __('site.heading.gallery') }}</li>
         </ol>
     </nav>
@@ -73,7 +73,7 @@
         @empty
         <div class="text-center py-5">
             <p class="text-muted">{{ __('site.no_data') ?? 'لا توجد عناصر في المعرض' }}</p>
-            <a href="{{ route('site.provider.show', $provider->id) }}" class="btn btn-blue">{{ __('site.buttons.back') ?? 'رجوع' }}</a>
+            <a href="{{ route('site.provider.show', $provider) }}" class="btn btn-blue">{{ __('site.buttons.back') ?? 'رجوع' }}</a>
         </div>
         @endforelse
     </div>

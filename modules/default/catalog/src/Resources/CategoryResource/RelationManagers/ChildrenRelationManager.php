@@ -2,23 +2,23 @@
 
 namespace App\CatalogModule\Resources\CategoryResource\RelationManagers;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\Action;
 use App\ContentModule\Models\Category;
-use Filament\Forms;
+use Filament\Actions\Action;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class ChildrenRelationManager extends RelationManager {
+class ChildrenRelationManager extends RelationManager
+{
     protected static string $relationship = 'children';
 
-    public function form(Schema $schema): Schema {
+    public function form(Schema $schema): Schema
+    {
         return $schema
             ->components([
                 TextInput::make('id')
@@ -30,7 +30,8 @@ class ChildrenRelationManager extends RelationManager {
             ]);
     }
 
-    public function table(Table $table): Table {
+    public function table(Table $table): Table
+    {
         return $table
             ->recordTitleAttribute('id')
             ->heading(__('menu.categories'))
@@ -41,10 +42,10 @@ class ChildrenRelationManager extends RelationManager {
                     ->boolean()
                     ->action(
                         Action::make('Active')
-                            ->label(fn(Model $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
-                            ->disabled(fn(Model $record): bool => !auth()->user()->can('update', $record))
+                            ->label(fn (Model $record): string => $record->status ? __('panel.messages.deactivate') : __('panel.messages.activate'))
+                            ->disabled(fn (Model $record): bool => ! auth()->user()->can('update', $record))
                             ->requiresConfirmation()
-                            ->action(fn(Model $record) => $record->toggleStatus())
+                            ->action(fn (Model $record) => $record->toggleStatus())
 
                     )->toggleable(false),
             ])
@@ -57,22 +58,36 @@ class ChildrenRelationManager extends RelationManager {
 
                 Action::make('edit')
                     ->label(__('forms.fields.edit'))
-                    ->url(fn(Category $record): string => route('filament.admin.resources.categories.edit', $record->id)),
+                    ->url(fn (Category $record): string => route('filament.admin.resources.categories.edit', $record->id)),
                 Action::make('delete')
                     ->label(__('panel.actions.delete'))
                     ->color('danger')
                     ->before(function ($action, Category $category) {
-                        if ($category->products()->count()) {
+                        $label = $category->getTranslation('name', app()->getLocale()) ?: ('#'.$category->getKey());
+
+                        if ($category->children()->exists()) {
                             Notification::make()
                                 ->warning()
                                 ->title(__('panel.messages.warning'))
-                                ->body(__('panel.messages.category_has_many_products', ['category' => $category->name]))
+                                ->body(__('panel.messages.category_has_many_subcategories', ['category' => $label]))
+                                ->persistent()
+                                ->send();
+                            $action->cancel();
+
+                            return;
+                        }
+
+                        if ($category->posts()->exists()) {
+                            Notification::make()
+                                ->warning()
+                                ->title(__('panel.messages.warning'))
+                                ->body(__('panel.messages.category_has_many_posts', ['category' => $label]))
                                 ->persistent()
                                 ->send();
                             $action->cancel();
                         }
                     })
-                    ->action(fn(Category $record) => $record->delete()),
+                    ->action(fn (Category $record) => $record->delete()),
             ])
             ->toolbarActions([
 
@@ -83,11 +98,13 @@ class ChildrenRelationManager extends RelationManager {
 
     }
 
-    protected function canEdit(Model $record): bool {
+    protected function canEdit(Model $record): bool
+    {
         return true;
     }
 
-    protected function canDelete(Model $record): bool {
+    protected function canDelete(Model $record): bool
+    {
         return true;
     }
 }

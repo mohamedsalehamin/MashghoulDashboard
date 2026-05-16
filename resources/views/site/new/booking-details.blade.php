@@ -84,7 +84,7 @@
                         </div>
                         <div class="data-item">
                             <span class="label"><i class="fa-solid fa-angles-left"></i> {{ __('site.heading.show_on_map') }}</span>
-                            <a href="{{ $provider ? route('site.provider.map', $provider->id) : '#' }}" class="value text-danger text-decoration-underline">{{ __('site.heading.show_on_map') }}</a>
+                            <a href="{{ $provider ? route('site.provider.map', $provider) : '#' }}" class="value text-danger text-decoration-underline">{{ __('site.heading.show_on_map') }}</a>
                         </div>
                         @if(!empty($workingDaysList))
                         <div class="data-item working-hours">

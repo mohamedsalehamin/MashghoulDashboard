@@ -3,11 +3,11 @@
 namespace App\DefaultPanel\Resources\Api\Customer;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Money\Money;
 
-class LightProviderResource extends JsonResource {
-
-    public function toArray($request) {
+class LightProviderResource extends JsonResource
+{
+    public function toArray($request)
+    {
 
         return [
             'id' => $this->id,
@@ -26,27 +26,29 @@ class LightProviderResource extends JsonResource {
 
             'working_days' => WorkingTimesResource::collection(collect($this->meta_data['days_list'] ?? [])->where('status', 1)),
             'reservation_fees_include_taxes' => \Cknow\Money\Money::parse(floatval($this->reservation_fees_include_taxes))->format(),
+            'slug' => $this->slug,
             'favorite' => $request->user('sanctum')?->isFavorited($this) ?? false,
 
         ];
     }
+
     /**
      * Average rating including ALL reservation-based + manual ratings (excluding replies).
      */
     private function getAvgRate(): float
     {
         $avg = \App\CatalogModule\Models\Reservation\Rate::query()
-            ->where(function($query) {
+            ->where(function ($query) {
                 // Reservation-based ratings
-                $query->whereHas('reservation', function($q) {
+                $query->whereHas('reservation', function ($q) {
                     $q->where('reservable_type', \App\UsersModule\Models\Provider::class)
                         ->where('reservable_id', $this->id);
                 })
                 // OR manual ratings with this provider
-                ->orWhere(function($q) {
-                    $q->where('provider_id', $this->user_id)
-                        ->where('source', 'manual');
-                });
+                    ->orWhere(function ($q) {
+                        $q->where('provider_id', $this->user_id)
+                            ->where('source', 'manual');
+                    });
             })
             ->whereNull('parent_id') // exclude replies
             ->where('is_approved', true)
@@ -55,5 +57,4 @@ class LightProviderResource extends JsonResource {
 
         return (float) ($avg ?? 0);
     }
-
 }

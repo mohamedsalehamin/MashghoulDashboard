@@ -7,7 +7,7 @@
     <nav class="custom-breadcrumb-nav my-4" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('site.home') }}">{{ __('site.heading.home') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider->id) }}">{{ $provider->getTranslation('name', $locale) }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider) }}">{{ $provider->getTranslation('name', $locale) }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ __('site.heading.book_now') }}</li>
         </ol>
     </nav>

@@ -14,13 +14,14 @@ use App\DefaultPanel\Enum\UserStatus;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Models\User;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 use Spatie\MediaLibrary\HasMedia;
@@ -73,6 +74,87 @@ class Provider extends Model implements HasMedia, Sitemapable
                 $model->wallet()->create(['balance' => 0, 'name' => 'Default Wallet']);
             }
         });
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Provider $provider) {
+            if (empty($provider->slug)) {
+                $provider->slug = static::generateUniqueSlug($provider, null);
+            }
+        });
+    }
+
+    /**
+     * Public profile URL segment: prefer slug when set (after backfill), else legacy id.
+     */
+    public function getRouteKey(): string|int
+    {
+        return $this->slug !== null && $this->slug !== '' ? $this->slug : $this->getKey();
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if ($field !== null) {
+            return static::query()->where($field, $value)->first();
+        }
+
+        $query = static::query();
+
+        $bySlug = (clone $query)->where('slug', $value)->first();
+        if ($bySlug !== null) {
+            return $bySlug;
+        }
+
+        if (ctype_digit((string) $value)) {
+            return (clone $query)->where('id', (int) $value)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Build a unique URL slug from provider name (prefers English, then Arabic).
+     */
+    public static function generateUniqueSlug(self $provider, ?int $ignoreId = null): string
+    {
+        $base = static::slugBaseFromProvider($provider);
+        $slug = Str::slug($base, '-', 'en');
+        if ($slug === '') {
+            $slug = 'provider';
+        }
+
+        return static::ensureUniqueSlug($slug, $ignoreId ?? $provider->id);
+    }
+
+    public static function slugBaseFromProvider(self $provider): string
+    {
+        $name = $provider->getTranslation('name', 'en')
+            ?: $provider->getTranslation('name', 'ar')
+            ?: 'provider';
+
+        return is_string($name) ? $name : (string) $name;
+    }
+
+    public static function ensureUniqueSlug(string $slug, ?int $ignoreId): string
+    {
+        $base = Str::limit($slug, 240, '');
+        $candidate = $base;
+        $n = 0;
+        while (static::query()
+            ->when($ignoreId !== null, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->where('slug', $candidate)
+            ->exists()) {
+            $n++;
+            $candidate = $base.'-'.$n;
+        }
+
+        return Str::limit($candidate, 255, '');
     }
 
     /** Upper bound for `meta_data.days_list` array slots checked in SQL (matches typical week + buffer). */
@@ -368,7 +450,8 @@ class Provider extends Model implements HasMedia, Sitemapable
         $locales = array_keys(config('laravellocalization.supportedLocales', ['ar' => [], 'en' => []]));
         $urls = [];
         foreach ($locales as $locale) {
-            $urls[] = Url::create("{$baseUrl}/{$locale}/providers/{$this->id}")
+            $key = $this->slug ?: $this->id;
+            $urls[] = Url::create("{$baseUrl}/{$locale}/providers/{$key}")
                 ->setLastModificationDate($this->updated_at ? \Carbon\Carbon::parse($this->updated_at) : now())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                 ->setPriority(0.7);

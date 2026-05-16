@@ -9,7 +9,7 @@ use App\ContentModule\Models\ProviderActivity;
 use App\ContentModule\Models\State;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\Forms\Components\SafeRepeater;
-use App\Support\PortfolioAlbumsFormState;
+use App\UsersModule\Models\Provider;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -25,6 +25,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use libphonenumber\PhoneNumberType;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -334,6 +337,11 @@ class EditProfilePage extends Page
                                                 ->placeholder(__('forms.placeholders.meta_keywords_tags')),
                                         ]),
                                 ]),
+                            TextInput::make('slug')
+                                ->label(__('forms.fields.slug'))
+                                ->helperText(__('forms.placeholders.slug_auto'))
+                                ->maxLength(255)
+                                ->required(),
                         ])->relationship('provider'),
                     ]),
                     Tab::make(__('sections.bank_account_information'))->schema([
@@ -388,6 +396,14 @@ class EditProfilePage extends Page
         ]);
 
         $this->normalizePortfolioAlbumsStatePath();
+
+        if (empty(data_get($this->record, 'provider.slug'))) {
+            data_set(
+                $this->record,
+                'provider.slug',
+                Provider::generateUniqueSlug(provider(), provider()->id)
+            );
+        }
     }
 
     /**
@@ -423,10 +439,29 @@ class EditProfilePage extends Page
             'bio',
             'city_id',
             'category_id',
+            'slug',
             'meta_description',
             'meta_keywords',
             'meta_data',
         ])->toArray();
+
+        $slug = Str::slug(trim((string) ($providerPayload['slug'] ?? '')), '-', 'en');
+        if ($slug === '') {
+            $slug = Provider::generateUniqueSlug(provider(), provider()->id);
+        }
+        Validator::make(
+            ['slug' => $slug],
+            [
+                'slug' => [
+                    'required',
+                    'max:255',
+                    Rule::unique('providers', 'slug')->ignore(provider()->id),
+                ],
+            ],
+            [],
+            ['slug' => __('forms.fields.slug')]
+        )->validate();
+        $providerPayload['slug'] = $slug;
 
         $portfolioAlbums = PortfolioAlbumsFormState::normalizeIncomingMeta(
             collect(data_get($providerPayload, 'meta_data.portfolio_albums', []))

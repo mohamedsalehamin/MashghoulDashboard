@@ -36,6 +36,7 @@ return [
         "pay_subscription_via_wallet" => "A sum of :شوخعرف was paid for the subscription to Package No. :id",
         'customers_only_have_inactive_subscription_will_appear_here' => 'Customers only have inactive subscription will appear here',
         'category_has_many_subcategories' => 'You cannot delete category :category for it has subcategories',
+        'category_has_many_posts' => 'You cannot delete category :category because it has linked blog posts',
         'zone_has_many_city' => 'You cannot delete zone :zone for it has cities',
         'deactivate' => 'Deactivate',
         'activate' => 'Activate',

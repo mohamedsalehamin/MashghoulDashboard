@@ -12,7 +12,7 @@
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="{{ route('site.home') }}">{{ __('site.heading.home') }}</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('site.categories') }}">{{ __('site.heading.categories') }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider->id) }}">{{ $providerName }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('site.provider.show', $provider) }}">{{ $providerName }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ __('site.heading.location_on_map') }}</li>
             </ol>
         </nav>

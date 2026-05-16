@@ -48,11 +48,11 @@ class ProviderController extends Controller
         ];
     }
 
-    public function show(int $provider)
+    public function show(Provider $provider)
     {
         // Clear cart when navigating to a different provider (like old_tmoono Lab clears on mount)
         $cartProviderId = session('cart_provider_id');
-        if ($cartProviderId !== null && (int) $cartProviderId !== (int) $provider) {
+        if ($cartProviderId !== null && (int) $cartProviderId !== (int) $provider->id) {
             app('cart')->clear();
             session()->forget(['cart_provider_id', 'reservation_data']);
         }
@@ -73,7 +73,8 @@ class ProviderController extends Controller
                     'services' => fn ($s) => $s->enabled()->with('products'),
                 ]),
             ])
-            ->findOrFail($provider);
+            ->whereKey($provider->id)
+            ->firstOrFail();
 
         $locale = app()->getLocale();
         $title = $provider->getTranslation('name', $locale);
@@ -117,7 +118,7 @@ class ProviderController extends Controller
 
         $siteUserId = site()->user()?->id;
         $isFavorited = $siteUserId ? $provider->isFavorited($siteUserId) : false;
-        $shareLink = route('site.provider.show', $provider->id);
+        $shareLink = route('site.provider.show', $provider);
 
         return view('site.new.provider-show', array_merge($this->sharedData(), [
             'provider' => $provider,
@@ -224,12 +225,13 @@ class ProviderController extends Controller
         })->values()->toArray();
     }
 
-    public function gallery(int $provider)
+    public function gallery(Provider $provider)
     {
         $provider = Provider::enabled()
             ->withoutTrashed()
             ->whereHas('user')
-            ->findOrFail($provider);
+            ->whereKey($provider->id)
+            ->firstOrFail();
 
         $portfolio = $this->getPortfolioAlbums($provider);
         $locale = app()->getLocale();
@@ -242,12 +244,13 @@ class ProviderController extends Controller
         ]));
     }
 
-    public function map(int $provider)
+    public function map(Provider $provider)
     {
         $provider = Provider::enabled()
             ->withoutTrashed()
             ->whereHas('user')
-            ->findOrFail($provider);
+            ->whereKey($provider->id)
+            ->firstOrFail();
 
         $location = $provider->location;
         if (! $location) {
@@ -329,7 +332,7 @@ class ProviderController extends Controller
             'seat_id' => $request->validated('seat_id'),
         ]]);
 
-        return redirect()->route('site.booking.create', $provider->id);
+        return redirect()->route('site.booking.create', $provider);
     }
 
     public function toggleFavorite(Provider $provider): JsonResponse

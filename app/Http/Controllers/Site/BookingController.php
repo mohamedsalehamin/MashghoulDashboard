@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\CatalogModule\Models\Reservation;
 use App\CatalogModule\Models\Seat;
+use App\CatalogModule\Models\Transaction;
 use App\ContentModule\Models\Page;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Settings\LandingSettings;
 use App\Http\Controllers\Controller;
 use App\UsersModule\Models\Provider;
-use App\CatalogModule\Models\Reservation;
-use App\CatalogModule\Models\Transaction;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class BookingController extends Controller
 {
     protected function sharedData(): array
     {
-        $settings = new GeneralSettings();
-        $landingSettings = new LandingSettings();
+        $settings = new GeneralSettings;
+        $landingSettings = new LandingSettings;
         $appPages = $landingSettings->content['app_pages'] ?? [];
         $pages = collect($appPages)->mapWithKeys(function ($pageId, $pageName) {
             return [$pageName => Page::find($pageId)];
@@ -33,28 +33,28 @@ class BookingController extends Controller
         ];
     }
 
-    public function create(int $provider): \Illuminate\View\View|RedirectResponse
+    public function create(Provider $provider): \Illuminate\View\View|RedirectResponse
     {
-        $provider = Provider::with('city')->enabled()->withoutTrashed()->whereHas('user')->findOrFail($provider);
+        $provider = Provider::with('city')->enabled()->withoutTrashed()->whereHas('user')->whereKey($provider->id)->firstOrFail();
 
         // Cart must have items for this provider (like old_tmoono EnsureThatCartExist)
         $cartProviderId = session('cart_provider_id');
         $cart = app('cart');
         if ((int) $cartProviderId !== (int) $provider->id || $cart->getContent()->isEmpty()) {
             return redirect()
-                ->route('site.provider.show', $provider->id)
+                ->route('site.provider.show', $provider)
                 ->with('warning', __('site.heading.select_services_first') ?? 'يرجى اختيار الخدمات أولاً');
         }
 
         $reservationData = session('reservation_data', []);
         $seatId = $reservationData['seat_id'] ?? $provider->seats()->enabled()->first()?->id;
-        if (!$seatId) {
-            return redirect()->route('site.provider.show', $provider->id)
+        if (! $seatId) {
+            return redirect()->route('site.provider.show', $provider)
                 ->with('warning', __('site.heading.select_services_first'));
         }
         $seat = Seat::with('provider')->find($seatId);
-        if (!$seat || $seat->provider_id !== $provider->id) {
-            return redirect()->route('site.provider.show', $provider->id)
+        if (! $seat || $seat->provider_id !== $provider->id) {
+            return redirect()->route('site.provider.show', $provider)
                 ->with('warning', __('site.heading.select_services_first'));
         }
 
@@ -66,27 +66,28 @@ class BookingController extends Controller
                 'quantity' => $p->quantity ?? 1,
                 'name' => is_array($p->title ?? null) ? ($p->getTranslation('title', app()->getLocale()) ?? '') : ($p->title ?? ''),
                 'price' => $p->price->formatByDecimal(),
-                'total_price' => \Cknow\Money\Money::parse((!$p->sale_price->isZero() ? $p->sale_price->formatByDecimal() : $p->price->formatByDecimal()) * ($p->quantity ?? 1))->formatByDecimal(),
+                'total_price' => \Cknow\Money\Money::parse((! $p->sale_price->isZero() ? $p->sale_price->formatByDecimal() : $p->price->formatByDecimal()) * ($p->quantity ?? 1))->formatByDecimal(),
             ])->values()->toArray();
+
             return [
                 'id' => $item->associatedModel->id,
                 'name' => is_array($item->associatedModel->title ?? null) ? ($item->associatedModel->getTranslation('title', app()->getLocale()) ?? '') : ($item->associatedModel->title ?? ''),
                 'duration' => $item->associatedModel->duration ?? 0,
                 'image' => $item->associatedModel->getFirstMediaUrl(),
                 'service_price' => $item->associatedModel->price->formatByDecimal(),
-                'sale_price' => !$item->associatedModel->sale_price->isZero() ? $item->associatedModel->sale_price->formatByDecimal() : null,
+                'sale_price' => ! $item->associatedModel->sale_price->isZero() ? $item->associatedModel->sale_price->formatByDecimal() : null,
                 'products' => $productsArray,
             ];
         })->values()->toArray();
 
         $totals = $cart->formattedTotals();
-        $pointsEarned = (new GeneralSettings())->getPointsOnAction('reserve') ?? 0;
+        $pointsEarned = (new GeneralSettings)->getPointsOnAction('reserve') ?? 0;
         $reservationFlow = $provider->user?->options?->reservation_flow ?? 'total';
         $completeOrderText = $provider->user?->options?->texts[app()->getLocale()]['text_when_order_completed'] ?? ($provider->user?->options?->text_when_order_completed ?? '');
 
         $workingDays = collect($provider->meta_data['days_list'] ?? [])->where('status', 1)->values()->toArray();
         $nextDays = $this->getNext11Days($workingDays);
-        $landingSettings = new LandingSettings();
+        $landingSettings = new LandingSettings;
         $termsPageId = $landingSettings->content['app_pages']['terms_and_conditions']
             ?? $landingSettings->content['site_pages']['terms_and_conditions']
             ?? null;
@@ -137,6 +138,7 @@ class BookingController extends Controller
 
         if (in_array($reason, ['tabby_cancel', 'tabby_failure'], true)) {
             $messageKey = $reason === 'tabby_cancel' ? 'validation.tabby.redirect_cancel' : 'validation.tabby.redirect_failure';
+
             return view('site.new.booking-checkout-error', array_merge($this->sharedData(), [
                 'tabbyReason' => $reason,
                 'tabbyMessage' => __($messageKey),
@@ -162,12 +164,13 @@ class BookingController extends Controller
             $dayName = strtolower($date->format('l'));
             $disable = collect($workingDays)->where('day_name', $dayName)->where('status', 1)->isEmpty();
             $days[] = [
-                'title' => __('forms.fields.weekdays.' . $dayName),
+                'title' => __('forms.fields.weekdays.'.$dayName),
                 'date' => $date->format('Y-m-d'),
                 'dateText' => $date->format('m-d'),
                 'disable' => $disable,
             ];
         }
+
         return $days;
     }
 
@@ -191,7 +194,7 @@ class BookingController extends Controller
                 $totalDuration += $duration * ($item->quantity ?? 1);
                 $price = method_exists($item, 'getPriceSumWithConditions') ? $item->getPriceSumWithConditions(true) : 0;
                 $servicesList[] = [
-                    'name' => $name . ($duration ? ' (' . $duration . ' ' . __('site.minutes') . ')' : ''),
+                    'name' => $name.($duration ? ' ('.$duration.' '.__('site.minutes').')' : ''),
                     'duration' => $duration,
                     'quantity' => $item->quantity ?? 1,
                     'price' => $price ? \Cknow\Money\Money::parse($price)->formatByDecimal() : '—',
@@ -232,22 +235,24 @@ class BookingController extends Controller
         ];
         $workingHoursText = collect($workingDays)->map(function ($day) use ($daysLabels) {
             $dayName = $daysLabels[$day['day_name'] ?? ''] ?? $day['day_name'] ?? '';
-            return $dayName . ': ' . ($day['from'] ?? '') . ' - ' . ($day['to'] ?? '');
+
+            return $dayName.': '.($day['from'] ?? '').' - '.($day['to'] ?? '');
         })->implode(' | ');
 
         $workingDaysList = collect($workingDays)->map(function ($day) use ($daysLabels) {
             $dayName = $daysLabels[$day['day_name'] ?? ''] ?? $day['day_name'] ?? '';
-            return $dayName . ': ' . ($day['from'] ?? '') . ' - ' . ($day['to'] ?? '');
+
+            return $dayName.': '.($day['from'] ?? '').' - '.($day['to'] ?? '');
         })->values()->all();
 
         $paymentMethod = '—';
         $paidAmount = $reservation->price->formatByDecimal();
         if ($reservation->transaction) {
             $gateway = $reservation->transaction->meta_data['gateway'] ?? $reservation->transaction->meta_data['method'] ?? null;
-            $paymentMethod = $gateway ? __('panel.gateways.' . $gateway) : ($reservation->transaction->meta_data['method'] ?? '—');
+            $paymentMethod = $gateway ? __('panel.gateways.'.$gateway) : ($reservation->transaction->meta_data['method'] ?? '—');
         }
 
-        $pointsEarned = (int) ($reservation->meta_data['points'] ?? (new GeneralSettings())->getPointsOnAction('reserve') ?? 0);
+        $pointsEarned = (int) ($reservation->meta_data['points'] ?? (new GeneralSettings)->getPointsOnAction('reserve') ?? 0);
 
         $serviceRating = $reservation->rates()->where('type', 'service')->first();
         $placeRating = $reservation->rates()->where('type', 'place')->first();

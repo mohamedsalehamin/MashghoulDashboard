@@ -42,6 +42,7 @@ return [
 
         'send_otp_code' => 'إرسال كود التحقق',
         'category_has_many_subcategories' => 'لا يمكنك حذف القسم :category لوجود أقسام فرعية مرتبطة به',
+        'category_has_many_posts' => 'لا يمكنك حذف القسم :category لوجود مقالات مرتبطة به',
         'shipping_error' => 'حدث خطأ أثناء عملية الشحن',
         'customers_only_have_inactive_subscription_will_appear_here' => 'العملاء الذين لديهم اشتراك منتهي فقط  من سيظهرون هنا',
         'zone_has_many_city' => 'لا يمكنك حذف المنطقة :zone لوجود مدن مرتبطة بها',

@@ -356,6 +356,10 @@ class ProviderResource extends Resource
                                             ->placeholder(__('forms.placeholders.meta_keywords_tags')),
                                     ]),
                             ]),
+                        TextInput::make('slug')
+                            ->label(__('forms.fields.slug'))
+                            ->helperText(__('forms.placeholders.slug_auto'))
+                            ->maxLength(255),
                     ])->relationship('provider'),
                 ]),
                 Tab::make(__('sections.bank_account_information'))->schema([
