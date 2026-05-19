@@ -30,7 +30,6 @@ use App\CatalogModule\Resources\ServiceResource\Pages\ViewService;
 use App\CatalogModule\Resources\ServiceResource\RelationManagers\ProductsRelationManager;
 use App\DefaultPanel\Settings\GeneralSettings;
 use App\DefaultPanel\Traits\Filament\HasTranslationLabel;
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use App\Filament\Imports\ProductsImporter;
 use App\Filament\Imports\ServicesImporter;
 use App\UsersModule\Models\Provider;
@@ -56,7 +55,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\Builder;
 
-class ServiceResource extends Resource implements HasShieldPermissions {
+class ServiceResource extends Resource {
     use HasTranslationLabel, Translatable;
 
     protected static ?string $model = Service::class;
@@ -393,23 +392,6 @@ class ServiceResource extends Resource implements HasShieldPermissions {
 
     public static function getGlobalSearchResultTitle(Model $record): string {
         return $record->name;
-    }
-
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view_any',
-            'view',
-            'create',
-            'update',
-            'restore',
-            'restore_any',
-            'reorder',
-            'delete',
-            'delete_any',
-            'force_delete',
-            'force_delete_any',
-        ];
     }
 
 }
