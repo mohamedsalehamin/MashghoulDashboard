@@ -5,6 +5,7 @@ namespace App\ReportsModule\Resources;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Maatwebsite\Excel\Excel;
 use App\CatalogModule\Models\Commission;
@@ -25,6 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Money\Money;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
@@ -126,24 +128,21 @@ class ReservationCommissionResource extends Resource {
                     ->icon('heroicon-o-currency-dollar')
                     ->hidden(fn($record) => $record->transferred)
                     ->requiresConfirmation()
-                    ->action(function (Commission $record) {
-                        $record->reservation->reservable->user->notify(new AdminSendEntitlementsNotification());
-                        $record->reservation->reservable->deposit(
-                            amount: $record->amount->formatByDecimal(),
-                            meta: [
-                                'description' => [
-                                    'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->amount, 'ID' => $record->reservation_id], 'ar'),
-                                    'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->amount, 'ID' => $record->reservation_id], 'en'),
-                                ],
-                            ]
-                        );
-                        $record->update(['transferred' => true, 'confirmed' => true]);
-
-                    })
+                    ->action(fn (Commission $record) => static::transferCommission($record))
                     ->label(__('forms.actions.transfer'))
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('transfer')
+                        ->label(__('panel.transfer_selected'))
+                        ->icon('heroicon-o-currency-dollar')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (Collection $records): void {
+                            $records
+                                ->filter(fn (Commission $record) => ! $record->transferred)
+                                ->each(fn (Commission $record) => static::transferCommission($record));
+                        }),
                     ExportBulkAction::make()->exports([
                         ExcelExport::make("CSV")
                             ->fromTable()
@@ -179,6 +178,21 @@ class ReservationCommissionResource extends Resource {
     public static function getMaxContentWidth(): Width
     {
         return Width::Full;
+    }
+
+    protected static function transferCommission(Commission $record): void
+    {
+        $record->reservation->reservable->user->notify(new AdminSendEntitlementsNotification());
+        $record->reservation->reservable->deposit(
+            amount: $record->amount->formatByDecimal(),
+            meta: [
+                'description' => [
+                    'ar' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->amount, 'ID' => $record->reservation_id], 'ar'),
+                    'en' => __('panel.messages.admin_transfer_lab_commission', ['AMOUNT' => $record->amount, 'ID' => $record->reservation_id], 'en'),
+                ],
+            ]
+        );
+        $record->update(['transferred' => true, 'confirmed' => true]);
     }
 
 }

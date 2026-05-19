@@ -463,6 +463,7 @@ return [
     'reject' => 'Reject',
     'approve_selected' => 'Approve Selected',
     'reject_selected' => 'Reject Selected',
+    'transfer_selected' => 'Transfer Selected',
     'no_replies' => 'No replies yet',
     'general' => 'General',
 ];

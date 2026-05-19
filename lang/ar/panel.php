@@ -493,6 +493,7 @@ return [
     'reject' => 'رفض',
     'approve_selected' => 'الموافقة على المحدد',
     'reject_selected' => 'رفض المحدد',
+    'transfer_selected' => 'تحويل المحدد',
     'no_replies' => 'لا توجد ردود بعد',
     'general' => 'عام',
 ];
