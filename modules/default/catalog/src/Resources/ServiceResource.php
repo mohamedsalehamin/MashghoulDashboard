@@ -16,6 +16,8 @@ use Livewire\Component;
 use Filament\Actions\ImportAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\CreateAction;
 use App\CatalogModule\Models\Product;
 use App\CatalogModule\Models\Seat;
@@ -164,6 +166,7 @@ class ServiceResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')
                     ->translateLabel()
@@ -178,7 +181,10 @@ class ServiceResource extends Resource {
                 TextColumn::make('price')->searchable(),
                 TextColumn::make('sale_price')->money('SAR'),
                 TextColumn::make('products_count')->counts("products")->searchable(false),
-
+                TextColumn::make('created_at')
+                    ->label(__('forms.fields.created_at'))
+                    ->dateTime()
+                    ->sortable(),
 
                 IconColumn::make('status')
                     ->boolean()
@@ -330,9 +336,9 @@ class ServiceResource extends Resource {
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-
-
                     DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                 ]),
             ])
 //            ->checkIfRecordIsSelectableUsing(fn(Model $record): bool => !$record->orders()->count())

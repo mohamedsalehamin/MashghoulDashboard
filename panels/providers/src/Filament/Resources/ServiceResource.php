@@ -146,6 +146,7 @@ class ServiceResource extends Resource {
     public static function table(Table $table): Table {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('provider_id', provider()->id))
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('index')->rowIndex(),
                 TextColumn::make('id')->translateLabel()->searchable(),
