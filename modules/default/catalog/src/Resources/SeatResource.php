@@ -188,6 +188,7 @@ class SeatResource extends Resource {
 
     public static function table(Table $table): Table {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn($query) => $query->whereHas("provider"))
             ->columns([
                 TextColumn::make('id')
@@ -201,7 +202,10 @@ class SeatResource extends Resource {
                 TextColumn::make('services_count')
                     ->state(fn(Model $record) => $record->services()->where('provider_id',$record->provider->id)->count())
                     ->searchable(false),
-                TextColumn::make('created_at')->date(),
+                TextColumn::make('created_at')
+                    ->label(__('forms.fields.created_at'))
+                    ->dateTime()
+                    ->sortable(),
 
 
                 IconColumn::make('status')
