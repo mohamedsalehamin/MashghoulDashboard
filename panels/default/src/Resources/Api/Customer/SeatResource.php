@@ -21,8 +21,8 @@ class SeatResource extends JsonResource {
                 'title' => $g->getTranslations('title')[app()->getLocale()],
             ])->values()->all(),
             'services' => ServiceResource::collection($services),
-            'working_days' => WorkingTimeSlotsResource::collection(
-                GeneralSettings::normalizeSeatDaysListToShifts($this->meta_data['days_list'] ?? [])
+            'working_days' => WorkingTimesResource::collection(
+                GeneralSettings::flatActiveSeatDaysList($this->meta_data['days_list'] ?? [])
             ),
         ];
     }

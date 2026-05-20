@@ -67,10 +67,8 @@ class Seat extends Model {
             return collect([]);
         }
 
-        $list = collect(array_values($this->meta_data['days_list'] ?? []))
-            ->flatten(1)
+        $list = collect(GeneralSettings::flatActiveSeatDaysList($this->meta_data['days_list'] ?? []))
             ->where('day_name', $day)
-            ->where('status', true)
             ->values();
 
         if (empty($list)) {

@@ -238,6 +238,20 @@ class GeneralSettings extends Settings {
     }
 
     /**
+     * Active seat day rows as a flat list (for API and availability checks).
+     *
+     * @param  list<mixed>  $daysList
+     * @return list<array<string, mixed>>
+     */
+    public static function flatActiveSeatDaysList(array $daysList): array
+    {
+        return collect(self::normalizeSeatDaysListToShifts($daysList))
+            ->flatten(1)
+            ->values()
+            ->all();
+    }
+
+    /**
      * @param  list<string>|null  $onlyDayNames  If null, all weekdays. If empty array, returns no schema rows.
      */
     static public function daysListSchema(?array $onlyDayNames = null): array {
