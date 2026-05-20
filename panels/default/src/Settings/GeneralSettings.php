@@ -191,6 +191,53 @@ class GeneralSettings extends Settings {
     }
 
     /**
+     * Normalize seat days_list for display/API: supports flat day rows or nested shift arrays.
+     *
+     * @param  list<mixed>  $daysList
+     * @return list<list<array<string, mixed>>>
+     */
+    public static function normalizeSeatDaysListToShifts(array $daysList): array
+    {
+        $daysList = array_values($daysList);
+        if ($daysList === []) {
+            return [];
+        }
+
+        $first = $daysList[0];
+        if (! is_array($first)) {
+            return [];
+        }
+
+        if (array_key_exists('day_name', $first)) {
+            $active = array_values(array_filter(
+                $daysList,
+                fn ($day) => is_array($day) && ! empty($day['status'])
+            ));
+
+            return $active === [] ? [] : [$active];
+        }
+
+        $shifts = [];
+        foreach ($daysList as $shift) {
+            if (! is_array($shift)) {
+                continue;
+            }
+            if (array_key_exists('day_name', $shift)) {
+                $shift = [$shift];
+            }
+            $active = array_values(array_filter(
+                $shift,
+                fn ($day) => is_array($day) && ! empty($day['status'])
+            ));
+            if ($active !== []) {
+                $shifts[] = $active;
+            }
+        }
+
+        return $shifts;
+    }
+
+    /**
      * @param  list<string>|null  $onlyDayNames  If null, all weekdays. If empty array, returns no schema rows.
      */
     static public function daysListSchema(?array $onlyDayNames = null): array {

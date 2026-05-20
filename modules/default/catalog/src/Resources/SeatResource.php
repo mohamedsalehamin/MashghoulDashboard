@@ -277,21 +277,22 @@ class SeatResource extends Resource {
 
     public static function getWorkingDaysShift($record): array {
         $schema = [];
-        foreach ($record->meta_data['days_list'] ?? [] as $index => $slot) {
+        $shifts = GeneralSettings::normalizeSeatDaysListToShifts($record->meta_data['days_list'] ?? []);
 
-            $schema[] = RepeatableEntry::make('meta_data.days_list')
+        foreach ($shifts as $index => $shiftDays) {
+            $schema[] = RepeatableEntry::make('working_days_shift_' . $index)
                 ->label(__("sections.shift_no", ['no' => $index + 1]))
-                ->state(fn($record) => collect($slot)->where('status', true)->toArray())
-                ->statePath('meta_data.days_list.' . $index)
+                ->state($shiftDays)
                 ->schema([
                     TextEntry::make('day_name')
-                        ->formatStateUsing(fn($record, $state) => __("forms.fields.weekdays." . $state))
+                        ->formatStateUsing(fn ($state) => __("forms.fields.weekdays." . $state))
                         ->label(__("forms.fields.day_name")),
                     TextEntry::make('from'),
                     TextEntry::make('to'),
                 ])
                 ->columns(3);
         }
+
         return $schema;
     }
 

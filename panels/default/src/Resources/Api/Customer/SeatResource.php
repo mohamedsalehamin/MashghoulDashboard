@@ -2,6 +2,7 @@
 
 namespace App\DefaultPanel\Resources\Api\Customer;
 
+use App\DefaultPanel\Settings\GeneralSettings;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SeatResource extends JsonResource {
@@ -20,7 +21,9 @@ class SeatResource extends JsonResource {
                 'title' => $g->getTranslations('title')[app()->getLocale()],
             ])->values()->all(),
             'services' => ServiceResource::collection($services),
-            'working_days' => collect(WorkingTimeSlotsResource::collection(collect($this->meta_data['days_list'] ?? [])->map(fn($slot) => collect($slot)->where('status', 1))))->filter(fn($slot) => $slot->isNotEmpty())->values(),
+            'working_days' => WorkingTimeSlotsResource::collection(
+                GeneralSettings::normalizeSeatDaysListToShifts($this->meta_data['days_list'] ?? [])
+            ),
         ];
     }
 }
