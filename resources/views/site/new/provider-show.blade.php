@@ -231,7 +231,9 @@
                             $svcTitle = is_array($svc->title ?? null) ? ($svc->getTranslation('title', $locale) ?? '') : ($svc->title ?? '');
                             $svcDesc = is_array($svc->description ?? null) ? ($svc->getTranslation('description', $locale) ?? '') : ($svc->description ?? '');
                             $svcGroupId = $svc->pivot_service_group_id ?? $svc->pivot?->service_group_id ?? null;
-                            $basePrice = $svc->sale_price && $svc->sale_price->getAmount() > 0 ? $svc->sale_price : $svc->price;
+                            $basePrice = $svc->sale_price && $svc->sale_price->getAmount() > 0
+                                ? $svc->sale_price_include_taxes
+                                : $svc->price_include_taxes;
                             $priceFormatted = $basePrice->formatByDecimal();
                             $priceAmount = $basePrice->getAmount();
                             $products = $svc->products ?? collect();
@@ -269,7 +271,9 @@
                                     <div class="products-list px-3 pb-3">
                                         @foreach($products as $prod)
                                         @php
-                                            $prodPrice = $prod->sale_price && $prod->sale_price->getAmount() > 0 ? $prod->sale_price : $prod->price;
+                                            $prodPrice = $prod->sale_price && $prod->sale_price->getAmount() > 0
+                                                ? $prod->sale_price_include_taxes
+                                                : $prod->price_include_taxes;
                                             $prodPriceFormatted = $prodPrice->formatByDecimal();
                                             $prodPriceAmount = $prodPrice->getAmount();
                                         @endphp

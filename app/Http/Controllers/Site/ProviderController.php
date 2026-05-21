@@ -83,9 +83,11 @@ class ProviderController extends Controller
         $metaKeywords = $provider->getTranslation('meta_keywords', $locale) ?: '';
         $metaKeywords = is_array($metaKeywords) ? implode(', ', $metaKeywords) : (string) $metaKeywords;
 
-        $seats = $provider->seats->map(function ($seat) {
-            $services = $seat->services->map(function ($svc) {
+        $seats = $provider->seats->map(function ($seat) use ($provider) {
+            $services = $seat->services->map(function ($svc) use ($provider) {
+                $svc->setRelation('provider', $provider);
                 $svc->pivot_service_group_id = $svc->pivot?->service_group_id;
+                $svc->products->each(fn ($product) => $product->setRelation('service', $svc));
 
                 return $svc;
             });
