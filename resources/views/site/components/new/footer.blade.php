@@ -64,7 +64,12 @@
     </div>
     <div class="copyrights">
         <div class="container">
-            <div class="text-center">{{ __('site.heading.copyright') }} <span>Mashghoul</span> {{ date('Y') }}</div>
+            <div class="text-center">
+                {{ __('site.heading.copyright_rights') }} <span>Mashghoul</span> {{ date('Y') }}
+                |
+                {{ __('site.heading.made_with_love_at') }}
+                <a href="https://targetlines.com/" target="_blank" rel="noopener noreferrer">{{ __('site.heading.target_lines') }}</a>
+            </div>
         </div>
     </div>
 </footer>
