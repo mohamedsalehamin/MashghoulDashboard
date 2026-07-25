@@ -204,7 +204,7 @@ class SeatResource extends Resource {
                     ->searchable(false),
                 TextColumn::make('created_at')
                     ->label(__('forms.fields.created_at'))
-                    ->dateTime()
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
 
 

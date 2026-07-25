@@ -173,7 +173,7 @@ class CustomerResource extends Resource {
                     ->sortable()
                     ->label(__('forms.fields.reservations_totals'))
                     ->searchable(false),
-                TextColumn::make('created_at')->searchable()->date(),
+                TextColumn::make('created_at')->searchable()->date('d M Y'),
                 TextColumn::make('active')
                     ->label(__('forms.fields.status'))
                     ->formatStateUsing(fn($record) => $record->active->getLabel())

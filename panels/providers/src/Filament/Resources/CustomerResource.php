@@ -47,7 +47,7 @@ class CustomerResource extends Resource {
                     ->searchable(true, fn(Builder $query, $search) => $query->where('data->last_name', 'like', '%' . $search . '%')),
                 TextColumn::make('phone')
                     ->searchable(),
-                TextColumn::make('created_at')->searchable()->date(),
+                TextColumn::make('created_at')->searchable()->date('d M Y'),
 
 
             ])

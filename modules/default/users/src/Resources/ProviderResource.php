@@ -420,7 +420,7 @@ class ProviderResource extends Resource
                     ->searchable(),
                 TextColumn::make('provider.city.name')
                     ->searchable(),
-                TextColumn::make('created_at')->searchable()->date(),
+                TextColumn::make('created_at')->searchable()->date('d M Y'),
                 TextColumn::make('active')
                     ->label(__('forms.fields.status'))
                     ->formatStateUsing(fn ($record) => $record->active->getLabel())

@@ -82,10 +82,10 @@ class ReservationResource extends Resource {
                 TextColumn::make('from')->searchable(),
                 TextColumn::make('to')->searchable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('Y-m-d H:i')
                     ->searchable(),
                 TextColumn::make('date')
-                    ->date()
+                    ->date('d M Y')
                     ->searchable(),
                 TextColumn::make('price')
                     ->searchable(),

@@ -183,7 +183,7 @@ class ServiceResource extends Resource {
                 TextColumn::make('products_count')->counts("products")->searchable(false),
                 TextColumn::make('created_at')
                     ->label(__('forms.fields.created_at'))
-                    ->dateTime()
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
 
                 IconColumn::make('status')
